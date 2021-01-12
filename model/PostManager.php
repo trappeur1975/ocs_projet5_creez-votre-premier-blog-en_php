@@ -2,7 +2,7 @@
 
 namespace Ocs\Blog\Model;
 
-// use Ocs\Blog\Model\Manager;
+use Ocs\Blog\Model\Manager;
 use Ocs\Blog\entity\Post;
 
 require_once("model/Manager.php");
