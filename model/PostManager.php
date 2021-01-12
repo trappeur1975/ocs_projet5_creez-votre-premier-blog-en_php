@@ -2,7 +2,8 @@
 
 namespace Ocs\Blog\Model;
 
-use Post; //?????????????????
+// use Ocs\Blog\Model\Manager;
+use Ocs\Blog\entity\Post;
 
 require_once("model/Manager.php");
 require_once("entity/Post.php");

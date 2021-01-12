@@ -17,8 +17,6 @@
 
     <?php //teste hydratation
 
-    require_once('entity/Post.php');
-
     // attention ne pas mettre de $ devant les key de ce tableau
     $donnees = array(
         'id' => 56,
@@ -30,8 +28,8 @@
         'user_id' => 20
     );
 
-    $myPost = new Post($donnees);
-    var_dump($myPost);
+    // $myPost = new Post($donnees);
+    // var_dump($myPost);
     ?>
 
     <?php $content = ob_get_clean(); ?>

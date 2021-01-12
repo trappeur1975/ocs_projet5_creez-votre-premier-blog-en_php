@@ -1,4 +1,7 @@
 <?php
+
+namespace Ocs\Blog\entity;
+
 class Post
 {
     private $id,
