@@ -1,12 +1,11 @@
 <?php //va interroger la base de donnée pour recuperer des infos concernant la table post
-
 namespace Ocs\Blog\Model;
-
-use Ocs\Blog\Model\Manager;
-use Ocs\Blog\entity\Post;
 
 require_once("model/Manager.php");
 require_once("entity/Post.php");
+
+use Ocs\Blog\Model\Manager;
+use Ocs\Blog\entity\Post;
 
 // POUR COMPLETER CES FONCTION S APPUYER SUR LA DOC PDF "PROGRAMMEZ EN ORIENTE OBJET" PAGE 46 ET 47
 class PostManager extends Manager

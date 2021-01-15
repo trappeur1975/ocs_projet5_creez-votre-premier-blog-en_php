@@ -1,5 +1,4 @@
 <?php
-
 use \Ocs\Blog\Model\PostManager;
 
 require_once('model/PostManager.php');
