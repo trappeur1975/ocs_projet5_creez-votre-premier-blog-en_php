@@ -1,5 +1,5 @@
 <?php
-namespace Ocs\Blog\Model;
+namespace App\Model;
 
 /**
  * Manager

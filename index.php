@@ -1,5 +1,5 @@
 <?php //NOTRE ROUTEUR (indique au controller quel function lancer en fonction des paramétres (notamment ici "action") dans url de la page du site
-require('./controller/frontend.php');
+require('./App/controller/frontend.php');
 
 try { // On essaie de faire des choses
     if (isset($_GET['action'])) { // URL : http://localhost/ocs_projet5_creez-votre-premier-blog-en_php/?action=listPosts

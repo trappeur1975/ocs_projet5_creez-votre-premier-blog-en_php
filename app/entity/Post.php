@@ -1,6 +1,5 @@
 <?php
-
-namespace Ocs\Blog\entity;
+namespace App\Entity;
 
 /**
  * Post
