@@ -1,24 +1,76 @@
 <?php
+
 namespace Ocs\Blog\entity;
 
+/**
+ * Post
+ * generate a post
+ */
 class Post
 {
-    private $id,
-        $title,
-        $introduction,
-        $content,
-        $dateCreate,
-        $datechange,
-        $user_id;
 
-    public function __construct(array $donnees)
+    /**
+     * id
+     * @var integer $id id of the post
+     */
+    private $id; 
+
+    /**
+     * title 
+     *
+     * @var string $title title of the post
+     */
+    private $title;
+    
+    /**
+     * introduction
+     *
+     * @var string $introduction post introduction
+     */
+    private $introduction;
+    
+    /**
+     * content
+     *
+     * @var string $content content of the post
+     */
+    private $content;
+    
+    /**
+     * dateCreate
+     *
+     * @var datetime $dateCreate post creation date
+     */
+    private $dateCreate;
+    
+    /**
+     * datechange
+     *
+     * @var datetime $datechange post modification date
+     */
+    private $datechange;
+        
+    /**
+     * user_id
+     *
+     * @var integer $user_id  id of the user who created the post
+     */
+
+    public function __construct(array $data)
     {
-        $this->hydrate($donnees);
+        $this->hydrate($data);
     }
 
-    public function hydrate(array $donnees)
+    /**
+     * Method hydrate
+     *
+     * @param array $data content of the post
+     *
+     * @return void
+     */
+    public function hydrate(array $data)
     {
-        foreach ($donnees as $key => $value) {
+        foreach ($data as $key => $value) {
             $method = 'set' . ucfirst($key);
 
             if (method_exists($this, $method)) {
@@ -37,6 +89,7 @@ class Post
 
     /**
      * Set the value of id
+     * @param integer $id id of the post
      *
      * @return  self
      */
@@ -57,7 +110,8 @@ class Post
 
     /**
      * Set the value of title
-     *
+     * @param string $title title of the post
+     * 
      * @return  self
      */
     public function setTitle($title)
@@ -77,16 +131,15 @@ class Post
 
     /**
      * Set the value of introduction
-     *
+     * @param string $introduction post introduction
+     * 
      * @return  self
      */
     public function setIntroduction($introduction)
     {
         $this->introduction = $introduction;
-
         return $this;
     }
-
     /**
      * Get the value of content
      */
@@ -97,6 +150,7 @@ class Post
 
     /**
      * Set the value of content
+     * @param string $content content of the post
      *
      * @return  self
      */
@@ -117,6 +171,7 @@ class Post
 
     /**
      * Set the value of dateCreate
+     * @param datetime $dateCreate post creation date
      *
      * @return  self
      */
@@ -137,6 +192,7 @@ class Post
 
     /**
      * Set the value of datechange
+     * @param datetime $datechange post modification date
      *
      * @return  self
      */
@@ -157,6 +213,7 @@ class Post
 
     /**
      * Set the value of user_id
+     * @param integer $user_id id of the user who created the post
      *
      * @return  self
      */
