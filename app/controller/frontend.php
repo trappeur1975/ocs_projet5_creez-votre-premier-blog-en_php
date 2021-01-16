@@ -1,7 +1,7 @@
 <?php
 use App\Model\PostManager;
 
-require_once('app/model/PostManager.php');
+require_once('vendor/autoload.php');
 
 // URL : http://localhost/ocs_projet5_creez-votre-premier-blog-en_php/?action=post&id=1
 function post()

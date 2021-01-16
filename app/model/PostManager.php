@@ -1,8 +1,7 @@
 <?php //va interroger la base de donnée pour recuperer des infos concernant la table post
 namespace App\Model;
 
-require_once('./app/model/Manager.php');
-require_once('./app/entity/Post.php');
+require_once('vendor/autoload.php');
 
 use App\Entity\Post;
 
