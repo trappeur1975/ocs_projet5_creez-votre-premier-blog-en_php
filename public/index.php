@@ -33,24 +33,24 @@ $router = new AltoRouter();
     }
 
 // AltoRouter via using controller#action string
-    $router->map('GET', '/listposts', 'Backend#listPosts');
-    $router->map('GET', '/post/[i:id]', 'Backend#post');
+    // $router->map('GET', '/listposts', 'Backend#listPosts');
+    // $router->map('GET', '/post/[i:id]', 'Backend#post');
 
-    $match = $router->match();
-    if ($match === false) {
-        echo "// here you can handle 404 \n";
-    } else {
-        list($controller, $action) = explode('#', $match['target']);
-        $nomController = 'App\\Controller\\'.$controller; //OBLIGER DE FAIRE COMME CELA POUR INTEGRER LE NAMESPACE CAR AVEC LE USE CELA NE FONCTIONNE PAS ??
-        $myController = new $nomController(); 
-        if (is_callable(array($myController, $action))) {
-            call_user_func_array(array($myController, $action), array($match['params']));
-        } else {
-            echo 'Error: can not call ' . get_class($myController) . '#' . $action;
-            // here your routes are wrong.
-            // Throw an exception in debug, send a 500 error in production
-        }
-    }
+    // $match = $router->match();
+    // if ($match === false) {
+    //     echo "// here you can handle 404 \n";
+    // } else {
+    //     list($controller, $action) = explode('#', $match['target']);
+    //     $nomController = 'App\\Controller\\'.$controller; //OBLIGER DE FAIRE COMME CELA POUR INTEGRER LE NAMESPACE CAR AVEC LE USE CELA NE FONCTIONNE PAS ??
+    //     $myController = new $nomController(); 
+    //     if (is_callable(array($myController, $action))) {
+    //         call_user_func_array(array($myController, $action), array($match['params']));
+    //     } else {
+    //         echo 'Error: can not call ' . get_class($myController) . '#' . $action;
+    //         // here your routes are wrong.
+    //         // Throw an exception in debug, send a 500 error in production
+    //     }
+    // }
 
 // -----------------------------------
 
