@@ -18,7 +18,7 @@ class Backend
     // URL : http://localhost/ocs_projet5_creez-votre-premier-blog-en_php/?action=listPosts
     function listPosts()
     {
-        $postManager = new \App\Model\PostManager(); // Création d'un objet
+        $postManager = new PostManager(); // Création d'un objet
         $listPosts = $postManager->getListPosts(); // Appel d'une fonction de cet objet
     
         require('../app/view/frontend/listPostsView.php');

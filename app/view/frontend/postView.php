@@ -3,7 +3,7 @@
 <?php ob_start(); ?>
         
     <body>
-        <h1>Test mvc</h1>
+        <h1>Test post nico</h1>
         <p>THE POST:</p>
         <h2>tilte</h2>
         <?= $post->getTitle(); ?>

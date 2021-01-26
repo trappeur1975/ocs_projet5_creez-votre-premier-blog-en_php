@@ -3,7 +3,7 @@
 <?php ob_start(); ?>
 
 <body>
-    <h1>Test mvc</h1>
+    <h1>Test listpost nico</h1>
     <p>affichage des post:</p>
 
     <?php //boucle d'affichage des donnnees => ici les titres des posts

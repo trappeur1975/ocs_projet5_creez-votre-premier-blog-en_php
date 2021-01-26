@@ -8,7 +8,8 @@ function post($id)
     $postManager = new PostManager(); // Création de l'objet manger de post
     $post = $postManager->getPost($id);
 
-    require('../app/view/frontend/postView.php');
+    require('../app/view/frontend/postView.php'); //BON CHEMIN QUAND INDEX.PHP EST dans le dossier "public"
+    //require('app/view/frontend/postView.php'); // BON CHEMIN QUAND INDEX.PHP EST A LA RACINE DU PROJET
 }
 // URL : http://localhost/ocs_projet5_creez-votre-premier-blog-en_php/?action=post&id=1
 // function post()
@@ -23,8 +24,9 @@ function post($id)
 // URL : http://localhost/ocs_projet5_creez-votre-premier-blog-en_php/?action=listPosts
 function listPosts()
 {
-    $postManager = new \App\Model\PostManager(); // Création d'un objet
+    $postManager = new PostManager(); // Création d'un objet
     $listPosts = $postManager->getListPosts(); // Appel d'une fonction de cet objet
 
     require('../app/view/frontend/listPostsView.php');
+    // require('app/view/frontend/listPostsView.php');
 }

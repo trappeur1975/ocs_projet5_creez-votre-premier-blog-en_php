@@ -55,12 +55,13 @@ $router = new AltoRouter();
 // -----------------------------------
 
 // try { 
-//     if (isset($_GET['action'])) { // URL : http://localhost/ocs_projet5_creez-votre-premier-blog-en_php/?action=listPosts
+//     if (isset($_GET['action'])) { // URL : http://localhost:8000/?action=listPosts
 //         if ($_GET['action'] == 'listPosts') {
 //             listPosts();
-//         } elseif ($_GET['action'] == 'post') { // URL : http://localhost/ocs_projet5_creez-votre-premier-blog-en_php/?action=post&id=1
+//         } elseif ($_GET['action'] == 'post') { // URL : http://localhost:8000/?action=post&id=1
 //             if (isset($_GET['id']) && $_GET['id'] > 0) {
-//                 post();
+//                 // post();
+//                 post($_GET['id']);
 //             } else {
 //                 // Erreur ! On arrête tout, on envoie une exception, donc au saute directement au catch
 //                 throw new Exception('Aucun identifiant de billet envoyé');
@@ -68,21 +69,21 @@ $router = new AltoRouter();
 //         }
 
 //          // VOIR CI CE ELSE IF EST CORRECT POUR AJOUTER DES COMMENTAIRE A UN POST
-//          elseif ($_GET['action'] == 'addComment') {
-//              if (isset($_GET['id']) && $_GET['id'] > 0) {
-//                  if (!empty($_POST['author']) && !empty($_POST['comment'])) {
-//                      addComment($_GET['id'], $_POST['author'], $_POST['comment']);
-//                  }
-//                  else {
-//                      // Autre exception
-//                      throw new Exception('Tous les champs ne sont pas remplis !');
-//                  }
-//              }
-//              else {
-//                  // Autre exception
-//                  throw new Exception('Aucun identifiant de billet envoyé');
-//              }
-//          }
+//         //  elseif ($_GET['action'] == 'addComment') {
+//         //      if (isset($_GET['id']) && $_GET['id'] > 0) {
+//         //          if (!empty($_POST['author']) && !empty($_POST['comment'])) {
+//         //              addComment($_GET['id'], $_POST['author'], $_POST['comment']);
+//         //          }
+//         //          else {
+//         //              // Autre exception
+//         //              throw new Exception('Tous les champs ne sont pas remplis !');
+//         //          }
+//         //      }
+//         //      else {
+//         //          // Autre exception
+//         //          throw new Exception('Aucun identifiant de billet envoyé');
+//         //      }
+//         //  }
 
 //     } else {
 //         //  listPosts();
