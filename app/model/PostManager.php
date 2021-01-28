@@ -1,8 +1,6 @@
 <?php //va interroger la base de donnée pour recuperer des infos concernant la table post
 namespace App\Model;
 
-// require_once('../../vendor/autoload.php');
-
 use App\Entity\Post;
 
 // POUR COMPLETER CES FONCTION S APPUYER SUR LA DOC PDF "PROGRAMMEZ EN ORIENTE OBJET" PAGE 46 ET 47

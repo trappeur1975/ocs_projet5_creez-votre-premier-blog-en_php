@@ -1,8 +1,8 @@
 <?php //NOTRE ROUTEUR (indique au controller quel function lancer en fonction des paramétres (notamment ici "action") dans url de la page du site
 
-require('../vendor/altorouter/altorouter/AltoRouter.php');
-require('../App/controller/frontend.php');
 require_once('../vendor/autoload.php');
+require('../vendor/altorouter/altorouter/AltoRouter.php');
+require('../app/Controller/frontend.php');
 
 use App\Controller\Backend;
 
@@ -52,7 +52,7 @@ $router = new AltoRouter();
     //     }
     // }
 
-// -----------------------------------
+// --------------------- routeur initial --------------
 
 // try { 
 //     if (isset($_GET['action'])) { // URL : http://localhost:8000/?action=listPosts
@@ -87,7 +87,7 @@ $router = new AltoRouter();
 
 //     } else {
 //         //  listPosts();
-//         echo "salut internaute";
+//         echo "<h1> salut internaute</h1>";
 //     }
 // } catch (Exception $e) { // S'il y a eu une erreur, alors...
 //     echo 'Erreur : ' . $e->getMessage();
