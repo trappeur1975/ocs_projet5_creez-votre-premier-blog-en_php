@@ -4,11 +4,12 @@ require_once('../vendor/autoload.php');
 require('../vendor/altorouter/altorouter/AltoRouter.php');
 require('../app/Controller/frontend.php');
 
-use App\Controller\Backend;
+// use App\Controller\Backend;
 
 $router = new AltoRouter();
 
 // AltoRouter via des fonction anonyme
+try { 
     $router->map('GET', '/', function () {  // pour la route http://localhost:8000/
         echo 'salut nicolas';
     });
@@ -31,6 +32,9 @@ $router = new AltoRouter();
         // $match['target']();
         // $match['target']($match['params']);
     }
+} catch (Exception $e) { // S'il y a eu une erreur, alors...
+    echo 'Erreur : ' . $e->getMessage();
+}
 
 // AltoRouter via using controller#action string
     // $router->map('GET', '/listposts', 'Backend#listPosts');
