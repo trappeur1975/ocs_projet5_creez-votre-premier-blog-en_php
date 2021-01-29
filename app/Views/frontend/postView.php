@@ -1,3 +1,5 @@
+<?php //require('../vendor/altorouter/altorouter/AltoRouter.php');?>
+
 <?php $title = 'The Blog'; ?>
 
 <?php ob_start(); ?>
@@ -17,6 +19,11 @@
         <?= $post->getDatechange(); ?>
         <h2>User_id</h2>
         <?= $post->getUser_id(); ?>
+        
+        <!-- <a href="/listposts">listposts</a> -->
+        <a href="<?php //echo($router->generate('listposts')) ?>">My listposts</a>
+        <?php //$router->generate('listposts') ?>
+
  
     <p>FIN this POST</p>
 

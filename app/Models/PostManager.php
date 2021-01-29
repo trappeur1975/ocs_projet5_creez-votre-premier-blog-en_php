@@ -1,7 +1,7 @@
 <?php //va interroger la base de donnée pour recuperer des infos concernant la table post
-namespace App\Model;
+namespace App\Models;
 
-use App\Entity\Post;
+use App\Entities\Post;
 
 // POUR COMPLETER CES FONCTION S APPUYER SUR LA DOC PDF "PROGRAMMEZ EN ORIENTE OBJET" PAGE 46 ET 47
 

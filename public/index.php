@@ -1,98 +1,40 @@
-<?php //NOTRE ROUTEUR (indique au controller quel function lancer en fonction des paramétres (notamment ici "action") dans url de la page du site
+<?php //this file is our router based on the altoRouter library which uses anonymous functions to execute the controller functions according to the routes (url)
 
 require_once('../vendor/autoload.php');
 require('../vendor/altorouter/altorouter/AltoRouter.php');
-require('../app/Controller/frontend.php');
-
-// use App\Controller\Backend;
+require('../app/Controllers/frontend.php');
 
 $router = new AltoRouter();
 
-// AltoRouter via des fonction anonyme
+// routing
 try { 
-    $router->map('GET', '/', function () {  // pour la route http://localhost:8000/
+    
+
+    $router->map('GET', '/', function () {  // for the road  http://localhost:8000/
         echo 'salut nicolas';
     });
 
-    $router->map('GET', '/listposts', function (){  // pour la route http://localhost:8000/listposts
+    $router->map('GET', '/listposts', function (){  // for the road  http://localhost:8000/listposts
         listPosts();
-    });
+    }, 'listpots');
 
-    $router->map('GET', '/post/[i:id]', function ($id){  // pour la route http://localhost:8000/post/1 ou http://localhost:8000/post/2 ou ....
+    $router->map('GET', '/post/[i:id]', function ($id){  // for the road http://localhost:8000/post/1 ou http://localhost:8000/post/2 ou ....
         post($id);
-    });
+    }, 'blog');
+
     // $router->map('GET', '/post/[i:id]/[i:id]', function ($id, $nom){  // pour generer plusieur parametre dans une fonction avec la route http://localhost:8000/post/1/salut
     //     post($id, $nom);
     // });
 
-    $match = $router->match();
-    if($match !== null){
-        call_user_func_array($match['target'], $match['params']); //pour gerer les arguments appeller dans la closure
+    $match = $router->match(); // we check if a route exists in relation to url to call 
+    if($match !== false){
+        call_user_func_array($match['target'], $match['params']); // to manage the arguments called in the closure 
         // $match['target']($match['params']['id']);
         // $match['target']();
         // $match['target']($match['params']);
+    } else { //if no route matches we call a 404 page (here "erros.php") 
+        require_once('../app/Views/errors.php'); // pourquoi le chemin absolu (/app/View/errors.php)ne fonctionne pas
     }
-} catch (Exception $e) { // S'il y a eu une erreur, alors...
+} catch (Exception $e) {
     echo 'Erreur : ' . $e->getMessage();
 }
-
-// AltoRouter via using controller#action string
-    // $router->map('GET', '/listposts', 'Backend#listPosts');
-    // $router->map('GET', '/post/[i:id]', 'Backend#post');
-
-    // $match = $router->match();
-    // if ($match === false) {
-    //     echo "// here you can handle 404 \n";
-    // } else {
-    //     list($controller, $action) = explode('#', $match['target']);
-    //     $nomController = 'App\\Controller\\'.$controller; //OBLIGER DE FAIRE COMME CELA POUR INTEGRER LE NAMESPACE CAR AVEC LE USE CELA NE FONCTIONNE PAS ??
-    //     $myController = new $nomController(); 
-    //     if (is_callable(array($myController, $action))) {
-    //         call_user_func_array(array($myController, $action), array($match['params']));
-    //     } else {
-    //         echo 'Error: can not call ' . get_class($myController) . '#' . $action;
-    //         // here your routes are wrong.
-    //         // Throw an exception in debug, send a 500 error in production
-    //     }
-    // }
-
-// --------------------- routeur initial --------------
-
-// try { 
-//     if (isset($_GET['action'])) { // URL : http://localhost:8000/?action=listPosts
-//         if ($_GET['action'] == 'listPosts') {
-//             listPosts();
-//         } elseif ($_GET['action'] == 'post') { // URL : http://localhost:8000/?action=post&id=1
-//             if (isset($_GET['id']) && $_GET['id'] > 0) {
-//                 // post();
-//                 post($_GET['id']);
-//             } else {
-//                 // Erreur ! On arrête tout, on envoie une exception, donc au saute directement au catch
-//                 throw new Exception('Aucun identifiant de billet envoyé');
-//             }
-//         }
-
-//          // VOIR CI CE ELSE IF EST CORRECT POUR AJOUTER DES COMMENTAIRE A UN POST
-//         //  elseif ($_GET['action'] == 'addComment') {
-//         //      if (isset($_GET['id']) && $_GET['id'] > 0) {
-//         //          if (!empty($_POST['author']) && !empty($_POST['comment'])) {
-//         //              addComment($_GET['id'], $_POST['author'], $_POST['comment']);
-//         //          }
-//         //          else {
-//         //              // Autre exception
-//         //              throw new Exception('Tous les champs ne sont pas remplis !');
-//         //          }
-//         //      }
-//         //      else {
-//         //          // Autre exception
-//         //          throw new Exception('Aucun identifiant de billet envoyé');
-//         //      }
-//         //  }
-
-//     } else {
-//         //  listPosts();
-//         echo "<h1> salut internaute</h1>";
-//     }
-// } catch (Exception $e) { // S'il y a eu une erreur, alors...
-//     echo 'Erreur : ' . $e->getMessage();
-// }
