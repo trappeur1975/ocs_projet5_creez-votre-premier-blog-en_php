@@ -32,6 +32,7 @@ $router = new AltoRouter();
         // $match['target']($match['params']);
     }
 
+// ISSUE PROBLEME DE GESTION DES PARAMETRE EN UTILISANT LA METHODE CI DESSOUS DE ALTOROUTEUR
 // AltoRouter via using controller#action string
     // $router->map('GET', '/listposts', 'Backend#listPosts');
     // $router->map('GET', '/post/[i:id]', 'Backend#post');
