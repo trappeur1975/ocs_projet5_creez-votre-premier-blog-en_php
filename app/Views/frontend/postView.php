@@ -21,6 +21,7 @@
         <?= $post->getUser_id(); ?>
         
         <!-- <a href="/listposts">listposts</a> -->
+        <!-- ISSUE PROBLEME DE ROUTER -->
         <a href="<?php //echo($router->generate('listposts')) ?>">My listposts</a>
         <?php //$router->generate('listposts') ?>
 

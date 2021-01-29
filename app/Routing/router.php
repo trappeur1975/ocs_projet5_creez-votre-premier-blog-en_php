@@ -16,6 +16,7 @@ try {
         // $match['target']();
         // $match['target']($match['params']);
     } else { //if no route matches we call a 404 page (here "erros.php") 
+        // ISSUE PROBLEME DE CHEMIN
         require_once('../app/Views/errors.php'); // pourquoi le chemin absolu (/app/View/errors.php)ne fonctionne pas ?? toujours routage par rapport a index.php (sinon "../Views/errors.php" devrait fonctionner) ??
     }
 } catch (Exception $e) {
