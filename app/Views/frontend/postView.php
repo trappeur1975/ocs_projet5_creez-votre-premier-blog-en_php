@@ -8,17 +8,18 @@
         <h1>Test post nico</h1>
         <p>THE POST:</p>
         <h2>tilte</h2>
-        <?= $post->getTitle(); ?>
+        <?= nl2br(htmlentities($post->getTitle())); ?>
         <h2>introduction</h2>
-        <?= $post->getIntroduction(); ?>
+        <?= nl2br(htmlentities($post->getIntroduction())); ?>  <!-- note perso mettre se formattage dans la class post a cette fonction -->
         <h2>content</h2>
-        <?= $post->getContent(); ?>
+        <?= nl2br(htmlentities($post->getContent())); ?> <!-- note perso mettre se formattage dans la class post a cette fonction -->
         <h2>DateCreate</h2>
-        <?= $post->getDateCreate(); ?>
+        <?= htmlentities($post->getDateCreate()); ?>
         <h2>Datechange</h2>
-        <?= $post->getDatechange(); ?>
+        <?= htmlentities($post->getDatechange()); ?>
         <h2>User_id</h2>
-        <?= $post->getUser_id(); ?>
+        <?= htmlentities($post->getUser_id()); ?> -->
+        <!-- <?php dump($post); ?> -->
         
         <!-- <a href="/listposts">listposts</a> -->
         <a href="<?php //echo($router->generate('listposts')) ?>">My listposts</a>

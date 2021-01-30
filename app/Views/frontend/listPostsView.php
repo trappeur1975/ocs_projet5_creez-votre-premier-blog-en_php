@@ -13,7 +13,6 @@ ob_start();
     foreach ($listPosts as $post) {
         echo htmlentities($post->getTitle()) . '</br>'; // ici on affiche que les titres
     }
-
     ?>
 
     <p>this finish3</p>

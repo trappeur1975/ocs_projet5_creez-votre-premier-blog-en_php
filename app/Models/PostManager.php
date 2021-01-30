@@ -3,6 +3,7 @@ namespace App\Models;
 
 use PDO;
 use App\Entities\Post;
+use Exception;
 
 // POUR COMPLETER CES FONCTION S APPUYER SUR LA DOC PDF "PROGRAMMEZ EN ORIENTE OBJET" PAGE 46 ET 47
 
@@ -22,8 +23,8 @@ class PostManager extends Manager
     public function getListPosts()
     {
         $db = $this->dbConnect();    
-        $req = $db->query('SELECT * FROM post');
-        $listPosts = $req ->fetchAll(PDO::FETCH_CLASS, Post::class); // methode grafikart
+        $query = $db->query('SELECT * FROM post');
+        $listPosts = $query ->fetchAll(PDO::FETCH_CLASS, Post::class); // methode grafikart
         return $listPosts;
     }
 
@@ -36,11 +37,16 @@ class PostManager extends Manager
      */
     public function getPost($id)
     {
-        $db = $this->dbConnect();
         $id = (int) $id;
-        $req = $db->query('SELECT * FROM post WHERE id = ' . $id);
-        $data = $req->fetch(\PDO::FETCH_ASSOC);
-        return new Post($data);
+        $db = $this->dbConnect();
+        $query = $db->prepare('SELECT * FROM post WHERE id = :id');
+        $query->execute(['id' => $id]);
+        $query->setFetchMode(PDO::FETCH_CLASS, Post::class);
+        $post = $query->fetch(); // methode grafikart
+        if($post === false){
+            throw new Exception('aucun post ne correspond a cet ID');
+        }
+        return $post;
     }
 
 

@@ -1,6 +1,8 @@
 <?php
 namespace App\Models;
 
+use PDO;
+
 /**
  * Manager
  * 
@@ -15,10 +17,10 @@ class Manager // connection a la base de donnee
      * 
      * @return PDO connection to the database
      */
-    protected function dbConnect()
+    protected function dbConnect() : PDO
     {
         // NE PAS OUBLIER "charset=utf8" POUR REGLER LES PROBLEME D ENCODAGE
-        $db = new \PDO('mysql:host=localhost;dbname=p5_ocs_blog_php; charset=utf8', 'root', '');
+        $db = new PDO('mysql:host=localhost;dbname=p5_ocs_blog_php; charset=utf8', 'root', '');
         return $db;
     }
 }
