@@ -1,6 +1,17 @@
 <?php
 use App\Models\PostManager;
 
+/**
+ * function use for route http: // localhost: 8000 / listposts
+ * will display the view listPostsView.php  
+ */
+function listPosts()
+{
+    $postManager = new PostManager();
+    $listPosts = $postManager->getListPosts(); // $listPosts sera utiliser dans listPostsView.php dans la boucle foreach
+    require('../app/Views/frontend/listPostsView.php');
+}
+
 function post($id)
 {
     $postManager = new PostManager(); // Création de l'objet manger de post
@@ -18,12 +29,3 @@ function post($id)
 //     require('../app/Views/frontend/postView.php');
 // }
 
-// A MODIFIER POUR GERER L HYDRATATION
-// URL : http://localhost/ocs_projet5_creez-votre-premier-blog-en_php/?action=listPosts
-function listPosts()
-{
-    $postManager = new PostManager(); // Création d'un objet
-    $listPosts = $postManager->getListPosts(); // Appel d'une fonction de cet objet
-
-    require('../app/Views/frontend/listPostsView.php');
-}

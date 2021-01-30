@@ -1,6 +1,7 @@
 <?php //va interroger la base de donnée pour recuperer des infos concernant la table post
 namespace App\Models;
 
+use PDO;
 use App\Entities\Post;
 
 // POUR COMPLETER CES FONCTION S APPUYER SUR LA DOC PDF "PROGRAMMEZ EN ORIENTE OBJET" PAGE 46 ET 47
@@ -12,6 +13,20 @@ use App\Entities\Post;
  */
 class PostManager extends Manager
 {
+        
+    /**
+     * Method getListPosts which returns the list of Post (as an object of type Post) 
+     *
+     * @return Post[] 
+     */
+    public function getListPosts()
+    {
+        $db = $this->dbConnect();    
+        $req = $db->query('SELECT * FROM post');
+        $listPosts = $req ->fetchAll(PDO::FETCH_CLASS, Post::class); // methode grafikart
+        return $listPosts;
+    }
+
     /**
      * Method getPost
      *
@@ -28,17 +43,7 @@ class PostManager extends Manager
         return new Post($data);
     }
 
-    // recupére toute (la liste) des posts present en base de donnee et la retourne
-    public function getListPosts()
-    {
-        $db = $this->dbConnect();
 
-        // On effectue la requete
-        $req = $db->query('SELECT * FROM post');
-
-        // on return la requete
-        return $req;
-    }
 
     // ajoute le post (en attribut de cette fonction) a la table post en bdd
     public function addPost(Post $post)

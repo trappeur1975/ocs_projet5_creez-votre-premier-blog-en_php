@@ -8,6 +8,18 @@ ocs_projet5_creez-votre-premier-blog-en_php
 6- Relire son code à votre mentor (code proposé dans la ou les pull requests), et une fois validée(s) mergez la ou les pull requests dans la branche principale.
 7- Valider la qualité du code via SymfonyInsight ou Codacy.
 
+
+Ce code c'est inspiré des tutorielles suivants :
+https://openclassrooms.com/fr/courses/4670706-adoptez-une-architecture-mvc-en-php
+https://grafikart.fr/formations/php
+https://openclassrooms.com/fr/courses/1665806-programmez-en-oriente-objet-en-php
+
+----------------- lien utile pour le developpement ----------------
+1) php doc 
+https://docs.phpdoc.org/3.0/guide/references/phpdoc/tags/index.html
+https://docs.phpdoc.org/3.0/guide/guides/types.html
+
+
 ----------------- librairie utiliser via composer ----------------
 1) autoload
 un autoloader
@@ -25,6 +37,7 @@ https://packagist.org/packages/symfony/var-dumper
 
 pour la documentation : https://symfony.com/doc/current/components/var_dumper.html
 
+commande pour executer var-dumper : "dump($someVar);"
 
 ----------------- infos site ----------------
 pour lancer le serveur php via la console avec pour dossier racine "public" executer la commande suivante:

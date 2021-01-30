@@ -54,34 +54,35 @@ class Post
      *
      * @var integer $user_id  id of the user who created the post
      */
+    private $user_id;
 
-    public function __construct(array $data)
-    {
-        $this->hydrate($data);
-    }
+    // public function __construct(array $data)
+    // {
+    //     $this->hydrate($data);
+    // }
 
-    /**
-     * Method hydrate
-     *
-     * @param array $data content of the post
-     *
-     * @return void
-     */
-    public function hydrate(array $data)
-    {
-        foreach ($data as $key => $value) {
-            $method = 'set' . ucfirst($key);
+    // /**
+    //  * Method hydrate
+    //  *
+    //  * @param array $data content of the post
+    //  *
+    //  * @return void
+    //  */
+    // public function hydrate(array $data)
+    // {
+    //     foreach ($data as $key => $value) {
+    //         $method = 'set' . ucfirst($key);
 
-            if (method_exists($this, $method)) {
-                $this->$method($value);
-            }
-        }
-    }
+    //         if (method_exists($this, $method)) {
+    //             $this->$method($value);
+    //         }
+    //     }
+    // }
 
     /**
      * Get the value of id
      */
-    public function getId()
+    public function getId() : ?int
     {
         return $this->id;
     }
@@ -92,7 +93,7 @@ class Post
      *
      * @return  self
      */
-    public function setId($id)
+    public function setId(int $id) : self
     {
         $this->id = $id;
 
@@ -102,7 +103,7 @@ class Post
     /**
      * Get the value of title
      */
-    public function getTitle()
+    public function getTitle() : ?string
     {
         return $this->title;
     }
@@ -113,7 +114,7 @@ class Post
      * 
      * @return  self
      */
-    public function setTitle($title)
+    public function setTitle(string $title) : self
     {
         $this->title = $title;
 
@@ -123,7 +124,7 @@ class Post
     /**
      * Get the value of introduction
      */
-    public function getIntroduction()
+    public function getIntroduction() : ?string
     {
         return $this->introduction;
     }
@@ -134,7 +135,7 @@ class Post
      * 
      * @return  self
      */
-    public function setIntroduction($introduction)
+    public function setIntroduction(string $introduction) : self
     {
         $this->introduction = $introduction;
         return $this;
@@ -142,7 +143,7 @@ class Post
     /**
      * Get the value of content
      */
-    public function getContent()
+    public function getContent() : ?string
     {
         return $this->content;
     }
@@ -153,7 +154,7 @@ class Post
      *
      * @return  self
      */
-    public function setContent($content)
+    public function setContent(string $content) : self
     {
         $this->content = $content;
 
@@ -174,7 +175,7 @@ class Post
      *
      * @return  self
      */
-    public function setDateCreate($dateCreate)
+    public function setDateCreate($dateCreate) : self
     {
         $this->dateCreate = $dateCreate;
 
@@ -195,7 +196,7 @@ class Post
      *
      * @return  self
      */
-    public function setDatechange($datechange)
+    public function setDatechange($datechange) : self
     {
         $this->datechange = $datechange;
 
@@ -205,7 +206,7 @@ class Post
     /**
      * Get the value of user_id
      */
-    public function getUser_id()
+    public function getUser_id() : ?int
     {
         return $this->user_id;
     }
@@ -216,7 +217,7 @@ class Post
      *
      * @return  self
      */
-    public function setUser_id($user_id)
+    public function setUser_id(int $user_id) : self
     {
         $this->user_id = $user_id;
 
