@@ -1,6 +1,7 @@
 {
     "name": "trappeur/ocs_projet5_creez-votre-premier-blog-en_php",
     "autoload": {
+        "files": ["app/globalFunctions.php"],
         "psr-4": {
             "App\\":"app/"
         }

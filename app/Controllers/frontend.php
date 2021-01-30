@@ -8,7 +8,12 @@ use App\Models\PostManager;
 function listPosts()
 {
     $postManager = new PostManager();
-    $listPosts = $postManager->getListPosts(); // $listPosts sera utiliser dans listPostsView.php dans la boucle foreach
+    /**
+     * will be used in "listPostsView.php" in the foreach loop 
+     * 
+     * @ Post[] 
+     * */
+    $listPosts = $postManager->getListPosts();
     require('../app/Views/frontend/listPostsView.php');
 }
 

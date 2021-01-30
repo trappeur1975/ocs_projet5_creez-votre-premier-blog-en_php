@@ -9,35 +9,39 @@ ocs_projet5_creez-votre-premier-blog-en_php
 7- Valider la qualité du code via SymfonyInsight ou Codacy.
 
 
-Ce code c'est inspiré des tutorielles suivants :
-https://openclassrooms.com/fr/courses/4670706-adoptez-une-architecture-mvc-en-php
-https://grafikart.fr/formations/php
-https://openclassrooms.com/fr/courses/1665806-programmez-en-oriente-objet-en-php
+Ce code c'est inspiré fortement des tutorielles suivants :
+    https://openclassrooms.com/fr/courses/4670706-adoptez-une-architecture-mvc-en-php
+    https://grafikart.fr/formations/php
+    https://openclassrooms.com/fr/courses/1665806-programmez-en-oriente-objet-en-php
 
------------------ lien utile pour le developpement ----------------
+----------------- info utile pour le developpement ----------------
 1) php doc 
-https://docs.phpdoc.org/3.0/guide/references/phpdoc/tags/index.html
-https://docs.phpdoc.org/3.0/guide/guides/types.html
+    https://docs.phpdoc.org/3.0/guide/references/phpdoc/tags/index.html
+    https://docs.phpdoc.org/3.0/guide/guides/types.html
 
+2) composer
+    lien librairies pour composer : https://packagist.org/
+    commande pour relancer l autoloader : composer dump-autoload
+    commande pour supprimer un package composer remove vendor/package
 
 ----------------- librairie utiliser via composer ----------------
 1) autoload
-un autoloader
+    un autoloader
 
 2) AltoRouter
-un routeur
+    un routeur
 
-https://packagist.org/packages/altorouter/altorouter
+    https://packagist.org/packages/altorouter/altorouter
 
-pour la documentation de la librairie AltoRouter aller sur : http://altorouter.com/ ou https://packagist.org/packages/altorouter/altorouter
+    pour la documentation de la librairie AltoRouter aller sur : http://altorouter.com/ ou https://packagist.org/packages/altorouter/altorouter
 
 3) var-dumper (juste pour le developpement)
 
-https://packagist.org/packages/symfony/var-dumper
+    https://packagist.org/packages/symfony/var-dumper
 
-pour la documentation : https://symfony.com/doc/current/components/var_dumper.html
+    pour la documentation : https://symfony.com/doc/current/components/var_dumper.html
 
-commande pour executer var-dumper : "dump($someVar);"
+    commande pour executer var-dumper : "dump($someVar);"
 
 ----------------- infos site ----------------
 pour lancer le serveur php via la console avec pour dossier racine "public" executer la commande suivante:

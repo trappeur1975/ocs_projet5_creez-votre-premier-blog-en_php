@@ -1,6 +1,6 @@
 <?php //require('../vendor/altorouter/altorouter/AltoRouter.php');?>
 
-<?php $title = 'The Blog'; ?>
+
 
 <?php ob_start(); ?>
         
@@ -8,18 +8,17 @@
         <h1>Test post nico</h1>
         <p>THE POST:</p>
         <h2>tilte</h2>
-        <?= nl2br(htmlentities($post->getTitle())); ?>
+        <?= $title = formatHtml($post->getTitle()); ?> <!-- we display here the title of the post but also to integrate this title in the browser tab by putting this title in the variable $ title  -->
         <h2>introduction</h2>
-        <?= nl2br(htmlentities($post->getIntroduction())); ?>  <!-- note perso mettre se formattage dans la class post a cette fonction -->
+        <?= formatHtml($post->getIntroduction()); ?> 
         <h2>content</h2>
-        <?= nl2br(htmlentities($post->getContent())); ?> <!-- note perso mettre se formattage dans la class post a cette fonction -->
+        <?= formatHtml($post->getContent()); ?>
         <h2>DateCreate</h2>
         <?= htmlentities($post->getDateCreate()); ?>
         <h2>Datechange</h2>
         <?= htmlentities($post->getDatechange()); ?>
         <h2>User_id</h2>
-        <?= htmlentities($post->getUser_id()); ?> -->
-        <!-- <?php dump($post); ?> -->
+        <?= htmlentities($post->getUser_id()); ?>
         
         <!-- <a href="/listposts">listposts</a> -->
         <a href="<?php //echo($router->generate('listposts')) ?>">My listposts</a>
