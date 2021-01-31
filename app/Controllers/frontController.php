@@ -2,7 +2,18 @@
 use App\Models\PostManager;
 
 /**
- * function use for route http: // localhost: 8000 / listposts
+ * function use for route http://localhost:8000
+ * will display the view home.php  
+ */
+function home()
+{
+    // $postManager = new PostManager();
+    // $listPosts = $postManager->getListPosts();
+    require('../app/Views/frontViews/homeView.php');
+}
+
+/**
+ * function use for route http://localhost:8000/listposts
  * will display the view listPostsView.php  
  */
 function listPosts()

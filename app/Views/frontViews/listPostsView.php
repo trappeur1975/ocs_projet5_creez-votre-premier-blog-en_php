@@ -1,24 +1,20 @@
 <?php
-$title = 'The Blog';
-
+$title = 'liste des posts';
 ob_start(); 
 ?>
-
-<body>
     <h1>Test listpost nico</h1>
-    <p>affichage des post:</p>
+        <p>affichage des post:</p>
 
-    <?php
-    // methode grafikart
-    foreach ($listPosts as $post) {
-        echo htmlentities($post->getTitle()) . '</br>'; // ici on affiche que les titres
-    }
-    ?>
+        <?php
+        // methode grafikart
+        foreach ($listPosts as $post) {
+            echo htmlentities($post->getTitle()) . '</br>'; // ici on affiche que les titres
+        }
+        ?>
 
-    <p>this finish3</p>
+        <p>this finish3</p>
 
 <?php 
 $content = ob_get_clean();
-
-require('template.php'); 
+require('../app/Views/template.php'); 
 ?>

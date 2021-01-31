@@ -1,6 +1,6 @@
 <?php //here are defined the routes of the website front part. the routing is defined by the router of the AltoRouteur library which uses a mapping between url requested by the Internet user and an anonymous function which calls the functions defined in the files of the "Controllers" folder. 
 $router->map('GET', '/', function () {  // for the road  http://localhost:8000/
-    echo 'salut nicolas'; //DEVRA AFFICHER MA PAGE D ACCUEIL "HOME" A FAIRE PLUS TARD
+    home();
 });
 
 $router->map('GET', '/listposts', function (){  // for the road  http://localhost:8000/listposts

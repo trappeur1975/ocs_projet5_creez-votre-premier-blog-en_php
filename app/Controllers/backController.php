@@ -2,8 +2,8 @@
 // use App\Models\PostManager;
 
 /**
- * function use for route http: // localhost: 8000 / listposts
- * will display the view listPostsView.php  
+ * function use for route http://localhost:8000/backend
+ * will display the view backendView.php  
  */
 function backend()
 {
