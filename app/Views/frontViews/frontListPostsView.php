@@ -1,5 +1,5 @@
 <?php
-$title = 'liste des posts';
+$title = 'Liste des posts';
 ob_start(); 
 ?>
     <h1>Test listpost nico</h1>
@@ -8,7 +8,7 @@ ob_start();
         <?php
         // methode grafikart
         foreach ($listPosts as $post) {
-            echo htmlentities($post->getTitle()) . '</br>'; // ici on affiche que les titres
+            echo formatHtml($post->getTitle()) . '</br>'; // ici on affiche que les titres
         }
         ?>
 

@@ -35,6 +35,11 @@ Ce code c'est inspiré fortement des tutorielles suivants :
 
     pour la documentation de la librairie AltoRouter aller sur : http://altorouter.com/ ou https://packagist.org/packages/altorouter/altorouter
 
+    exemple de mapping de route avec altoruter:
+        $router->map('GET', '/post/[i:id]/[i:id]', function ($id, $nom){  // pour generer plusieur parametre dans une fonction avec la route http://localhost:8000/post/1/salut
+            post($id, $nom);
+        });
+
 3) var-dumper (juste pour le developpement)
 
     https://packagist.org/packages/symfony/var-dumper

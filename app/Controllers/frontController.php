@@ -2,19 +2,19 @@
 use App\Models\PostManager;
 
 /**
- * function use for route http://localhost:8000
- * will display the view home.php  
+ * function use for road http://localhost:8000
+ * will display the view frontHomeView.php  
  */
-function home()
+function frontHome()
 {
     // $postManager = new PostManager();
     // $listPosts = $postManager->getListPosts();
-    require('../app/Views/frontViews/homeView.php');
+    require('../app/Views/frontViews/frontHomeView.php');
 }
 
 /**
- * function use for route http://localhost:8000/listposts
- * will display the view listPostsView.php  
+ * function use for road http://localhost:8000/listposts
+ * will display the view frontListPostsView.php  
  */
 function listPosts()
 {
@@ -25,23 +25,16 @@ function listPosts()
      * @ Post[] 
      * */
     $listPosts = $postManager->getListPosts();
-    require('../app/Views/frontViews/listPostsView.php');
+    require('../app/Views/frontViews/frontListPostsView.php');
 }
 
+/**
+ * function use for road http://localhost:8000/post/1 ou http://localhost:8000/post/2 ou ....
+ * will display the view frontPostView.php  
+ */
 function post($id)
 {
     $postManager = new PostManager(); // Création de l'objet manger de post
     $post = $postManager->getPost($id);
-
-    require('../app/Views/frontViews/postView.php'); //BON CHEMIN QUAND INDEX.PHP EST dans le dossier "public"
-    //require('app/views/frontViews/postView.php'); // BON CHEMIN QUAND INDEX.PHP EST A LA RACINE DU PROJET
+    require('../app/Views/frontViews/frontPostView.php'); //BON CHEMIN QUAND INDEX.PHP EST dans le dossier "public"
 }
-// URL : http://localhost/ocs_projet5_creez-votre-premier-blog-en_php/?action=post&id=1
-// function post()
-// {
-//     $postManager = new PostManager(); // Création de l'objet manger de post
-//     $post = $postManager->getPost($_GET["id"]);
-
-//     require('../app/Views/frontViews/postView.php');
-// }
-
