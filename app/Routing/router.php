@@ -6,6 +6,7 @@ $router = new AltoRouter();
 try { 
     
     require('frontRoads.php');
+    require('backRoads.php');
     
     //ici il faudra require le fichier backRoads.php qui definira les routeur pour l administration du site
 

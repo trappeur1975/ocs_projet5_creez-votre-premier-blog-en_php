@@ -14,7 +14,7 @@ function listPosts()
      * @ Post[] 
      * */
     $listPosts = $postManager->getListPosts();
-    require('../app/Views/frontend/listPostsView.php');
+    require('../app/Views/frontViews/listPostsView.php');
 }
 
 function post($id)
@@ -22,8 +22,8 @@ function post($id)
     $postManager = new PostManager(); // Création de l'objet manger de post
     $post = $postManager->getPost($id);
 
-    require('../app/Views/frontend/postView.php'); //BON CHEMIN QUAND INDEX.PHP EST dans le dossier "public"
-    //require('app/views/frontend/postView.php'); // BON CHEMIN QUAND INDEX.PHP EST A LA RACINE DU PROJET
+    require('../app/Views/frontViews/postView.php'); //BON CHEMIN QUAND INDEX.PHP EST dans le dossier "public"
+    //require('app/views/frontViews/postView.php'); // BON CHEMIN QUAND INDEX.PHP EST A LA RACINE DU PROJET
 }
 // URL : http://localhost/ocs_projet5_creez-votre-premier-blog-en_php/?action=post&id=1
 // function post()
@@ -31,6 +31,6 @@ function post($id)
 //     $postManager = new PostManager(); // Création de l'objet manger de post
 //     $post = $postManager->getPost($_GET["id"]);
 
-//     require('../app/Views/frontend/postView.php');
+//     require('../app/Views/frontViews/postView.php');
 // }
 

@@ -49,20 +49,57 @@ class PostManager extends Manager
         return $post;
     }
 
-
+// --------------------------------------------------------------------------------------
 
     // ajoute le post (en attribut de cette fonction) a la table post en bdd
     public function addPost(Post $post)
     {
-    }
-
-    // supprime le post (en attribut de cette fonction) a la table post en bdd
-    public function deletePost(Post $post)
-    {
+        $db = $this->dbConnect();
+        $query = $db->prepare('INSERT INTO post (title,
+                                                introduction,
+                                                content,
+                                                dateCreate,
+                                                dateChange,
+                                                userid) 
+                                                VALUE (:title,
+                                                :introduction,
+                                                :content,
+                                                :dateCreate,
+                                                :dateChange,
+                                                :userid)');
+        $query->execute(['title' => $post->getTitle(),
+                        'introduction' => $post->getIntroduction(),
+                        'content' => $post->getContent(),
+                        'dateCreate' => $post->getDateCreate(),
+                        'dateChange' => $post->getDatechange(),
+                        'user_id' => $post->getUser_id()]);
     }
 
     // mise a jour du post (en attribut de cette fonction) dans la table post en bdd
     public function updatePost(Post $post)
     {
+        $db = $this->dbConnect();
+        $query = $db->prepare('UPDATE post SET title = :title,
+                                            SET introduction = :introduction,
+                                            SET content = :content,
+                                            SET dateCreate = :dateCreate,
+                                            SET dateChange = :dateChange,
+                                            SET userid = :userid
+                                WHERE id = :id');
+        $query->execute(['title' => $post->getTitle(),
+                        'introduction' => $post->getIntroduction(),
+                        'content' => $post->getContent(),
+                        'dateCreate' => $post->getDateCreate(),
+                        'dateChange' => $post->getDatechange(),
+                        'user_id' => $post->getUser_id(),
+                        'id' => $post->getId(),]);
     }
+
+    // supprime le post (en attribut de cette fonction) a la table post en bdd
+    public function deletePost(Post $post)
+    {
+        $db = $this->dbConnect();
+        $db ->exec('DELETE FROM post WHERE $post->getId()');
+    }
+
 }
