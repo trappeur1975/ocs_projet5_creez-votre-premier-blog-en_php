@@ -35,9 +35,16 @@ ob_start();
                     <a href="<?= '/backend/editPost/'. $post->getId()?>" class="btn btn-primary"> <!-- ISSUE faudra changer cela (ce qu il y a en php) avec l utilisation des nom de route -->
                         Editer
                     </a>
-                    <a href="<?= '/backend/deletePost/'. $post->getId()?>" class="btn btn-danger" onclick="return confirm('Souhaitez vous vraiment axecuter cette action?')"> <!-- ISSUE faudra changer cela (ce qu il y a en php) avec l utilisation des nom de route -->
-                        Supprimer
-                    </a>
+                    <!-- ISSUE faudra changer cela (ce qu il y a en php) avec l utilisation des nom de route -->
+                        <!-- si on utilise la methode "get -->
+                            <!-- <a href="<?= '/backend/deletePost/'. $post->getId()?>" class="btn btn-danger" onclick="return confirm('Souhaitez vous vraiment axecuter cette action?')">
+                                Supprimer
+                            </a> -->
+                        <!-- si on utilise la methode "post" -->
+                            <form action="<?= '/backend/deletePost/'. $post->getId()?>" methode="POST"
+                                onsubmit="return confirm('Souhaitez vous vraiment axecuter cette action?')">
+                                <button type="submit" class="btn btn-danger">Supprimer</button>
+                            </form>
                 </td>
             </tr>
             <?php endforeach ?>

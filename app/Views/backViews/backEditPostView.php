@@ -1,22 +1,32 @@
 <?php 
 $title = 'Edit post';
+$success = false;
 ob_start(); 
 ?>
 
+<?php //once the form has been sent
+    if(!empty($_POST)){
+        $post->setTitle($_POST['title']);
+        $postManager->updatePost($post);
+        $success = true;
+    }
+?>
+
+<?php if($success): ?>
+    <div class="alert alert-success">
+        Le post a bien été modifié.
+    </div>
+<?php endif ?>
+
 <h1>Edit le post id: <?= $post->getId() ?></h1>
-    <p>THE POST:</p>
-    <h2>tilte</h2>
-    <?= $title = formatHtml($post->getTitle()); ?> <!-- we display here the title of the post but also to integrate this title in the browser tab by putting this title in the variable $ title  -->
-    <h2>introduction</h2>
-    <?= formatHtml($post->getIntroduction()); ?> 
-    <h2>content</h2>
-    <?= formatHtml($post->getContent()); ?>
-    <h2>DateCreate</h2>
-    <?= htmlentities($post->getDateCreate()); ?>
-    <h2>Datechange</h2>
-    <?= htmlentities($post->getDatechange()); ?>
-    <h2>User_id</h2>
-    <?= htmlentities($post->getUser_id()); ?>
+ <form action="" method="post">
+    <div class="form-group">
+        <label for="title">Titre</label>
+        <input type="text" class="form-control" name="title" value="<?= formatHtml($post->getTitle()); ?>">
+    </div>
+    
+    <button class="btn btn-primary">Modifier</button>
+ </form>
 
 <?php 
 $content = ob_get_clean(); 

@@ -48,6 +48,19 @@ class PostManager extends Manager
         return $post;
     }
 
+    // supprime le post (en attribut de cette fonction) a la table post en bdd
+    // public function deletePost(Post $post)
+    public function deletePost(int $id) : void
+    {
+        $db = $this->dbConnect();
+        $query = $db->prepare('DELETE FROM post WHERE id = :id');
+        $result = $query->execute(['id' => $id]);
+        if($result === false){
+            throw new Exception('impossible de supprimer le post :'.$id.'peut être il n\'existe pas');
+        }
+    }
+
+
 // --------------------------------------------------------------------------------------
 
     // ajoute le post (en attribut de cette fonction) a la table post en bdd
@@ -75,36 +88,36 @@ class PostManager extends Manager
     }
 
     // mise a jour du post (en attribut de cette fonction) dans la table post en bdd
-    public function updatePost(Post $post)
+    public function updatePost(Post $post): void
     {
         $db = $this->dbConnect();
-        $query = $db->prepare('UPDATE post SET title = :title,
-                                            SET introduction = :introduction,
-                                            SET content = :content,
-                                            SET dateCreate = :dateCreate,
-                                            SET dateChange = :dateChange,
-                                            SET userid = :userid
-                                WHERE id = :id');
-        $query->execute(['title' => $post->getTitle(),
-                        'introduction' => $post->getIntroduction(),
-                        'content' => $post->getContent(),
-                        'dateCreate' => $post->getDateCreate(),
-                        'dateChange' => $post->getDatechange(),
-                        'user_id' => $post->getUser_id(),
-                        'id' => $post->getId(),]);
+        $query = $db->prepare('UPDATE post SET title = :title WHERE id = :id');
+        $result = $query->execute([
+            'id' => $post->getId(),
+            'title' => $post->getTitle()
+            ]);
+        if($result === false){
+            throw new Exception('impossible de modifier le post'.$post->getTitle());
+        }
     }
 
-    // supprime le post (en attribut de cette fonction) a la table post en bdd
-    // public function deletePost(Post $post)
-    public function deletePost(int $id)
-    {
-        $id = $id;
-        $db = $this->dbConnect();
-        // $query = $db->prepare('DELETE FROM post WHERE id = :id');
-        // $result = $query->execute(['id' => $id]);
-        // if($result === false){
-        //     throw new Exception('impossible de supprimer le post :'.$id.'peut être il n\'existe pas');
-        // }
-    }
+    // public function updatePost(Post $post): void
+    // {
+    //     $db = $this->dbConnect();
+    //     $query = $db->prepare('UPDATE post SET title = :title,
+    //                                         SET introduction = :introduction,
+    //                                         SET content = :content,
+    //                                         SET dateCreate = :dateCreate,
+    //                                         SET dateChange = :dateChange,
+    //                                         SET userid = :userid
+    //                             WHERE id = :id');
+    //     $query->execute(['title' => $post->getTitle(),
+    //                     'introduction' => $post->getIntroduction(),
+    //                     'content' => $post->getContent(),
+    //                     'dateCreate' => $post->getDateCreate(),
+    //                     'dateChange' => $post->getDatechange(),
+    //                     'user_id' => $post->getUser_id(),
+    //                     'id' => $post->getId(),]);
+    // }
 
 }

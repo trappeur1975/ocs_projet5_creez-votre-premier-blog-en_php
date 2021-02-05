@@ -9,9 +9,12 @@ $router->map('GET', '/backend/adminPosts', function (){  // for the road  http:/
 });
 
 //function to edit a post
-$router->map('GET', '/backend/editPost/[i:id]', function ($id){  // for the road http://localhost:8000/backend/editPost/1 ou http://localhost:8000/backend/editPost/2 ou ....
+$router->map('POST|GET', '/backend/editPost/[i:id]', function ($id){  // for the road http://localhost:8000/backend/editPost/1 ou http://localhost:8000/backend/editPost/2 ou ....
     editPost($id);
 });
+// $router->map('GET', '/backend/editPost/[i:id]', function ($id){  // for the road http://localhost:8000/backend/editPost/1 ou http://localhost:8000/backend/editPost/2 ou ....
+//     editPost($id);
+// });
 
 //function to create a post
 $router->map('GET', '/backend/createPost', function (){  // for the road http://localhost:8000/backend/createPost
@@ -19,6 +22,9 @@ $router->map('GET', '/backend/createPost', function (){  // for the road http://
 });
 
 //function to delete a post
-$router->map('GET', '/backend/deletePost/[i:id]', function ($id){  // for the road http://localhost:8000/backend/deletePost/1 ou http://localhost:8000/backend/deletePost/2 ou ....
+$router->map('POST|GET', '/backend/deletePost/[i:id]', function ($id){  // for the road http://localhost:8000/backend/deletePost/1 ou http://localhost:8000/backend/deletePost/2 ou ....
     deletePost($id);
 });
+// $router->map('GET', '/backend/deletePost/[i:id]', function ($id){  // for the road http://localhost:8000/backend/deletePost/1 ou http://localhost:8000/backend/deletePost/2 ou ....
+//     deletePost($id);
+// });
