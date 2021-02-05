@@ -35,9 +35,8 @@ class PostManager extends Manager
      *
      * @return Post the content of the post
      */
-    public function getPost($id)
+    public function getPost(int $id)
     {
-        $id = (int) $id;
         $db = $this->dbConnect();
         $query = $db->prepare('SELECT * FROM post WHERE id = :id');
         $query->execute(['id' => $id]);
@@ -96,10 +95,16 @@ class PostManager extends Manager
     }
 
     // supprime le post (en attribut de cette fonction) a la table post en bdd
-    public function deletePost(Post $post)
+    // public function deletePost(Post $post)
+    public function deletePost(int $id)
     {
+        $id = $id;
         $db = $this->dbConnect();
-        $db ->exec('DELETE FROM post WHERE $post->getId()');
+        // $query = $db->prepare('DELETE FROM post WHERE id = :id');
+        // $result = $query->execute(['id' => $id]);
+        // if($result === false){
+        //     throw new Exception('impossible de supprimer le post :'.$id.'peut être il n\'existe pas');
+        // }
     }
 
 }

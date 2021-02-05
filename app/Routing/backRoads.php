@@ -14,6 +14,11 @@ $router->map('GET', '/backend/editPost/[i:id]', function ($id){  // for the road
 });
 
 //function to create a post
-$router->map('GET', '/backend/createPost', function ($id){  // for the road http://localhost:8000/backend/createPost
+$router->map('GET', '/backend/createPost', function (){  // for the road http://localhost:8000/backend/createPost
         createPost();
+});
+
+//function to delete a post
+$router->map('GET', '/backend/deletePost/[i:id]', function ($id){  // for the road http://localhost:8000/backend/deletePost/1 ou http://localhost:8000/backend/deletePost/2 ou ....
+    deletePost($id);
 });
