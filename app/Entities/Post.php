@@ -181,6 +181,12 @@ class Post
 
         return $this;
     }
+    // public function setDateCreate(string $dateCreate) : self
+    // {
+    //     $this->dateCreate = $dateCreate;
+
+    //     return $this;
+    // }
 
     /**
      * Get the value of datechange

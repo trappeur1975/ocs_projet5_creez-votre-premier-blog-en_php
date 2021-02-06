@@ -63,7 +63,10 @@ function editPost($id)
             }
 
             if(empty($errors)){
-                $post->setTitle($_POST['title']);
+                $post
+                    ->setTitle($_POST['title'])
+                    ->setIntroduction($_POST['introduction']);
+                // dd($post);
                 $postManager->updatePost($post);
                 header('Location: /backend/editPost/'.$post->getId().'?success=true');
             }else{

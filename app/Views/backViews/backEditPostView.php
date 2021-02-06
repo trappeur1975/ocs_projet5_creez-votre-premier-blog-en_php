@@ -1,4 +1,7 @@
-<?php 
+<?php
+
+use App\Entities\Form;
+
 $title = 'Edit post';
 ob_start(); 
 ?>
@@ -13,12 +16,13 @@ ob_start();
     </div>
 <?php endif ?>
 
+<?php $form = new Form($post); ?>
+
 <h1>Edit le post id: <?= $post->getId() ?></h1>
  <form action="" method="post">
-    <div class="form-group">
-        <label for="title">Titre</label>
-        <input type="text" class="form-control" name="title" value="<?= formatHtml($post->getTitle()); ?>">
-    </div>
+    <?= $form->input('title', 'titre') ?>
+    <?= $form->textarea('introduction', 'introduction') ?>
+    <?= $form->input('dateCreate', 'date de creation') ?>
     
     <button class="btn btn-primary">Modifier</button>
  </form>

@@ -75,10 +75,15 @@ class PostManager extends Manager
       public function updatePost(Post $post): void
       {
           $db = $this->dbConnect();
-          $query = $db->prepare('UPDATE post SET title = :title WHERE id = :id');
+          $query = $db->prepare('UPDATE post SET title = :title, 
+                                                    introduction = :introduction,
+                                                    dateCreate = :dateCreate
+                                WHERE id = :id');
           $result = $query->execute([
-              'id' => $post->getId(),
-              'title' => $post->getTitle()
+              'title' => $post->getTitle(),
+              'introduction' => $post->getIntroduction(),
+              'dateCreate' => $post->getDateCreate(),
+              'id' => $post->getId()
               ]);
           if($result === false){
               throw new Exception('impossible de modifier le post'.$post->getId());
