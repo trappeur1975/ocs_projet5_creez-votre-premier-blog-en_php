@@ -4,17 +4,9 @@ $success = false;
 ob_start(); 
 ?>
 
-<?php //once the form has been sent
-    if(!empty($_POST)){
-        $post->setTitle($_POST['title']);
-        $postManager->updatePost($post);
-        $success = true;
-    }
-?>
-
-<?php if($success): ?>
+<?php  if(isset($_GET['success'])): ?>
     <div class="alert alert-success">
-        Le post a bien été modifié.
+        le post a bien été modifié.
     </div>
 <?php endif ?>
 

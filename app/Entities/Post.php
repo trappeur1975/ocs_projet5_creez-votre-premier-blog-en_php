@@ -175,7 +175,7 @@ class Post
      *
      * @return  self
      */
-    public function setDateCreate($dateCreate) : self
+    public function setDateCreate(\Datetime $dateCreate) : self
     {
         $this->dateCreate = $dateCreate;
 

@@ -29,7 +29,7 @@ class PostManager extends Manager
     }
 
     /**
-     * Method getPost
+     * Method getPost which displays the content of a post 
      *
      * @param integer $id id of the post we want to display
      *
@@ -48,8 +48,13 @@ class PostManager extends Manager
         return $post;
     }
 
-    // supprime le post (en attribut de cette fonction) a la table post en bdd
-    // public function deletePost(Post $post)
+    /**
+     * Method deletePost delete a post 
+     *
+     * @param int $id post id to delete 
+     *
+     * @return void
+     */
     public function deletePost(int $id) : void
     {
         $db = $this->dbConnect();
@@ -59,6 +64,45 @@ class PostManager extends Manager
             throw new Exception('impossible de supprimer le post :'.$id.'peut être il n\'existe pas');
         }
     }
+   
+      /**
+       * Method updatePost update the content of a post 
+       *
+       * @param Post $post post to update 
+       *
+       * @return void
+       */
+      public function updatePost(Post $post): void
+      {
+          $db = $this->dbConnect();
+          $query = $db->prepare('UPDATE post SET title = :title WHERE id = :id');
+          $result = $query->execute([
+              'id' => $post->getId(),
+              'title' => $post->getTitle()
+              ]);
+          if($result === false){
+              throw new Exception('impossible de modifier le post'.$post->getId());
+          }
+      }
+  
+      // public function updatePost(Post $post): void
+      // {
+      //     $db = $this->dbConnect();
+      //     $query = $db->prepare('UPDATE post SET title = :title,
+      //                                         SET introduction = :introduction,
+      //                                         SET content = :content,
+      //                                         SET dateCreate = :dateCreate,
+      //                                         SET dateChange = :dateChange,
+      //                                         SET userid = :userid
+      //                             WHERE id = :id');
+      //     $query->execute(['title' => $post->getTitle(),
+      //                     'introduction' => $post->getIntroduction(),
+      //                     'content' => $post->getContent(),
+      //                     'dateCreate' => $post->getDateCreate(),
+      //                     'dateChange' => $post->getDatechange(),
+      //                     'user_id' => $post->getUser_id(),
+      //                     'id' => $post->getId(),]);
+      // }
 
 
 // --------------------------------------------------------------------------------------
@@ -87,37 +131,6 @@ class PostManager extends Manager
                         'user_id' => $post->getUser_id()]);
     }
 
-    // mise a jour du post (en attribut de cette fonction) dans la table post en bdd
-    public function updatePost(Post $post): void
-    {
-        $db = $this->dbConnect();
-        $query = $db->prepare('UPDATE post SET title = :title WHERE id = :id');
-        $result = $query->execute([
-            'id' => $post->getId(),
-            'title' => $post->getTitle()
-            ]);
-        if($result === false){
-            throw new Exception('impossible de modifier le post'.$post->getTitle());
-        }
-    }
-
-    // public function updatePost(Post $post): void
-    // {
-    //     $db = $this->dbConnect();
-    //     $query = $db->prepare('UPDATE post SET title = :title,
-    //                                         SET introduction = :introduction,
-    //                                         SET content = :content,
-    //                                         SET dateCreate = :dateCreate,
-    //                                         SET dateChange = :dateChange,
-    //                                         SET userid = :userid
-    //                             WHERE id = :id');
-    //     $query->execute(['title' => $post->getTitle(),
-    //                     'introduction' => $post->getIntroduction(),
-    //                     'content' => $post->getContent(),
-    //                     'dateCreate' => $post->getDateCreate(),
-    //                     'dateChange' => $post->getDatechange(),
-    //                     'user_id' => $post->getUser_id(),
-    //                     'id' => $post->getId(),]);
-    // }
+  
 
 }
