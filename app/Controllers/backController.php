@@ -50,12 +50,28 @@ function editPost($id)
 {
     $postManager = new PostManager();
     $post = $postManager->getPost($id);
-    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-        $post->setTitle($_POST['title']);
-        $postManager->updatePost($post);
-        // $success = true; // LE GERER EN ATTRIBUT DANS URL
-        header('Location: /backend/editPost/'.$post->getId().'?success=true');
+    
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') { // if a submission of the form (=> a modification) has been made 
+        //for data validation
+            $errors = [];
+        
+            if(empty($_POST['title'])){
+                $errors['title'][] = 'Le champs titre ne peut être vide';
+            }
+            if(mb_strlen($_POST['title'])<=3){
+                $errors['title'][] = 'Le champs titre doit contenir plus de 3 caractere';
+            }
+
+            if(empty($errors)){
+                $post->setTitle($_POST['title']);
+                $postManager->updatePost($post);
+                header('Location: /backend/editPost/'.$post->getId().'?success=true');
+            }else{
+                // ISSUE COMMENT TRANSMETTRE UN TABLEAU $errors=[]; DANS LA REDIRECTION CI DESSOUS POUR AFFICHER DANS LA VIEW LES DIFFERENTES ERREORS
+                header('Location: /backend/editPost/'.$post->getId().'?success=false');
+            }
     }
+
     require('../app/Views/backViews/backEditPostView.php');
 }
 

@@ -41,7 +41,7 @@ class PostManager extends Manager
         $query = $db->prepare('SELECT * FROM post WHERE id = :id');
         $query->execute(['id' => $id]);
         $query->setFetchMode(PDO::FETCH_CLASS, Post::class);
-        $post = $query->fetch(); // methode grafikart
+        $post = $query->fetch();
         if($post === false){
             throw new Exception('aucun post ne correspond a cet ID');
         }

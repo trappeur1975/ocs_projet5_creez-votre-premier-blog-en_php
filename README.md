@@ -46,7 +46,7 @@ Ce code c'est inspiré fortement des tutorielles suivants :
 
     pour la documentation : https://symfony.com/doc/current/components/var_dumper.html
 
-    commande pour executer var-dumper : "dump($someVar);"
+    commande pour executer var-dumper : "dd($someVar);" ou "dump($someVar);"
 
 ----------------- infos site ----------------
 pour lancer le serveur php via la console avec pour dossier racine "public" executer la commande suivante:

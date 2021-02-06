@@ -1,12 +1,15 @@
 <?php 
 $title = 'Edit post';
-$success = false;
 ob_start(); 
 ?>
 
-<?php  if(isset($_GET['success'])): ?>
+<?php  if(isset($_GET['success'])and($_GET['success'])==='true'): ?>
     <div class="alert alert-success">
         le post a bien été modifié.
+    </div>
+<?php elseif(isset($_GET['success'])and($_GET['success'])==='false'): ?>
+    <div class="alert alert-danger">
+        le post n'a pu être modifié.
     </div>
 <?php endif ?>
 
