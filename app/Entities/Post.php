@@ -47,7 +47,7 @@ class Post
      *
      * @var datetime $datechange post modification date
      */
-    private $datechange;
+    private $dateChange;
         
     /**
      * user_id
@@ -175,25 +175,25 @@ class Post
      *
      * @return  self
      */
-    public function setDateCreate(\Datetime $dateCreate) : self
-    {
-        $this->dateCreate = $dateCreate;
-
-        return $this;
-    }
-    // public function setDateCreate(string $dateCreate) : self
+    // public function setDateCreate(\Datetime $dateCreate) : self
     // {
     //     $this->dateCreate = $dateCreate;
 
     //     return $this;
     // }
+    public function setDateCreate($dateCreate) : self //--------------POUR LE MOMENT L'ARGUMENT $dateCreate N EST PAS TYPER "\Datetime" (=>actuellement en string) CAR JE N AI PAS TROUVER DE MOYEN POUR GERER APRES SON ENREGISTREMENT DANS LA BASE DE DONNER VIA POSTMANAGER LORS DE LA CREATION DUN POST OU L EDIT DUN POST
+    {
+        $this->dateCreate = $dateCreate;
+
+        return $this;
+    }
 
     /**
      * Get the value of datechange
      */
-    public function getDatechange()
+    public function getDateChange()
     {
-        return $this->datechange;
+        return $this->dateChange;
     }
 
     /**
@@ -202,9 +202,9 @@ class Post
      *
      * @return  self
      */
-    public function setDatechange($datechange) : self
+    public function setDateChange($datechange) : self
     {
-        $this->datechange = $datechange;
+        $this->dateChange = $datechange;
 
         return $this;
     }

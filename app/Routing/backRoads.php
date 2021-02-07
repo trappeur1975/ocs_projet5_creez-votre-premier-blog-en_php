@@ -15,7 +15,7 @@ $router->map('POST|GET', '/backend/editPost/[i:id]', function ($id){  // for the
 
 
 //function to create a post
-$router->map('GET', '/backend/createPost', function (){  // for the road http://localhost:8000/backend/createPost
+$router->map('POST|GET', '/backend/createPost', function (){  // for the road http://localhost:8000/backend/createPost
         createPost();
 });
 

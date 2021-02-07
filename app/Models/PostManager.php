@@ -14,7 +14,7 @@ use Exception;
  */
 class PostManager extends Manager
 {
-        
+    
     /**
      * Method getListPosts which returns the list of Post (as an object of type Post) 
      *
@@ -65,50 +65,37 @@ class PostManager extends Manager
         }
     }
    
-      /**
-       * Method updatePost update the content of a post 
-       *
-       * @param Post $post post to update 
-       *
-       * @return void
-       */
-      public function updatePost(Post $post): void
-      {
-          $db = $this->dbConnect();
-          $query = $db->prepare('UPDATE post SET title = :title, 
-                                                    introduction = :introduction,
-                                                    dateCreate = :dateCreate
-                                WHERE id = :id');
-          $result = $query->execute([
-              'title' => $post->getTitle(),
-              'introduction' => $post->getIntroduction(),
-              'dateCreate' => $post->getDateCreate(),
-              'id' => $post->getId()
-              ]);
-          if($result === false){
-              throw new Exception('impossible de modifier le post'.$post->getId());
-          }
-      }
-  
-      // public function updatePost(Post $post): void
-      // {
-      //     $db = $this->dbConnect();
-      //     $query = $db->prepare('UPDATE post SET title = :title,
-      //                                         SET introduction = :introduction,
-      //                                         SET content = :content,
-      //                                         SET dateCreate = :dateCreate,
-      //                                         SET dateChange = :dateChange,
-      //                                         SET userid = :userid
-      //                             WHERE id = :id');
-      //     $query->execute(['title' => $post->getTitle(),
-      //                     'introduction' => $post->getIntroduction(),
-      //                     'content' => $post->getContent(),
-      //                     'dateCreate' => $post->getDateCreate(),
-      //                     'dateChange' => $post->getDatechange(),
-      //                     'user_id' => $post->getUser_id(),
-      //                     'id' => $post->getId(),]);
-      // }
-
+    /**
+     * Method updatePost update the content of a post 
+     *
+     * @param Post $post post to update 
+     *
+     * @return void
+     */
+    public function updatePost(Post $post): void
+    {
+        $db = $this->dbConnect();
+        $query = $db->prepare('UPDATE post SET title = :title, 
+                                                introduction = :introduction,
+                                                content = :content,
+                                                dateCreate = :dateCreate,
+                                                dateChange = :dateChange,
+                                                user_id = :user_id
+                            WHERE id = :id');
+        $result = $query->execute([
+            'title' => $post->getTitle(),
+            'introduction' => $post->getIntroduction(),
+            'content' => $post->getContent(),
+            'dateCreate' => $post->getDateCreate()->format('Y-m-d H:i:s'),
+            'dateChange' => $post->getDateChange(),
+            'user_id' => $post->getUser_id(),
+            'id' => $post->getId()
+        ]);
+        
+        if($result === false){
+            throw new Exception('impossible de modifier le post'.$post->getId());
+        }
+    }
 
 // --------------------------------------------------------------------------------------
 
@@ -116,26 +103,27 @@ class PostManager extends Manager
     public function addPost(Post $post)
     {
         $db = $this->dbConnect();
-        $query = $db->prepare('INSERT INTO post (title,
-                                                introduction,
-                                                content,
-                                                dateCreate,
-                                                dateChange,
-                                                userid) 
-                                                VALUE (:title,
-                                                :introduction,
-                                                :content,
-                                                :dateCreate,
-                                                :dateChange,
-                                                :userid)');
-        $query->execute(['title' => $post->getTitle(),
-                        'introduction' => $post->getIntroduction(),
-                        'content' => $post->getContent(),
-                        'dateCreate' => $post->getDateCreate(),
-                        'dateChange' => $post->getDatechange(),
-                        'user_id' => $post->getUser_id()]);
-    }
+        
+        $query = $db->prepare('INSERT INTO post SET title = :title, 
+                                                  introduction = :introduction,
+                                                  content = :content,
+                                                  dateCreate = :dateCreate,
+                                                  dateChange = :dateChange,
+                                                  user_id = :user_id');
+        $result = $query->execute([
+            'title' => $post->getTitle(),
+            'introduction' => $post->getIntroduction(),
+            'content' => $post->getContent(),
+            'dateCreate' => $post->getDateCreate()->format('Y-m-d H:i:s'),
+            'dateChange' => $post->getDateChange(),
+            'user_id' => $post->getUser_id()
+            ]);
 
-  
+        if($result === true){
+            return $db->lastInsertId();
+        } else {
+            throw new Exception('impossible de de creer l enregistrement du post');
+        }
+    }
 
 }

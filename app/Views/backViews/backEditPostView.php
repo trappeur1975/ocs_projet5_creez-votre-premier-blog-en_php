@@ -22,7 +22,10 @@ ob_start();
  <form action="" method="post">
     <?= $form->input('title', 'titre') ?>
     <?= $form->textarea('introduction', 'introduction') ?>
+    <?= $form->textarea('content', 'content') ?>
     <?= $form->input('dateCreate', 'date de creation') ?>
+    <?= $form->input('dateChange', 'date de changement') ?>
+    <?= $form->input('user_id', 'user_id') ?>
     
     <button class="btn btn-primary">Modifier</button>
  </form>
