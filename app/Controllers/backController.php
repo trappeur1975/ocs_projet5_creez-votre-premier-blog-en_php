@@ -25,7 +25,7 @@ function adminPosts()
     
     $postManager = new PostManager();
     $listPosts = $postManager->getListPosts();
-    require('../app/Views/backViews/backAdminPostsView.php');
+    require('../app/Views/backViews/post/backAdminPostsView.php');
 }
 
 /**
@@ -38,7 +38,7 @@ function deletePost($id)
     
     $postManager = new PostManager();
     $post = $postManager->deletePost($id);
-    require('../app/Views/backViews/backDeletePostView.php');
+    require('../app/Views/backViews/post/backDeletePostView.php');
 }
 
 // -------------------------------
@@ -90,7 +90,7 @@ function editPost($id)
             }
     }
 
-    require('../app/Views/backViews/backEditPostView.php');
+    require('../app/Views/backViews/post/backEditPostView.php');
 }
 
 /**
@@ -136,12 +136,13 @@ function createPost()
 
                 $postManager = new PostManager();
                 $lastRecording = $postManager->addPost($post);// add the post to the database and get the last id of the posts in the database via the return of the function
-                header('Location: /backend/editPost/'.$lastRecording.'?success=true');
+                header('Location: /backend/editPost/'.$lastRecording.'?created=true');
+                // exit();
             }else{
                 // ISSUE COMMENT TRANSMETTRE UN TABLEAU $errors=[]; DANS LA REDIRECTION CI DESSOUS POUR AFFICHER DANS LA VIEW LES DIFFERENTES ERREORS
-                header('Location: /backend/createPost?success=false');
+                header('Location: /backend/createPost?created=false');
             }
     }
-    require('../app/Views/backViews/backCreatePostView.php');
+    require('../app/Views/backViews/post/backCreatePostView.php');
 }
 

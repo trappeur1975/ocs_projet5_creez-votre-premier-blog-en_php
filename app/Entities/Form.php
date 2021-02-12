@@ -13,6 +13,7 @@ class Form
         $this->data = $data;
     }
 
+    //pour creer un champ input
     public function input(string $key, string $label): string
     {
         $value = $this->getValue($key);
@@ -24,6 +25,7 @@ class Form
 HTML;
     }
 
+    //pour creer un champ textarea
     public function textarea(string $key, string $label): string
     {
         $value = $this->getValue($key);
@@ -46,7 +48,7 @@ HTML;
         $method = 'get'.ucfirst($key);
         // return $this->data->$method();
         $value = $this->data->$method();
-        if($value instanceof \DateTimeInterface){ //
+        if($value instanceof \DateTimeInterface){
            return  $value->format('Y-m-d H:i:s');
         }
         return $value;

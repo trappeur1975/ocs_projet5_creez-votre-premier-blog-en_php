@@ -17,7 +17,11 @@ ob_start();
         <thead>
             <th>Id</th>
             <th>Titre</th>
-            <th>Actions</th>
+            <th>
+                <a href="/backend/createPost" class="btn btn-primary">nouveau post</a>
+            <th>
+
+            </th>
         </thead>
         <tbody>
             <?php foreach ($listPosts as $post): ?>         

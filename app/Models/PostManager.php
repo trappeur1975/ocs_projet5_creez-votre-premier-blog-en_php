@@ -5,8 +5,6 @@ use PDO;
 use App\Entities\Post;
 use Exception;
 
-// POUR COMPLETER CES FONCTION S APPUYER SUR LA DOC PDF "PROGRAMMEZ EN ORIENTE OBJET" PAGE 46 ET 47
-
 /**
  * PostManager
  * 
@@ -24,7 +22,7 @@ class PostManager extends Manager
     {
         $db = $this->dbConnect();    
         $query = $db->query('SELECT * FROM post');
-        $listPosts = $query ->fetchAll(PDO::FETCH_CLASS, Post::class); // methode grafikart
+        $listPosts = $query ->fetchAll(PDO::FETCH_CLASS, Post::class);
         return $listPosts;
     }
 
