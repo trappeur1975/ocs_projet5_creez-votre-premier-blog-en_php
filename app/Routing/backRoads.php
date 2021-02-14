@@ -3,6 +3,17 @@ $router->map('GET', '/backend', function (){  // for the road  http://localhost:
     backHome();
 });
 
+//function to connect to the site 
+$router->map('POST|GET', '/backend/connection', function (){  // for the road  http://localhost:8000/backend/connection
+    connection();
+});
+
+//function to disconnect to the site 
+$router->map('POST|GET', '/backend/disconnection', function (){  // for the road  http://localhost:8000/backend/disconnection
+    disconnection();
+});
+
+
 //function to administer posts 
 $router->map('GET', '/backend/adminPosts', function (){  // for the road  http://localhost:8000/backend/adminPosts
     adminPosts();

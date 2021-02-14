@@ -59,7 +59,7 @@ class Post
     /**
      * Get the value of id
      */
-    public function getId() : ?int
+    public function getId(): ?int
     {
         return $this->id;
     }
@@ -70,7 +70,7 @@ class Post
      *
      * @return  self
      */
-    public function setId(int $id) : self
+    public function setId(int $id): self
     {
         $this->id = $id;
 
@@ -80,7 +80,7 @@ class Post
     /**
      * Get the value of title
      */
-    public function getTitle() : ?string
+    public function getTitle(): ?string
     {
         return $this->title;
     }
@@ -91,7 +91,7 @@ class Post
      * 
      * @return  self
      */
-    public function setTitle(string $title) : self
+    public function setTitle(string $title): self
     {
         $this->title = $title;
 
@@ -101,7 +101,7 @@ class Post
     /**
      * Get the value of introduction
      */
-    public function getIntroduction() : ?string
+    public function getIntroduction(): ?string
     {
         return $this->introduction;
     }
@@ -112,7 +112,7 @@ class Post
      * 
      * @return  self
      */
-    public function setIntroduction(string $introduction) : self
+    public function setIntroduction(string $introduction): self
     {
         $this->introduction = $introduction;
         return $this;
@@ -120,7 +120,7 @@ class Post
     /**
      * Get the value of content
      */
-    public function getContent() : ?string
+    public function getContent(): ?string
     {
         return $this->content;
     }
@@ -131,7 +131,7 @@ class Post
      *
      * @return  self
      */
-    public function setContent(string $content) : self
+    public function setContent(string $content): self
     {
         $this->content = $content;
 
@@ -152,13 +152,13 @@ class Post
      *
      * @return  self
      */
-    // public function setDateCreate(\Datetime $dateCreate) : self
+    // public function setDateCreate(\Datetime $dateCreate): self
     // {
     //     $this->dateCreate = $dateCreate;
 
     //     return $this;
     // }
-    public function setDateCreate($dateCreate) : self //--------------POUR LE MOMENT L'ARGUMENT $dateCreate N EST PAS TYPER "\Datetime" (=>actuellement en string) CAR JE N AI PAS TROUVER DE MOYEN POUR GERER APRES SON ENREGISTREMENT DANS LA BASE DE DONNER VIA POSTMANAGER LORS DE LA CREATION DUN POST OU L EDIT DUN POST
+    public function setDateCreate($dateCreate): self //--------------POUR LE MOMENT L'ARGUMENT $dateCreate N EST PAS TYPER "\Datetime" (=>actuellement en string) CAR JE N AI PAS TROUVER DE MOYEN POUR GERER APRES SON ENREGISTREMENT DANS LA BASE DE DONNER VIA POSTMANAGER LORS DE LA CREATION DUN POST OU L EDIT DUN POST
     {
         $this->dateCreate = $dateCreate;
 
@@ -179,7 +179,7 @@ class Post
      *
      * @return  self
      */
-    public function setDateChange($datechange) : self
+    public function setDateChange($datechange): self
     {
         $this->dateChange = $datechange;
 
@@ -189,7 +189,7 @@ class Post
     /**
      * Get the value of user_id
      */
-    public function getUser_id() : ?int
+    public function getUser_id(): ?int
     {
         return $this->user_id;
     }
@@ -200,7 +200,7 @@ class Post
      *
      * @return  self
      */
-    public function setUser_id(int $user_id) : self
+    public function setUser_id(int $user_id): self
     {
         $this->user_id = $user_id;
 

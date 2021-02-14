@@ -1,6 +1,8 @@
 <?php
 namespace App\Entities;
 
+use Exception;
+
 class Auth {
     
     /**
@@ -9,6 +11,13 @@ class Auth {
      * @return void
      */
     public static function check(){
-        // TODO : ecrire le code
+        if(session_status() === PHP_SESSION_NONE){
+            session_start();
+        }
+        
+        if(!isset($_SESSION['connection'])){
+            // throw new Exception('vous n\'étes identifier sur le site');
+            header('Location: /backend/connection?badConnection=true');
+        }
     }
 }

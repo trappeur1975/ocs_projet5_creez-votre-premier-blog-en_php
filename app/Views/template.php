@@ -11,6 +11,13 @@
     <body>
         <nav class="navbar navbar-expand-lg navbar-dark bg-primary"> 
             <a href="#" class="navbar-brand">Mon site</a>
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <form action="<?= '/backend/disconnection' ?>" method="post" style="display:inline"> <!-- for security to prevent me being forcibly disconnected by sending me this link -->
+                        <button type ="submit" class="nav-link" style="background:transparent; border:none;" >Se deconnecter</button>
+                    </form>
+                </li>
+            </ul>
         </nav>
         
         <div class="container mt-4">
