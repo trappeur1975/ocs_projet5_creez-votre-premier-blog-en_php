@@ -24,8 +24,8 @@ function connection()
             $userManager = new UserManager();
 
             try {
-                $utilisateur = $userManager->findByUserLogin($_POST['login']);
-                if($utilisateur->getPassword() ===  $_POST['password']){
+                $userRegister = $userManager->findByUserLogin($_POST['login']);
+                if($userRegister->getPassword() ===  $_POST['password']){
                     session_start();
                     $_SESSION['connection'] = 'administrateur'. // --------------POUR LE TESTE APRES IL FAUTDRA FAIRE UN TRAITEMENT POUR RECUPERER LE TYPE DE L'USER QUI TENTE DE SE CONNECTER
                     header('Location: /backend/adminPosts'); //ISSUE faudra changer cela (ce qu il y a en php) avec l utilisation des nom de route
