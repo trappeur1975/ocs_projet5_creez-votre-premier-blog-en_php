@@ -1,5 +1,6 @@
 <?php
 use App\Models\PostManager;
+use App\Models\MediaManager;
 
 /**
  * function use for road http://localhost:8000
@@ -36,5 +37,8 @@ function post($id)
 {
     $postManager = new PostManager(); // Création de l'objet manger de post
     $post = $postManager->getPost($id);
+
+    $mediaManager= new MediaManager();
+    $listMediasForPost = $mediaManager->findMediaForPost($id);
     require('../app/Views/frontViews/frontPostView.php'); //BON CHEMIN QUAND INDEX.PHP EST dans le dossier "public"
 }

@@ -13,6 +13,15 @@
             <a href="#" class="navbar-brand">Mon site</a>
             <ul class="navbar-nav">
                 <li class="nav-item">
+                    <a href="<?= '/backend/adminPosts'?>"class="nav-link">articles</a>
+                </li>
+                <li class="nav-item">
+                    <a href="<?= '/backend/adminMediaTypes'?>"class="nav-link">mediaTypes</a>
+                </li>
+                <li class="nav-item">
+                    <a href="<?= '/backend/adminUsers'?>"class="nav-link">users</a>
+                </li>
+                <li class="nav-item">
                     <form action="<?= '/backend/disconnection' ?>" method="post"> <!-- for security to prevent me being forcibly disconnected by sending me this link -->
                         <button type ="submit" class="nav-link" style="background:transparent; border:none;" >Se deconnecter</button>
                     </form>
