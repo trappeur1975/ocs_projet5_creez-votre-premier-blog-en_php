@@ -2,8 +2,9 @@
 namespace App\Models;
 
 use PDO;
-use App\Entities\User;
 use Exception;
+use App\Entities\Post;
+use App\Entities\User;
 
 /**
  * UserManager
@@ -12,18 +13,7 @@ use Exception;
  */
 class UserManager extends Manager
 {
-    public function findByUserLogin(string $login)
-    {
-        $db = $this->dbConnect();
-        $query = $db->prepare('SELECT * FROM user WHERE login = :login');
-        $query->execute(['login' => $login]);
-        $query->setFetchMode(PDO::FETCH_CLASS, User::class);
-        $user = $query->fetch();
-        if($user === false){
-            throw new Exception('aucun user ne correspond a ce login');
-        }
-        return $user;
-    }
+
 
     /**
      * Method getListUsers which returns the list of user (as an object of type user) 
@@ -117,7 +107,7 @@ class UserManager extends Manager
         }
     }
 
-
+// --------------------------------------------------------------------------------------
     // ajoute le user (en attribut de cette fonction) a la table post en bdd
     public function addUser(User $user)
     {
@@ -152,4 +142,47 @@ class UserManager extends Manager
             throw new Exception('impossible de de creer l enregistrement du user');
         }
     }
+
+    public function findByUserLogin(string $login)
+    {
+        $db = $this->dbConnect();
+        $query = $db->prepare('SELECT * FROM user WHERE login = :login');
+        $query->execute(['login' => $login]);
+        $query->setFetchMode(PDO::FETCH_CLASS, User::class);
+        $user = $query->fetch();
+        if($user === false){
+            throw new Exception('aucun user ne correspond a ce login');
+        }
+        return $user;
+    }
+
+    // methode pour recuperer un tableau des users que l on va utiliser dans le select
+    public function listSelect(): array
+    {
+        $users = $this->getListUsers();
+        $results = [];
+        foreach($users as $user){
+            $results[$user->getId()] = $user->getLastName();
+        }
+        return $results;
+    }
+
+// ------------------------------MODIFICATION----------------------------------------------
+
+    // recuperer l'user d'un post
+    public function getUserPost(Post $post)
+    {
+        $db = $this->dbConnect();
+        $query = $db->prepare('SELECT user_id FROM post WHERE id = :id');
+        $query->execute(['id' => $post->getId()]);
+
+        $userId = $query->fetch()["user_id"];
+        $user = $this->getUser($userId);
+
+        if($user === false){
+            throw new Exception('aucun user ne correspond a cet post');
+        }
+        return $user;
+    }
+
 }

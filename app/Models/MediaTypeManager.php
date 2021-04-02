@@ -101,4 +101,36 @@ class MediaTypeManager extends Manager
         }
     }
 
+    // methode pour recuperer un tableau que l on va utiliser dans le select
+    public function list(): array
+    {
+        $mediaTypes = $this->getListMediatypes();
+        $results = [];
+        foreach($mediaTypes as $mediaType){
+        $results[$mediaType->getId()] = $mediaType->getType();
+        }
+        return $results;
+    }
+    
+    /**
+     * Method getIdMediaType find the id of a mediaType in relation to a type pass as a parameter of the method
+     *
+     * @param string $type type of which we want to retrieve the id of the mediaType corresponding to this type 
+     *
+     * @return id
+     */
+    public function getIdMediaType(string $type) : ?int
+    {
+        $db = $this->dbConnect();
+        $query = $db->prepare('SELECT id FROM mediatype WHERE type = :type');
+        $query->execute(['type' => $type]);
+        $query->setFetchMode(PDO::FETCH_CLASS, MediaType::class);
+        $id = $query->fetch();
+        if($id === false){ //if we do not find any mediaType corresponding to this type then we return an id equal to zero 
+            $id = 0; 
+        }
+        return $id;
+    }
+
+
 }

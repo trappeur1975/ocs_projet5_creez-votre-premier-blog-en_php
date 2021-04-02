@@ -54,7 +54,7 @@ class Post
      *
      * @var integer $user_id  id of the user who created the post
      */
-    private $user_id;
+    // private $user_id;
 
     /**
      * Get the value of id
@@ -176,10 +176,10 @@ class Post
     /**
      * Get the value of user_id
      */
-    public function getUser_id(): ?int
-    {
-        return $this->user_id;
-    }
+    // public function getUser_id(): ?int
+    // {
+    //     return $this->user_id;
+    // }
 
     /**
      * Set the value of user_id
@@ -187,10 +187,10 @@ class Post
      *
      * @return  self
      */
-    public function setUser_id(int $user_id): self
-    {
-        $this->user_id = $user_id;
+    // public function setUser_id(int $user_id): self
+    // {
+    //     $this->user_id = $user_id;
 
-        return $this;
-    }
+    //     return $this;
+    // }
 }

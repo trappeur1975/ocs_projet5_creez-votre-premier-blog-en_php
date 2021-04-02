@@ -12,6 +12,9 @@ ob_start();
             <div class="alert alert-success">
                 le post a bien été modifié.
             </div>
+            <div class="alert alert-danger">
+                ATTENTION si vous aviez modifier le user du post vous devez reselectionner les media pour se post pour que ceux ci soient pris en compte dans le cas contraire tout est ok
+            </div>
         <?php elseif(isset($_GET['success'])and($_GET['success'])==='false'): ?>
             <div class="alert alert-danger">
                 le post n'a pu être modifié.

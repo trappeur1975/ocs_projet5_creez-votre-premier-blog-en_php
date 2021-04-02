@@ -2,11 +2,13 @@
 
 use App\Entities\Auth;
 use App\Entities\Form;
-use App\Entities\MediaType;
 use App\Entities\Post;
 use App\Entities\User;
+use App\Entities\Media;
+use App\Entities\MediaType;
 use App\Models\PostManager;
 use App\Models\UserManager;
+use App\Models\MediaManager;
 use App\Models\MediaTypeManager;
 
 // CONNECTION / DECONNECTION AU SITE
@@ -21,7 +23,7 @@ use App\Models\MediaTypeManager;
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') { // if a submission of the form (=> a connection attempt ) has been made
             
-            if(!empty($_POST['login']) && !empty($_POST['login'])){
+            if(!empty($_POST['login']) && !empty($_POST['password'])){
                 
                 $userManager = new UserManager();
 
@@ -31,7 +33,6 @@ use App\Models\MediaTypeManager;
                         session_start();
                         $_SESSION['connection'] = 'administrateur'. // --------------POUR LE TESTE APRES IL FAUTDRA FAIRE UN TRAITEMENT POUR RECUPERER LE TYPE DE L'USER QUI TENTE DE SE CONNECTER
                         header('Location: /backend/adminPosts'); //ISSUE faudra changer cela (ce qu il y a en php) avec l utilisation des nom de route
-                        // echo 'code correct';
                         exit();
                     } else { 
                         $error = 'mot de passe incorrect';
@@ -81,7 +82,7 @@ use App\Models\MediaTypeManager;
      */
     function adminPosts()
     {
-        // Auth::check();
+        Auth::check();
         
         $postManager = new PostManager();
         $listPosts = $postManager->getListPosts();
@@ -98,6 +99,20 @@ use App\Models\MediaTypeManager;
 
         $postManager = new PostManager();
         $post = $postManager->getPost($id);
+
+        // pour afficher le contenu du select des users ------------
+        $userManager = new UserManager();
+        $user = $userManager->getUserPost($post);   // sera utiliser dans "$formPost = new Form($post);" ci dessous qui permettra de creer les champs propre au $post (via l entité "Form.php")
+        
+        $listSelectUsers = $userManager->listSelect(); //sera utiliser dans "backView > post > _form.php"
+
+        // pour afficher le contenu du select des medias liers a l user qui est lier au post que l on souhaite editer
+            $mediaManager = new MediaManager();             
+            $media = ($mediaManager->getListMediasForUser($user))[0]; // on recuperer le premier media de l user du post qui sera utiliser dans "$formMedia = new Form($media);" ci dessous qui permettra de creer les champs propre au $media (via l entité "Form.php")
+
+            //utiliser dans "backviews > post > _form.php"
+            $listSelectMediasForUser =  $mediaManager->listSelect($user); // on affiche la liste des media de l'user auteur du post
+            $listSelectMediasForPost =  $mediaManager->getIdOftListMediasForPost($post);// on recupere la liste des media pour ce $post
         
         if ($_SERVER['REQUEST_METHOD'] === 'POST') { // if a submission of the form (=> a modification of a post) has been made
             //for data validation
@@ -111,8 +126,8 @@ use App\Models\MediaTypeManager;
                 }
 
                 if(empty($errors)){
-                
-                    //ISSSUE  gestion des date en datetime dans entité post // base de donnee en string pour la create ou l edit d un post (=>voir methode setDateCreate($dateCreate) de la class Post)
+                                   
+                    //ISSUE  gestion des date en datetime dans entité post // base de donnee en string pour la create ou l edit d un post (=>voir methode setDateCreate($dateCreate) de la class Post)
                     //modification pour gerer l enregistrement dans la base de donnee via le Postmanager
                     $dateCreate = DateTime::createFromFormat('Y-m-d H:i:s',$_POST['dateCreate']); // pour que la date String soit en Datetime
                     $dateChange = $_POST['dateChange'];
@@ -121,15 +136,48 @@ use App\Models\MediaTypeManager;
                         $dateChange=NULL;
                     }
                 
-                    $post
-                        ->setTitle($_POST['title'])
-                        ->setIntroduction($_POST['introduction'])
-                        ->setContent($_POST['content'])
-                        ->setDateCreate($dateCreate)
-                        ->setDateChange($dateChange)
-                        ->setUser_id($_POST['user_id']);
-    
-                    $postManager->updatePost($post);
+                    // enregistrement des modifications (via le select des users) infos sur le post
+                        $post
+                            ->setTitle($_POST['title'])
+                            ->setIntroduction($_POST['introduction'])
+                            ->setContent($_POST['content'])
+                            ->setDateCreate($dateCreate)
+                            ->setDateChange($dateChange)
+                            ;
+
+                        $postManager->updatePost($post, $_POST['user'][0]);  //MODIFICATION par rapport a la la fonction d'origine on a rajouter "$_POST['user'][0]" pour avoir id de l'user du post (voir explication dans "Form.php")
+
+                    // -------- enregistrement des modifications (via le select des medias) des infos sur les media lié au post
+                        // cela nous servira par la suite a savoir si le user a l origine du post a ete modifier
+                        $userOrigine = $user;
+                        $newUser = $userManager->getUserPost($post);
+
+                        // si l utilisateur a ete modifier on desactive les medias lier a ce post
+                        if ($userOrigine != $newUser){
+                            foreach($listSelectMediasForPost as $value){                           
+                                $mediaManager->UpdateStatutActifMedia($value, 0); 
+                            }
+                        }
+                    
+                        if(!is_null($_POST['path']) and ($userOrigine == $newUser)){ //on enregistre la nouvelle liste de media pour le post definit dans le select des medias uniquement si le user n a pas changer
+                        // if(!is_null($_POST['path'])){    //ancien code
+                            // on met tout les medias du post en statutActif = false
+                            foreach($listSelectMediasForPost as $value){                           
+                                $mediaManager->UpdateStatutActifMedia($value, 0); 
+                            }
+                            // on met tout les medias dont leurs id sont dans "$_POST['path']" en statutActif = true 
+                            // et on modifie leurs post_id pour bien attribuer auw media selectionner dans le select le id du post
+                            foreach($_POST['path'] as $value){
+                                $mediaManager->UpdateStatutActifMedia($value, 1);
+                                $mediaManager->UpdatePostIdMedia($value, $post->getId());
+                            }
+                        }
+
+                        // ATTENTION ON MODIFIE LE USERORIGINE pour que notre verification de changement de user du post soit toujours valable
+                        $userOrigine = $newUser;
+                    
+                    // --------------FIN enregistrement des modifications (via le select des medias) des infos sur les media lié au post
+                    
                     header('Location: /backend/editPost/'.$post->getId().'?success=true');
                 }else{
                     // ISSUE COMMENT TRANSMETTRE UN TABLEAU $errors=[]; DANS LA REDIRECTION CI DESSOUS POUR AFFICHER DANS LA VIEW LES DIFFERENTES ERREORS
@@ -137,11 +185,14 @@ use App\Models\MediaTypeManager;
                 }
         }
 
-        $form = new Form($post);
+        // display of the form before saving changes 
+        $formPost = new Form($post);    //pour pouvoir creer le formulaire de post (grace aux fonction qui creer les champs)
+       
+        $formUser = new Form($user);    //pour creer le champs select des users qui sera integrer dans "backView > post > _form.php"
+        
+        $formMedia = new Form($media);  //pour creer le champs select des media qui sera integrer dans "backView > post > _form.php"
 
         require('../app/Views/backViews/post/backEditPostView.php');
-
-
     }
 
     /**
@@ -155,7 +206,11 @@ use App\Models\MediaTypeManager;
         $post = new Post();
         $post->setDateCreate(new Datetime()); //to assign today's date (in datetime) by default to the post we create 
         $post->setDatechange(NULL); // ------POUR LE TESTE J ASSIGNE LA DATECHANGE A "NULL" VOIR APRES COMMENT FAIRE POUR GERER CELA --------------
-        $post->setUser_id(2); // ------POUR LE TESTE J ASSIGNE L UTILISATEUR "2" VOIR APRES COMMENT FAIRE POUR GERER CELA --------------
+        
+        // pour afficher le contenu du select des users ------------
+        $userManager = new UserManager();
+        $user = new User();
+        $listSelectUsers = $userManager->listSelect();
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') { // if a submission of the form (=> a creation of a post) has been made
             //for data validation
@@ -185,17 +240,22 @@ use App\Models\MediaTypeManager;
                         ->setContent($_POST['content'])
                         ->setDateCreate($dateCreate)
                         ->setDateChange($dateChange)
-                        ->setUser_id($_POST['user_id']);
+                        // ->setUser_id($_POST['user_id'])
+                        ;
 
                     $postManager = new PostManager();
-                    $lastRecording = $postManager->addPost($post);// add the post to the database and get the last id of the posts in the database via the return of the function
+                     //MODIFICATION par rapport a la la fonction d'origine on a rajouter "$_POST['id']" pour avoir id de l'user du post
+                    $lastRecording = $postManager->addPost($post, $_POST['id']);// add the post to the database and get the last id of the posts in the database via the return of the function
+                    
                     header('Location: /backend/editPost/'.$lastRecording.'?created=true');
                 }else{
                     // ISSUE COMMENT TRANSMETTRE UN TABLEAU $errors=[]; DANS LA REDIRECTION CI DESSOUS POUR AFFICHER DANS LA VIEW LES DIFFERENTES ERREORS
                     header('Location: /backend/createPost?created=false');
                 }
         }
-        $form = new Form($post);
+
+        $formPost = new Form($post);
+        $formUser = new Form($user);
 
         require('../app/Views/backViews/post/backCreatePostView.php');
     }
@@ -214,7 +274,6 @@ use App\Models\MediaTypeManager;
     }
 
 // USER
-
     /**
      * function use for road http://localhost:8000/backend/adminUsers
      * will display the view backAdminUsersView.php  
@@ -393,32 +452,27 @@ use App\Models\MediaTypeManager;
     {
         Auth::check();
 
-        $postManager = new PostManager();
-        $post = $postManager->getPost($id);
+        $mediaManager = new MediaManager();
+        $media = $mediaManager->getMedia($id);
+
+        // pour afficher le contenu du select des type de media------------
+        $mediaTypeManager = new MediaTypeManager();
+        $list = $mediaTypeManager->list();
         
         if ($_SERVER['REQUEST_METHOD'] === 'POST') { // if a submission of the form (=> a modification of a post) has been made
             //for data validation
                 $errors = [];
 
-                if(empty($_POST['title'])){
-                    $errors['title'][] = 'Le champs titre ne peut être vide';
-                }
-                if(mb_strlen($_POST['title'])<=3){
-                    $errors['title'][] = 'Le champs titre doit contenir plus de 3 caractere';
-                }
+                // if(empty($_POST['title'])){
+                //     $errors['title'][] = 'Le champs titre ne peut être vide';
+                // }
+                // if(mb_strlen($_POST['title'])<=3){
+                //     $errors['title'][] = 'Le champs titre doit contenir plus de 3 caractere';
+                // }
 
                 if(empty($errors)){
-                
-                    //ISSSUE  gestion des date en datetime dans entité post // base de donnee en string pour la create ou l edit d un post (=>voir methode setDateCreate($dateCreate) de la class Post)
-                    //modification pour gerer l enregistrement dans la base de donnee via le Postmanager
-                    $dateCreate = DateTime::createFromFormat('Y-m-d H:i:s',$_POST['dateCreate']); // pour que la date String soit en Datetime
-                    $dateChange = $_POST['dateChange'];
-
-                    if($_POST['dateChange'] === ''){
-                        $dateChange=NULL;
-                    }
-                
-                    $post
+                          
+                    $media
                         ->setTitle($_POST['title'])
                         ->setIntroduction($_POST['introduction'])
                         ->setContent($_POST['content'])
@@ -426,17 +480,17 @@ use App\Models\MediaTypeManager;
                         ->setDateChange($dateChange)
                         ->setUser_id($_POST['user_id']);
     
-                    $postManager->updatePost($post);
-                    header('Location: /backend/editPost/'.$post->getId().'?success=true');
+                    $mediaManager->updateMedia($media);
+                    header('Location: /backend/editMedia/'.$media->getId().'?success=true');
                 }else{
                     // ISSUE COMMENT TRANSMETTRE UN TABLEAU $errors=[]; DANS LA REDIRECTION CI DESSOUS POUR AFFICHER DANS LA VIEW LES DIFFERENTES ERREORS
-                    header('Location: /backend/editPost/'.$post->getId().'?success=false');
+                    header('Location: /backend/editMedia/'.$media->getId().'?success=false');
                 }
         }
 
-        $form = new Form($post);
+        $form = new Form($media);
 
-        require('../app/Views/backViews/post/backEditPostView.php');
+        require('../app/Views/backViews/media/backEditMediaView.php');
 
 
     }
@@ -449,34 +503,26 @@ use App\Models\MediaTypeManager;
     {
         Auth::check();
 
-        $post = new Post();
-        $post->setDateCreate(new Datetime()); //to assign today's date (in datetime) by default to the post we create 
-        $post->setDatechange(NULL); // ------POUR LE TESTE J ASSIGNE LA DATECHANGE A "NULL" VOIR APRES COMMENT FAIRE POUR GERER CELA --------------
-        $post->setUser_id(2); // ------POUR LE TESTE J ASSIGNE L UTILISATEUR "2" VOIR APRES COMMENT FAIRE POUR GERER CELA --------------
+        $media = new Media();
+        // $media->setUser_id(2); // ------POUR LE TESTE J ASSIGNE L UTILISATEUR "2" VOIR APRES COMMENT FAIRE POUR GERER CELA --------------
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') { // if a submission of the form (=> a creation of a post) has been made
             //for data validation
                 $errors = [];
             
-                if(empty($_POST['title'])){
-                    $errors['title'][] = 'Le champs titre ne peut être vide';
-                }
-                if(mb_strlen($_POST['title'])<=3){
-                    $errors['title'][] = 'Le champs titre doit contenir plus de 3 caractere';
-                }
+                // if(empty($_POST['title'])){
+                //     $errors['title'][] = 'Le champs titre ne peut être vide';
+                // }
+                // if(mb_strlen($_POST['title'])<=3){
+                //     $errors['title'][] = 'Le champs titre doit contenir plus de 3 caractere';
+                // }
                 
                 if(empty($errors)){
                     
                     //ISSSUE  gestion des date en datetime dans entité post // base de donnee en string pour la create ou l edit d un post (=>voir methode setDateCreate($dateCreate) de la class Post)
-                    //modification pour gerer l enregistrement dans la base de donnee via le Postmanager
-                    $dateCreate = DateTime::createFromFormat('Y-m-d H:i:s',$_POST['dateCreate']); // pour que la date String soit en Datetime
-                    $dateChange = $_POST['dateChange'];
+                    //modification pour gerer l enregistrement dans la base de donnee via le MediaManager
 
-                    if($_POST['dateChange'] === ''){
-                        $dateChange=NULL;
-                    }
-
-                    $post
+                    $media
                         ->setTitle($_POST['title'])
                         ->setIntroduction($_POST['introduction'])
                         ->setContent($_POST['content'])
@@ -484,18 +530,18 @@ use App\Models\MediaTypeManager;
                         ->setDateChange($dateChange)
                         ->setUser_id($_POST['user_id']);
 
-                    $postManager = new PostManager();
-                    $lastRecording = $postManager->addPost($post);// add the post to the database and get the last id of the posts in the database via the return of the function
+                    $mediaManager = new MediaManager();
+                    $lastRecording = $mediaManager->addMedia($media);// add the media to the database and get the last id of the medias in the database via the return of the function
                     header('Location: /backend/editPost/'.$lastRecording.'?created=true');
                 }else{
                     // ISSUE COMMENT TRANSMETTRE UN TABLEAU $errors=[]; DANS LA REDIRECTION CI DESSOUS POUR AFFICHER DANS LA VIEW LES DIFFERENTES ERREORS
-                    header('Location: /backend/createPost?created=false');
+                    header('Location: /backend/createMedia?created=false');
                 }
         }
         
-        $form = new Form($post);
+        $form = new Form($media);
 
-        require('../app/Views/backViews/post/backCreatePostView.php');
+        require('../app/Views/backViews/media/backCreateMediaView.php');
     }
 
     /**
@@ -508,7 +554,7 @@ use App\Models\MediaTypeManager;
         
         $postManager = new PostManager();
         $post = $postManager->deletePost($id);
-        require('../app/Views/backViews/post/backDeletePostView.php');
+        require('../app/Views/backViews/media/backDeleteMediaView.php');
     }
 
 // MEDIATYPE

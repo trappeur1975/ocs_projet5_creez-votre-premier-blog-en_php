@@ -33,28 +33,28 @@ class User
      * @var string $email email of the user
      */
     private $email;
-    
+   
     /**
-     * picture
+     * userType
      *
-     * @var Media $picture picture of the user
+     * @var string $userType userType of the user
      */
-    private $picture;
-    
-    /**
-     * logo
-     *
-     * @var Media $logo logo of the user
-     */
-    private $logo;
-    
+    private $userType;
+
     /**
      * slogan
      *
      * @var string $logo logo of the user
      */
     private $slogan;
-    
+
+    /**
+     * mediasUser
+     *
+     * @var Array $mediasUser the media related to the user 
+     */
+    private $mediasUser;
+
     /**
      * socialNetworks
      *
@@ -166,49 +166,25 @@ class User
     }
 
     /**
-     * Get $picture picture of the user
+     * Get $userType userType of the user
      *
-     * @return  Media
+     * @return  string
      */ 
-    public function getPicture(): ?Media
+    public function getUserType(): ?string
     {
-        return $this->picture;
+        return $this->userType;
     }
 
     /**
-     * Set $picture picture of the user
+     * Set $userType userType of the user
      *
-     * @param  Media  $picture picture of the user
+     * @param  string  $userType userType of the user
      *
      * @return  self
      */ 
-    public function setPicture(Media $picture): self
+    public function setUserType(string $userType): self
     {
-        $this->picture = $picture;
-
-        return $this;
-    }
-
-    /**
-     * Get $logo logo of the user
-     *
-     * @return  Media
-     */ 
-    public function getLogo(): ?Media
-    {
-        return $this->logo;
-    }
-
-    /**
-     * Set $logo logo of the user
-     *
-     * @param  Media  $logo logo of the user
-     *
-     * @return  self
-     */ 
-    public function setLogo(Media $logo): self
-    {
-        $this->logo = $logo;
+        $this->userType = $userType;
 
         return $this;
     }
@@ -233,6 +209,30 @@ class User
     public function setSlogan(string $slogan): self
     {
         $this->slogan = $slogan;
+
+        return $this;
+    }
+
+    /**
+     * Get $mediasUser the media related to the user
+     *
+     * @return  Array
+     */ 
+    public function getMediasUser() :?array
+    {
+        return $this->mediasUser;
+    }
+
+    /**
+     * Set $mediasUser the media related to the user
+     *
+     * @param  Array  $mediasUser the media related to the user
+     *
+     * @return  self
+     */ 
+    public function setMediasUser(Array $mediasUser): self
+    {
+        $this->mediasUser = $mediasUser;
 
         return $this;
     }

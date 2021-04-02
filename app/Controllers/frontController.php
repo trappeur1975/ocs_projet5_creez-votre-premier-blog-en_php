@@ -39,6 +39,7 @@ function post($id)
     $post = $postManager->getPost($id);
 
     $mediaManager= new MediaManager();
-    $listMediasForPost = $mediaManager->findMediaForPost($id);
-    require('../app/Views/frontViews/frontPostView.php'); //BON CHEMIN QUAND INDEX.PHP EST dans le dossier "public"
+    // $listMediasForPost = $mediaManager->getMediasForPost($id);
+    $listMediasForPost = $mediaManager->findMediasForPost($id);
+    require('../app/Views/frontViews/frontPostView.php');
 }

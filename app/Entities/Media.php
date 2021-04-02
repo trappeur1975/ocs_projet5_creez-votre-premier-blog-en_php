@@ -18,13 +18,19 @@ class Media
      * @var string $path path of the media
      */
     private $path;
-    
+
     /**
      * alt
      * @var string $alt alt of the media
      */
     private $alt;
-    
+
+    /**
+     * statutActif
+     * @var bool $statutActif media status (active = boolean true or not active = boolean false) depending on whether the media is used or not in a post 
+     */
+    private $statutActif;
+     
     /**
      * type
      * @var string $type type of the media
@@ -85,6 +91,30 @@ class Media
     public function setAlt(string $alt): self
     {
         $this->alt = $alt;
+
+        return $this;
+    }
+
+    /**
+     * Get $statutActif media status (active = boolean true or not active = boolean false) depending on whether the media is used or not in a post
+     *
+     * @return  bool
+     */ 
+    public function getStatutActif(): ?bool
+    {
+        return $this->statutActif;
+    }
+
+    /**
+     * Set $statutActif media status (active = boolean true or not active = boolean false) depending on whether the media is used or not in a post
+     *
+     * @param  bool  $statutActif  $statutActif media status (active = boolean true or not active = boolean false) depending on whether the media is used or not in a post
+     *
+     * @return  self
+     */ 
+    public function setStatutActif(bool $statutActif) :self
+    {
+        $this->statutActif = $statutActif;
 
         return $this;
     }

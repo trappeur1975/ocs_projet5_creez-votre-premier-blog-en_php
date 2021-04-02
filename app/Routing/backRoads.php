@@ -63,6 +63,7 @@ $router->map('GET', '/backend', function (){  // for the road  http://localhost:
         adminMedias();
     });
 
+    // ------------------en cours----------------------------------------
     //function to edit a media
     $router->map('POST|GET', '/backend/editMedia/[i:id]', function ($id){  // for the road http://localhost:8000/backend/editMedia/1 ou http://localhost:8000/backend/editMedia/2 ou ....
         editMedia($id);
@@ -73,6 +74,7 @@ $router->map('GET', '/backend', function (){  // for the road  http://localhost:
             createMedia();
     });
 
+// ------------------PAS FAIT----------------------------------------
     //function to delete a media
     $router->map('POST|GET', '/backend/deleteMedia/[i:id]', function ($id){  // for the road http://localhost:8000/backend/deleteMedia/1 ou http://localhost:8000/backend/deleteMedia/2 ou ....
         deleteMedia($id);

@@ -67,10 +67,11 @@ class PostManager extends Manager
      * Method updatePost update the content of a post 
      *
      * @param Post $post post to update 
-     *
+     * @param integer $idUser id of the post user
+     *  
      * @return void
      */
-    public function updatePost(Post $post): void
+    public function updatePost(Post $post, int $idUser): void
     {
         $db = $this->dbConnect();
         $query = $db->prepare('UPDATE post SET title = :title, 
@@ -86,7 +87,7 @@ class PostManager extends Manager
             'content' => $post->getContent(),
             'dateCreate' => $post->getDateCreate()->format('Y-m-d H:i:s'),
             'dateChange' => $post->getDateChange(),
-            'user_id' => $post->getUser_id(),
+            'user_id' => $idUser,
             'id' => $post->getId()
         ]);
         
@@ -98,7 +99,7 @@ class PostManager extends Manager
 // --------------------------------------------------------------------------------------
 
     // ajoute le post (en attribut de cette fonction) a la table post en bdd
-    public function addPost(Post $post)
+    public function addPost(Post $post, int $idUser)
     {
         $db = $this->dbConnect();
         
@@ -114,7 +115,7 @@ class PostManager extends Manager
             'content' => $post->getContent(),
             'dateCreate' => $post->getDateCreate()->format('Y-m-d H:i:s'),
             'dateChange' => $post->getDateChange(),
-            'user_id' => $post->getUser_id()
+            'user_id' => $idUser
             ]);
 
         if($result === true){
@@ -123,5 +124,6 @@ class PostManager extends Manager
             throw new Exception('impossible de de creer l enregistrement du post');
         }
     }
+
 
 }
