@@ -21,8 +21,8 @@ ob_start();
     <h2>Se connecter</h2>
 
     <form action="<?= '/backend/connection' ?>" method="post"> <!-- here we indicate the action of the form in order not to leave the alert "not identified" permanently on the connection page. this allows to reload the url of the page without "? badConnection = true"   -->
-        <?= $form->input('login', 'login') ?>
-        <?= $form->input('password', 'password') ?>
+        <?= $form->input('login', 'login', 'login') ?>
+        <?= $form->input('password', 'password', 'password') ?>
         <button type= "submit" class="btn btn-primary">Se connecter</button>
     </form>
 

@@ -32,10 +32,10 @@ class Media
     private $statutActif;
      
     /**
-     * type
-     * @var string $type type of the media
+     * mediaType
+     * @var string $mediaType type of the media
      */
-    private $type;
+    private $mediaType;
 
     /**
      * Get $id id of the media
@@ -120,23 +120,23 @@ class Media
     }
 
     /**
-     * Get $type type of the media
+     * Get $mediaType type of the media
      *
      * @return  string
      */ 
-    public function getType(): ?string
+    public function getMediaType(): ?string
     {
         return $this->type;
     }
 
     /**
-     * Set $type type of the media
+     * Set $mediaType type of the media
      *
-     * @param  string  $type type of the media
+     * @param  string  $mediaType type of the media
      *
      * @return  self
      */ 
-    public function setType(string $type): self
+    public function setMediaType(string $type): self
     {
         $this->type = $type;
 

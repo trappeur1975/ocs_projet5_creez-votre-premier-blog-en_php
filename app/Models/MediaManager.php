@@ -95,64 +95,41 @@ class MediaManager extends Manager
      *
      * @return Media[]  all media of a post
      */
-    public function getListMediasForPost(Post $post): array
+    public function getListMediasForPost(int $idPost): array
     {
         $db = $this->dbConnect();
-        $query = $db->prepare('SELECT media.id As id, media.path, media.alt, media.statutActif, media.mediaType_id, media.post_id, mediaType.type FROM media 
-                                INNER JOIN mediaType
-                                ON media.mediaType_id = mediaType.id
-                                WHERE media.post_id = :id');
-        $query->execute(['id' => $post->getId()]);
-        $listMediasForPost = $query ->fetchAll(PDO::FETCH_CLASS, Media::class);
+        $query = $db->prepare('SELECT * FROM media WHERE post_id = :id');
+        $query->execute(['id' => $idPost]);
 
-        // dd($listMediasForPost);
+        $listMediasForPost = $query ->fetchAll(PDO::FETCH_CLASS, Media::class);
 
         return $listMediasForPost;
     }
 
-    // return le premier media d un post si celui ci en a au moins un sinon return un tableau vide
-    public function getFirstMediaPost(Post $post)
-    {
-        $medias = $this->getListMediasForPost($post);
-
-        // on verifie que le post contient bien des media
-        if ($medias != [])
-        {
-            $media =  $medias[0];
-            return $media;
-        } else {
-            return [];
-        }
-    }
-
-    // OK MAIS  OBLIGER DE SUPPRIMER "mediatype.id," DANS MON SELECT CAR SINON MES ID DE media.id seront ceux de mediatype.id  => voir si dessous
     /**
      * Method getMediasForUser method that returns the list of media linked to a user 
      *
-     * @param User $User the user whose media we want to retrieve 
+     * @param int $idUser the id user whose media we want to retrieve 
      *
      * @return Media[]
      */
-    public function getListMediasForUser(User $user): array
+
+    public function getListMediasForUser(int $idUser): array
     {
         $db = $this->dbConnect();
 
-        // LA SOLUTION
-        $query = $db->prepare('SELECT media.id As id, media.path, media.alt, media.statutActif, media.mediaType_id, media.post_id, media.user_id, mediatype.id As mediaTypeId, mediatype.type FROM media 
-                                INNER JOIN mediaType
-                                ON media.mediaType_id = mediaType.id
-                                WHERE media.user_id = :id');
-        $query->execute(['id' => $user->getid()]);
+        $query = $db->prepare('SELECT * FROM media WHERE user_id = :id');
+        $query->execute(['id' => $idUser]);
 
         $listMediasForUser = $query ->fetchAll(PDO::FETCH_CLASS, Media::class);
-  
+
         return $listMediasForUser;
     }
 
     // methode pour recuperer un tableau de media lier a un utilisateur que l on va utiliser dans le select
-    public function listSelect(User $user): array
+    public function listSelect(int $idUser): array
     {
-        $medias = $this->getListMediasForUser($user);
+        $medias = $this->getListMediasForUser($idUser);
         $results = [];
         
         foreach($medias as $media){
@@ -163,9 +140,9 @@ class MediaManager extends Manager
     }
 
     // methode pour recuperer les id de la function getListMediasForPost(Post $post) de cette classe
-    public function getIdOftListMediasForPost($post): array
+    public function getIdOftListMediasForPost(int $idPost): array
     {
-        $medias = $this->getListMediasForPost($post);
+        $medias = $this->getListMediasForPost($idPost);
     
         $results = [];
         

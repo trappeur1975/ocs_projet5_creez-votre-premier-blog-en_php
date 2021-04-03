@@ -1,14 +1,12 @@
 <form action="" method="post">
-    <?= $form->input('firstName', 'firstName') ?>
-    <?= $form->input('lastName', 'lastName') ?>
-    <?= $form->input('email', 'email') ?>
-    <?= $form->input('picture', 'picture') ?>
-    <?= $form->input('logo', 'logo') ?>
-    <?= $form->input('slogan', 'slogan') ?>
-    <?= $form->input('socialNetworks', 'socialNetworks') ?>  <!-- DOIT ETRE UN ARRAY -->
-    <?= $form->input('login', 'login') ?>
-    <?= $form->input('password', 'password') ?>
-    <?= $form->input('validate', 'validate') ?> <!-- DOIT ETRE UN DATETIME -->
+    <?= $formUser->input('firstName', 'firstName','firstName' ) ?>
+    <?= $formUser->input('lastName', 'lastName', 'lastName') ?>
+    <?= $formUser->input('email', 'email', 'email') ?>
+    <?= $formUserType->select('id', 'userType_id', 'statut', $listSelectUserTypes) ?> <!--select des userType -->
+    <?= $formUser->input('slogan', 'slogan', 'slogan') ?>
+    <?= $formUser->input('login', 'login', 'login') ?>
+    <?= $formUser->input('password', 'password', 'password') ?>
+    <?= $formUser->input('validate', 'validate', 'validate') ?> <!-- DOIT ETRE UN DATETIME -->
 
     <button class="btn btn-primary">
         <?php if($user->getId() !==null):?>
@@ -17,5 +15,6 @@
             créer
         <?php endif?>
     </button>
+
     <a href="/backend/adminPosts" class="btn btn-primary">Administration des post</a>
 </form>

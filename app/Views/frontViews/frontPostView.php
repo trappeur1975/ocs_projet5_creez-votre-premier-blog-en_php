@@ -7,8 +7,8 @@
     <h2>image</h2>
         <!-- <img src="/media/post_top_javascript_img1.png" alt="Photo de montagne" /> -->
         <img src="<?='/'.$listMediasForPost[0]->getPath(); ?>" alt="<?=$listMediasForPost[0]->getAlt(); ?>" />
-        <h3>type image : <?=$listMediasForPost[0]->getType(); ?></h3>
-            
+        <h3>type image : <?=$listMediasForPost[0]->getMediaType(); ?></h3>
+
     <h2>introduction</h2>
         <?= formatHtml($post->getIntroduction()); ?> 
     <h2>content</h2>

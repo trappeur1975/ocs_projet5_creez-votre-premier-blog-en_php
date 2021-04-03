@@ -9,7 +9,7 @@ use App\Entities\User;
 /**
  * UserManager
  * 
- * manage access to the post database table
+ * manage access to the user database table
  */
 class UserManager extends Manager
 {
@@ -41,11 +41,11 @@ class UserManager extends Manager
         $query = $db->prepare('SELECT * FROM user WHERE id = :id');
         $query->execute(['id' => $id]);
         $query->setFetchMode(PDO::FETCH_CLASS, User::class);
-        $post = $query->fetch();
-        if($post === false){
+        $user = $query->fetch();
+        if($user === false){
             throw new Exception('aucun user ne correspond a cet ID');
         }
-        return $post;
+        return $user;
     }
 
     /**
@@ -79,26 +79,22 @@ class UserManager extends Manager
         $query = $db->prepare('UPDATE user SET firstName = :firstName, 
                                                 lastName = :lastName,
                                                 email = :email,
-                                                picture = :picture,
-                                                logo = :logo,
                                                 slogan = :slogan,
-                                                socialNetworks = :socialNetworks,
                                                 login = :login,
                                                 password = :password,
-                                                validate = :validate
+                                                validate = :validate,
+                                                userType_id = :userType_id
                             WHERE id = :id');
         $result = $query->execute([
             'firstName' => $user->getFirstName(),
             'lastName' => $user->getLastName(),
             'email' => $user->getEmail(),
-            // 'dateCreate' => $post->getDateCreate()->format('Y-m-d H:i:s'),
-            'picture' => $user->getPicture(),
-            'logo' => $user->getLogo(),
             'slogan' => $user->getSlogan(),
-            'socialNetworks' => $user->getSocialNetworks(),
             'login' => $user->getLogin(),
             'password' => $user->getPassword(),
-            'validate' => $user->getValidate(),
+            'validate' => $user->getValidate()->format('Y-m-d H:i:s'),
+            // 'validate' => $user->getValidate(),
+            'userType_id' => $user->getUserType_id(),
             'id' => $user->getId()
         ]);
         

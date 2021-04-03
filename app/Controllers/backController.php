@@ -9,6 +9,7 @@ use App\Entities\MediaType;
 use App\Models\PostManager;
 use App\Models\UserManager;
 use App\Models\MediaManager;
+use App\Models\UserTypeManager;
 use App\Models\MediaTypeManager;
 
 // CONNECTION / DECONNECTION AU SITE
@@ -108,11 +109,12 @@ use App\Models\MediaTypeManager;
 
         // pour afficher le contenu du select des medias liers a l user qui est lier au post que l on souhaite editer
             $mediaManager = new MediaManager();             
-            $media = ($mediaManager->getListMediasForUser($user))[0]; // on recuperer le premier media de l user du post qui sera utiliser dans "$formMedia = new Form($media);" ci dessous qui permettra de creer les champs propre au $media (via l entité "Form.php")
-
-            //utiliser dans "backviews > post > _form.php"
-            $listSelectMediasForUser =  $mediaManager->listSelect($user); // on affiche la liste des media de l'user auteur du post
-            $listSelectMediasForPost =  $mediaManager->getIdOftListMediasForPost($post);// on recupere la liste des media pour ce $post
+            $media = $mediaManager->getListMediasForUser($post->getUser_id())[0]; // on recuperer le premier media de l user du post qui sera utiliser dans "$formMedia = new Form($media);" ci dessous qui permettra de creer les champs propre au $media (via l entité "Form.php")
+           
+            //utiliser dans "backviews > post > _form.php" 
+                $listSelectMediasForUser =  $mediaManager->listSelect($post->getUser_id()); // on affiche la liste des media de l'user auteur du post
+               
+                $listSelectMediasForPost =  $mediaManager->getIdOftListMediasForPost($post->getId());// on recupere la liste des media pour ce $post
         
         if ($_SERVER['REQUEST_METHOD'] === 'POST') { // if a submission of the form (=> a modification of a post) has been made
             //for data validation
@@ -144,8 +146,10 @@ use App\Models\MediaTypeManager;
                             ->setDateCreate($dateCreate)
                             ->setDateChange($dateChange)
                             ;
-
+                        
+                        
                         $postManager->updatePost($post, $_POST['user'][0]);  //MODIFICATION par rapport a la la fonction d'origine on a rajouter "$_POST['user'][0]" pour avoir id de l'user du post (voir explication dans "Form.php")
+                        // $postManager->updatePost($post);
 
                     // -------- enregistrement des modifications (via le select des medias) des infos sur les media lié au post
                         // cela nous servira par la suite a savoir si le user a l origine du post a ete modifier
@@ -297,7 +301,14 @@ use App\Models\MediaTypeManager;
 
         $userManager = new UserManager();
         $user = $userManager->getUser($id);
-        
+
+        // dd($user);
+
+        $userTypeManager = new UserTypeManager();
+        $userType = $userTypeManager->getUserType($user->getUserType_id()); // sera utiliser dans "$formUserType = new Form($userType);" qui creer les champs propres au userType (via l entité "Form.php") qui seront eux meme integrer pour les integrer (en totalite ou en partie) dans "$formUser = new Form($user);" ci dessous qui permettra de creer les champs propre au $user (via l entité "Form.php")
+        $listSelectUserTypes = $userTypeManager->listSelect(); //pour afficher le contenu du select des usertypes, sera utiliser dans "backView > user > _form.php"
+
+   
         if ($_SERVER['REQUEST_METHOD'] === 'POST') { // if a submission of the form (=> a modification of a post) has been made
             //for data validation
                 $errors = [];
@@ -313,34 +324,30 @@ use App\Models\MediaTypeManager;
                 
                     //ISSSUE  gestion des date en datetime dans entité post // base de donnee en string pour la create ou l edit d un post (=>voir methode setDateCreate($dateCreate) de la class Post)
                     //modification pour gerer l enregistrement dans la base de donnee via le Usermanager
-                    // $dateCreate = DateTime::createFromFormat('Y-m-d H:i:s',$_POST['dateCreate']); // pour que la date String soit en Datetime
-                    $validate = $_POST['validate'];
+                    $dateValidate = DateTime::createFromFormat('Y-m-d H:i:s', $_POST['validate']); // pour que la date String soit en Datetime
+                    // $validate = $_POST['validate'];
 
                     if($_POST['validate'] === ''){
                         $validate=NULL;
                     }
                 
+                    // dd($_POST['userType_id']);
+
                     $user
                         ->setFirstName($_POST['firstName'])
                         ->setLastName($_POST['lastName'])
                         ->setEmail($_POST['email'])
-                        ->setPicture($_POST['picture'])
-                        ->setLogo($_POST['logo'])
                         ->setSlogan($_POST['slogan'])
-                        ->setSocialNetworks($_POST['socialNetworks'])
                         ->setLogin($_POST['login'])
                         ->setPassword($_POST['password'])
-                        ->setValidate($validate);
-    
-                    // $post
-                    //     ->setTitle($_POST['title'])
-                    //     ->setIntroduction($_POST['introduction'])
-                    //     ->setContent($_POST['content'])
-                    //     ->setDateCreate($dateCreate)
-                    //     ->setDateChange($dateChange)
-                    //     ->setUser_id($_POST['user_id']);
+                        ->setValidate($dateValidate)
+                        // ->setValidate($_POST['validate']);
+                        ->setUserType_id($_POST['userType_id'][0]); //car on cette donnee est issu d'un select simple
                     
+                    // dd($user);
+
                     $userManager->updateUser($user);
+
                     header('Location: /backend/editUser/'.$user->getId().'?success=true');
                 }else{
                     // ISSUE COMMENT TRANSMETTRE UN TABLEAU $errors=[]; DANS LA REDIRECTION CI DESSOUS POUR AFFICHER DANS LA VIEW LES DIFFERENTES ERREORS
@@ -348,11 +355,11 @@ use App\Models\MediaTypeManager;
                 }
         }
 
-        $form = new Form($user);
+        $formUser = new Form($user);
+        $formUserType = new Form($userType);
 
-        require('../app/Views/backViews/post/backEditUserView.php');
-
-
+        // require('../app/Views/backViews/post/backEditUserView.php');
+        require('../app/Views/backViews/user/backEditUserView.php');
     }
 
     /**

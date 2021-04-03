@@ -33,34 +33,13 @@ class User
      * @var string $email email of the user
      */
     private $email;
-   
-    /**
-     * userType
-     *
-     * @var string $userType userType of the user
-     */
-    private $userType;
 
     /**
      * slogan
      *
-     * @var string $logo logo of the user
+     * @var string $slogan slogan of the user
      */
     private $slogan;
-
-    /**
-     * mediasUser
-     *
-     * @var Array $mediasUser the media related to the user 
-     */
-    private $mediasUser;
-
-    /**
-     * socialNetworks
-     *
-     * @var string[] 
-     */
-    private $socialNetworks;
 
     /**
      * login
@@ -79,9 +58,16 @@ class User
     /**
      * validate
      *
-     * @var \Datetime $validate validate of the user
+     * @var \datetime $validate validate of the user
      */
     private $validate;
+
+    /**
+     * userType_id
+     *
+     * @var int $userType_id userType_id of the user
+     */
+    private $userType_id;
 
     /** 
      * Get $id id of the user
@@ -166,31 +152,7 @@ class User
     }
 
     /**
-     * Get $userType userType of the user
-     *
-     * @return  string
-     */ 
-    public function getUserType(): ?string
-    {
-        return $this->userType;
-    }
-
-    /**
-     * Set $userType userType of the user
-     *
-     * @param  string  $userType userType of the user
-     *
-     * @return  self
-     */ 
-    public function setUserType(string $userType): self
-    {
-        $this->userType = $userType;
-
-        return $this;
-    }
-
-    /**
-     * Get $logo logo of the user
+     * Get $slogan slogan of the user
      *
      * @return  string
      */ 
@@ -200,63 +162,15 @@ class User
     }
 
     /**
-     * Set $logo logo of the user
+     * Set $slogan slogan of the user
      *
-     * @param  string  $slogan logo of the user
+     * @param  string  $slogan slogan of the user
      *
      * @return  self
      */ 
     public function setSlogan(string $slogan): self
     {
         $this->slogan = $slogan;
-
-        return $this;
-    }
-
-    /**
-     * Get $mediasUser the media related to the user
-     *
-     * @return  Array
-     */ 
-    public function getMediasUser() :?array
-    {
-        return $this->mediasUser;
-    }
-
-    /**
-     * Set $mediasUser the media related to the user
-     *
-     * @param  Array  $mediasUser the media related to the user
-     *
-     * @return  self
-     */ 
-    public function setMediasUser(Array $mediasUser): self
-    {
-        $this->mediasUser = $mediasUser;
-
-        return $this;
-    }
-
-    /**
-     * Get $socialNetworks socialNetworks of the user
-     *
-     * @return  array
-     */ 
-    public function getSocialNetworks(): ?array
-    {
-        return $this->socialNetworks;
-    }
-
-    /**
-     * Set $socialNetworks socialNetworks of the user
-     *
-     * @param  array $socialNetworks socialNetworks of the user
-     *
-     * @return  self
-     */ 
-    public function setSocialNetworks(array $socialNetworks)
-    {
-        $this->socialNetworks = $socialNetworks;
 
         return $this;
     }
@@ -314,7 +228,8 @@ class User
      *
      * @return  \Datetime
      */ 
-    public function getValidate(): ?\datetime
+    // public function getValidate(): ?\datetime
+    public function getValidate()
     {
         return $this->validate;
     }
@@ -327,10 +242,34 @@ class User
      * @return  self
      */ 
     public function setValidate(\Datetime $validate): self
+    // public function setValidate($validate): self
     {
         $this->validate = $validate;
 
         return $this;
     }
 
+    /**
+     * Get $userType_id userType_id of the user
+     *
+     * @return  int
+     */ 
+    public function getUserType_id()
+    {
+        return $this->userType_id;
+    }
+
+    /**
+     * Set $userType_id userType_id of the user
+     *
+     * @param  int  $userType userType_id of the user
+     *
+     * @return  self
+     */ 
+    public function setUserType_id(int $userType_id): self
+    {
+        $this->userType_id = $userType_id;
+
+        return $this;
+    }
 }

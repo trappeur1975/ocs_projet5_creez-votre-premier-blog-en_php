@@ -14,7 +14,8 @@ class Form
     }
 
     //pour creer un champ input
-    public function input(string $key, string $label): string
+    // PERO j ai rajouter l attribue "$title" pour nommer le champ differement du label
+    public function input(string $key, string $label, string $title): string
     {
         $value = $this->getValue($key);
         $type = $key === "password" ? "password" : "text"; //CODE ORIGINAL GRAFIKART
@@ -33,10 +34,12 @@ class Form
         // }
         // -------------------- FIN DE MON CODE PERSO remplace code origien grafikart --------------------------
         
+        // modif perso j ai remplacé name="{$key}" par name="{$label}" ATTENTION VOIR L IMPLICATION QUE CELA A SUR LE SELECT MEDIA POUR L EDIT DE POST
+        // modif perso j ai remplacé for="{$key}" par for="{$label}"
         return <<<HTML
         <div class="form-group">
-            <label for="{$key}">{$label}</label>
-            <input type={$type} id="{$key}" class="form-control" name="{$key}" value="{$value}">
+            <label for="{$label}">{$title}</label>
+            <input type={$type} id="{$key}" class="form-control" name="{$label}" value="{$value}">
         </div>
 HTML;
     }
@@ -54,8 +57,8 @@ HTML;
     }
 
     //pour creer un champ select
-    //perso j ai rajouter array $select pour que l'on puisse recuperer la liste (ex des medias propre a un post) pour ensuite gerer l attribut select (ou les attributs dans le cas de select multiple)
-    //perso j ai rajouter $typeSelect=null pour gerer si c'est un select multiple
+    //perso j ai rajouter array $selects pour que l'on puisse recuperer la liste (ex des medias propre a un post) pour ensuite gerer l attribut select (ou les attributs dans le cas de select multiple)
+    //perso j ai rajouter $typeSelect=null pour gerer si c'est un select multiple ou pas
     //perso j ai rajouter string $title pour que l affichage du champs en front soit different du label (avant il n'y avait que label)
     public function select(string $key, string $label, string $title, array $options=[], array $selects=null, $typeSelect=null): ?string
     { 

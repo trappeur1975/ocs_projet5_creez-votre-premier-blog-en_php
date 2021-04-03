@@ -1,10 +1,10 @@
 <form action="" method="post">
-    <!-- CREATION DES CHAMPS PROPORE A LA CLASSE POST -->
-        <?= $formPost->input('title', 'titre') ?>
+    <!-- CREATION DES CHAMPS PROPRE A LA CLASSE POST -->
+        <?= $formPost->input('title', 'title', 'titre') ?>
         <?= $formPost->textarea('introduction', 'introduction') ?>
-        <?= $formPost->textarea('content', 'content') ?>
-        <?= $formPost->input('dateCreate', 'date de creation') ?>
-        <?= $formPost->input('dateChange', 'date de changement') ?>
+        <?= $formPost->textarea('content', 'contenu') ?>
+        <?= $formPost->input('dateCreate', 'dateCreate', 'date de creation') ?>
+        <?= $formPost->input('dateChange', 'dateChange', 'date de modification') ?>
     
     <!-- CREATION DES CHAMPS  SELECT -->
         <?= $formUser->select('id', 'user', 'auteur', $listSelectUsers) ?>   <!-- pour la creation du select des users -->

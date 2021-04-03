@@ -72,6 +72,7 @@ class PostManager extends Manager
      * @return void
      */
     public function updatePost(Post $post, int $idUser): void
+    // public function updatePost(Post $post): void
     {
         $db = $this->dbConnect();
         $query = $db->prepare('UPDATE post SET title = :title, 
@@ -88,6 +89,7 @@ class PostManager extends Manager
             'dateCreate' => $post->getDateCreate()->format('Y-m-d H:i:s'),
             'dateChange' => $post->getDateChange(),
             'user_id' => $idUser,
+            //'user_id' => $post->getUser_id(),
             'id' => $post->getId()
         ]);
         
