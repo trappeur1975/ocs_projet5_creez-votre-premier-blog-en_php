@@ -163,22 +163,4 @@ class UserManager extends Manager
         return $results;
     }
 
-// ------------------------------MODIFICATION----------------------------------------------
-
-    // recuperer l'user d'un post
-    public function getUserPost(Post $post)
-    {
-        $db = $this->dbConnect();
-        $query = $db->prepare('SELECT user_id FROM post WHERE id = :id');
-        $query->execute(['id' => $post->getId()]);
-
-        $userId = $query->fetch()["user_id"];
-        $user = $this->getUser($userId);
-
-        if($user === false){
-            throw new Exception('aucun user ne correspond a cet post');
-        }
-        return $user;
-    }
-
 }

@@ -2,7 +2,7 @@
     <?= $formUser->input('firstName', 'firstName','firstName' ) ?>
     <?= $formUser->input('lastName', 'lastName', 'lastName') ?>
     <?= $formUser->input('email', 'email', 'email') ?>
-    <?= $formUserType->select('id', 'userType_id', 'statut', $listSelectUserTypes) ?> <!--select des userType -->
+    <?= $formUserType->selectSimple('id', 'userType_id', 'statut', $listSelectUserTypes) ?> <!--select des userType -->
     <?= $formUser->input('slogan', 'slogan', 'slogan') ?>
     <?= $formUser->input('login', 'login', 'login') ?>
     <?= $formUser->input('password', 'password', 'password') ?>

@@ -7,9 +7,8 @@
         <?= $formPost->input('dateChange', 'dateChange', 'date de modification') ?>
     
     <!-- CREATION DES CHAMPS  SELECT -->
-        <?= $formUser->select('id', 'user', 'auteur', $listSelectUsers) ?>   <!-- pour la creation du select des users -->
-        <?= $formMedia->select('id', 'path','medias', $listSelectMediasForUser, $listSelectMediasForPost, 'multiple') ?><!--  pour la creation du select des medias -->
-        <!--<?//= $formMedia->select('id', 'media', $listSelectMediasForUser, $listSelectMediasForPost, 'multiple') ?>  pour la creation du select des medias -->
+        <?= $formUser->selectSimple('id', 'user', 'auteur', $listSelectUsers) ?>   <!-- pour la creation du select des users -->
+        <?= $formMedia->selectMultiple('id', 'path','medias', $listSelectMediasForUser, $listSelectMediasForPost) ?><!--  pour la creation du select des medias -->
 
     <button class="btn btn-primary">
         <?php if($post->getId() !==null):?>

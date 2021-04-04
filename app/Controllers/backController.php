@@ -103,7 +103,7 @@ use App\Models\MediaTypeManager;
 
         // pour afficher le contenu du select des users ------------
         $userManager = new UserManager();
-        $user = $userManager->getUserPost($post);   // sera utiliser dans "$formPost = new Form($post);" ci dessous qui permettra de creer les champs propre au $post (via l entité "Form.php")
+        $user = $userManager->getUser($post->getUser_id());   // sera utiliser dans "$formPost = new Form($post);" ci dessous qui permettra de creer les champs propre au $post (via l entité "Form.php")
         
         $listSelectUsers = $userManager->listSelect(); //sera utiliser dans "backView > post > _form.php"
 
@@ -145,16 +145,15 @@ use App\Models\MediaTypeManager;
                             ->setContent($_POST['content'])
                             ->setDateCreate($dateCreate)
                             ->setDateChange($dateChange)
+                            ->setUser_id($_POST['user'])
                             ;
-                        
-                        
-                        $postManager->updatePost($post, $_POST['user'][0]);  //MODIFICATION par rapport a la la fonction d'origine on a rajouter "$_POST['user'][0]" pour avoir id de l'user du post (voir explication dans "Form.php")
-                        // $postManager->updatePost($post);
+                                            
+                        $postManager->updatePost($post);
 
                     // -------- enregistrement des modifications (via le select des medias) des infos sur les media lié au post
                         // cela nous servira par la suite a savoir si le user a l origine du post a ete modifier
                         $userOrigine = $user;
-                        $newUser = $userManager->getUserPost($post);
+                        $newUser = $userManager->getUser($post->getUser_id());
 
                         // si l utilisateur a ete modifier on desactive les medias lier a ce post
                         if ($userOrigine != $newUser){
@@ -164,13 +163,12 @@ use App\Models\MediaTypeManager;
                         }
                     
                         if(!is_null($_POST['path']) and ($userOrigine == $newUser)){ //on enregistre la nouvelle liste de media pour le post definit dans le select des medias uniquement si le user n a pas changer
-                        // if(!is_null($_POST['path'])){    //ancien code
                             // on met tout les medias du post en statutActif = false
                             foreach($listSelectMediasForPost as $value){                           
                                 $mediaManager->UpdateStatutActifMedia($value, 0); 
                             }
                             // on met tout les medias dont leurs id sont dans "$_POST['path']" en statutActif = true 
-                            // et on modifie leurs post_id pour bien attribuer auw media selectionner dans le select le id du post
+                            // et on modifie leurs post_id pour bien attribuer au media selectionner dans le select le id du post
                             foreach($_POST['path'] as $value){
                                 $mediaManager->UpdateStatutActifMedia($value, 1);
                                 $mediaManager->UpdatePostIdMedia($value, $post->getId());
@@ -330,8 +328,6 @@ use App\Models\MediaTypeManager;
                     if($_POST['validate'] === ''){
                         $validate=NULL;
                     }
-                
-                    // dd($_POST['userType_id']);
 
                     $user
                         ->setFirstName($_POST['firstName'])
@@ -343,8 +339,6 @@ use App\Models\MediaTypeManager;
                         ->setValidate($dateValidate)
                         // ->setValidate($_POST['validate']);
                         ->setUserType_id($_POST['userType_id'][0]); //car on cette donnee est issu d'un select simple
-                    
-                    // dd($user);
 
                     $userManager->updateUser($user);
 
