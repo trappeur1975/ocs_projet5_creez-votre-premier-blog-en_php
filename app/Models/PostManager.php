@@ -101,10 +101,10 @@ class PostManager extends Manager
 // --------------------------------------------------------------------------------------
 
     // ajoute le post (en attribut de cette fonction) a la table post en bdd
-    public function addPost(Post $post, int $idUser)
+    public function addPost(Post $post)
+    // public function addPost(Post $post, int $idUser)
     {
         $db = $this->dbConnect();
-        
         $query = $db->prepare('INSERT INTO post SET title = :title, 
                                                   introduction = :introduction,
                                                   content = :content,
@@ -117,13 +117,14 @@ class PostManager extends Manager
             'content' => $post->getContent(),
             'dateCreate' => $post->getDateCreate()->format('Y-m-d H:i:s'),
             'dateChange' => $post->getDateChange(),
-            'user_id' => $idUser
+            'user_id' => $post->getUser_id()
+            // 'user_id' => $idUser
             ]);
 
         if($result === true){
             return $db->lastInsertId();
         } else {
-            throw new Exception('impossible de de creer l enregistrement du post');
+            throw new Exception('impossible de de creer l enregistrement du nouveau post');
         }
     }
 

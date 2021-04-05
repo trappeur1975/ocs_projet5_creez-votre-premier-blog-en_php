@@ -99,9 +99,15 @@ use App\Models\MediaTypeManager;
     {
         Auth::check();
 
+        // pour etre sur que l on est sur la page editPost et non creatPost
+        $editPost = true;
+
         $postManager = new PostManager();
         $post = $postManager->getPost($id);
-
+        if ( $post->getDateChange() === null){
+            $post->setDateChange(new Datetime()); //to assign today's date (in datetime) by default when to edit the post
+        }
+        
         // pour afficher le contenu du select des users ------------
         $userManager = new UserManager();
         $user = $userManager->getUser($post->getUser_id());   // sera utiliser dans "$formPost = new Form($post);" ci dessous qui permettra de creer les champs propre au $post (via l entité "Form.php")
@@ -231,11 +237,12 @@ use App\Models\MediaTypeManager;
                     //ISSSUE  gestion des date en datetime dans entité post // base de donnee en string pour la create ou l edit d un post (=>voir methode setDateCreate($dateCreate) de la class Post)
                     //modification pour gerer l enregistrement dans la base de donnee via le Postmanager
                     $dateCreate = DateTime::createFromFormat('Y-m-d H:i:s',$_POST['dateCreate']); // pour que la date String soit en Datetime
-                    $dateChange = $_POST['dateChange'];
+                    $dateChange = null;
+                        // $dateChange = $_POST['dateChange'];
 
-                    if($_POST['dateChange'] === ''){
-                        $dateChange=NULL;
-                    }
+                        // if($_POST['dateChange'] === ''){
+                        //     $dateChange=NULL;
+                        // }
 
                     $post
                         ->setTitle($_POST['title'])
@@ -243,12 +250,14 @@ use App\Models\MediaTypeManager;
                         ->setContent($_POST['content'])
                         ->setDateCreate($dateCreate)
                         ->setDateChange($dateChange)
+                        ->setUser_id($_POST['user'])
                         // ->setUser_id($_POST['user_id'])
                         ;
 
                     $postManager = new PostManager();
-                     //MODIFICATION par rapport a la la fonction d'origine on a rajouter "$_POST['id']" pour avoir id de l'user du post
-                    $lastRecording = $postManager->addPost($post, $_POST['id']);// add the post to the database and get the last id of the posts in the database via the return of the function
+                    //MODIFICATION par rapport a la la fonction d'origine on a rajouter "$_POST['id']" pour avoir id de l'user du post
+                    $lastRecording = $postManager->addPost($post);// add the post to the database and get the last id of the posts in the database via the return of the function
+                    // $lastRecording = $postManager->addPost($post, $_POST['id']);// add the post to the database and get the last id of the posts in the database via the return of the function
                     
                     header('Location: /backend/editPost/'.$lastRecording.'?created=true');
                 }else{
