@@ -6,6 +6,7 @@ use App\Entities\Post;
 use App\Entities\User;
 use App\Entities\Media;
 use App\Entities\MediaType;
+use App\Entities\UserType;
 use App\Models\PostManager;
 use App\Models\UserManager;
 use App\Models\MediaManager;
@@ -300,8 +301,6 @@ use App\Models\MediaTypeManager;
         $userManager = new UserManager();
         $user = $userManager->getUser($id);
 
-        // dd($user);
-
         $userTypeManager = new UserTypeManager();
         $userType = $userTypeManager->getUserType($user->getUserType_id()); // sera utiliser dans "$formUserType = new Form($userType);" qui creer les champs propres au userType (via l entité "Form.php") qui seront eux meme integrer pour les integrer (en totalite ou en partie) dans "$formUser = new Form($user);" ci dessous qui permettra de creer les champs propre au $user (via l entité "Form.php")
         $listSelectUserTypes = $userTypeManager->listSelect(); //pour afficher le contenu du select des usertypes, sera utiliser dans "backView > user > _form.php"
@@ -323,7 +322,6 @@ use App\Models\MediaTypeManager;
                     //ISSSUE  gestion des date en datetime dans entité post // base de donnee en string pour la create ou l edit d un post (=>voir methode setDateCreate($dateCreate) de la class Post)
                     //modification pour gerer l enregistrement dans la base de donnee via le Usermanager
                     $dateValidate = DateTime::createFromFormat('Y-m-d H:i:s', $_POST['validate']); // pour que la date String soit en Datetime
-                    // $validate = $_POST['validate'];
 
                     if($_POST['validate'] === ''){
                         $validate=NULL;
@@ -338,7 +336,7 @@ use App\Models\MediaTypeManager;
                         ->setPassword($_POST['password'])
                         ->setValidate($dateValidate)
                         // ->setValidate($_POST['validate']);
-                        ->setUserType_id($_POST['userType_id'][0]); //car on cette donnee est issu d'un select simple
+                        ->setUserType_id($_POST['userType_id'][0]); //car on cette donnee est issu d'un select multiple
 
                     $userManager->updateUser($user);
 
@@ -365,7 +363,12 @@ use App\Models\MediaTypeManager;
         Auth::check();
 
         $user = new user();
-        // $user->setValidate(new Datetime()); //to assign today's date (in datetime) by default to the user we create 
+        $userType = new UserType();
+
+        $userTypeManager = new UserTypeManager();
+        $listSelectUserTypes = $userTypeManager->listSelect(); //pour afficher le contenu du select des usertypes, sera utiliser dans "backView > user > _form.php"
+
+        $user->setValidate(new Datetime()); //to assign today's date (in datetime) by default to the user we create 
         
         // $user->setDatechange(NULL); // ------POUR LE TESTE J ASSIGNE LA DATECHANGE A "NULL" VOIR APRES COMMENT FAIRE POUR GERER CELA --------------
         // $post->setUser_id(2); // ------POUR LE TESTE J ASSIGNE L UTILISATEUR "2" VOIR APRES COMMENT FAIRE POUR GERER CELA --------------
@@ -384,9 +387,7 @@ use App\Models\MediaTypeManager;
                 if(empty($errors)){
                     
                     //ISSSUE  gestion des date en datetime dans entité post // base de donnee en string pour la create ou l edit d un post (=>voir methode setDateCreate($dateCreate) de la class Post)
-                    //modification pour gerer l enregistrement dans la base de donnee via le Postmanager
-                    // $dateCreate = DateTime::createFromFormat('Y-m-d H:i:s',$_POST['dateCreate']); // pour que la date String soit en Datetime
-                    // $dateChange = $_POST['dateChange'];
+                    $dateCreate = DateTime::createFromFormat('Y-m-d H:i:s',$_POST['validate']); // pour que la date String soit en Datetime
 
                     // if($_POST['dateChange'] === ''){
                     //     $dateChange=NULL;
@@ -396,14 +397,16 @@ use App\Models\MediaTypeManager;
                         ->setFirstName($_POST['firstName'])
                         ->setLastName($_POST['lastName'])
                         ->setEmail($_POST['email'])
-                        // ->setPicture($_POST['picture'])
+                        ->setUserType_id($_POST['userType_id'][0]) //car on cette donnee est issu d'un select multiple
                         // ->setLogo($_POST['logo'])
                         ->setSlogan($_POST['slogan'])
                         // ->setSocialNetworks($_POST['socialNetworks'])
                         ->setLogin($_POST['login'])
                         ->setPassword($_POST['password'])
-                        ->setValidate(new Datetime()); //to assign today's date (in datetime) by default to the user we create 
-
+                        ->setValidate($dateCreate);
+                        // ->setValidate(new Datetime()); //to assign today's date (in datetime) by default to the user we create
+                        // ->setValidate(DateTime::createFromFormat('Y-m-d H:i:s',new Datetime())); //to assign today's date (in datetime) by default to the user we create 
+                    
                     $userManager = new UserManager();
                     $lastRecording = $userManager->addUser($user);// add the post to the database and get the last id of the posts in the database via the return of the function
                     header('Location: /backend/editUser/'.$lastRecording.'?created=true');
@@ -413,7 +416,8 @@ use App\Models\MediaTypeManager;
                 }
         }
         
-        $form = new Form($user);
+        $formUser = new Form($user);
+        $formUserType = new Form($userType);
 
         require('../app/Views/backViews/user/backCreateUserView.php');
     }

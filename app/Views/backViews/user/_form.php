@@ -6,7 +6,7 @@
     <?= $formUser->input('slogan', 'slogan', 'slogan') ?>
     <?= $formUser->input('login', 'login', 'login') ?>
     <?= $formUser->input('password', 'password', 'password') ?>
-    <?= $formUser->input('validate', 'validate', 'validate') ?> <!-- DOIT ETRE UN DATETIME -->
+    <?= $formUser->input('validate', 'validate', 'validate') ?> <!--  DOIT ETRE UN DATETIME -->
 
     <button class="btn btn-primary">
         <?php if($user->getId() !==null):?>

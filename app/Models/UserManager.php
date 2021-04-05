@@ -112,10 +112,10 @@ class UserManager extends Manager
         $query = $db->prepare('INSERT INTO user SET firstName = :firstName, 
                                                     lastName = :lastName,
                                                     email = :email,
-                                                    picture = :picture,
-                                                    logo = :logo,
+                                                    userType_id = :userType_id,
+                                                    -- logo = :logo,
                                                     slogan = :slogan,
-                                                    socialNetworks = :socialNetworks,
+                                                    -- socialNetworks = :socialNetworks,
                                                     login = :login,
                                                     password = :password,
                                                     validate = :validate');
@@ -123,19 +123,20 @@ class UserManager extends Manager
             'firstName' => $user->getFirstName(),
             'lastName' => $user->getLastName(),
             'email' => $user->getEmail(),
-            'picture' => $user->getPicture()->format('Y-m-d H:i:s'),
-            'logo' => $user->getLogo(),
+            'userType_id' => $user->getUserType_id(),
+            // 'logo' => $user->getLogo(),
             'slogan' => $user->getSlogan(),
-            'socialNetworks' => $user->getSocialNetworks(),
+            // 'socialNetworks' => $user->getSocialNetworks(),
             'login' => $user->getLogin(),
             'password' => $user->getPassword(),
-            'validate' => $user->getValidate()
+            'validate' => $user->getValidate()->format('Y-m-d H:i:s')
+            // 'validate' => $user->getValidate()
             ]);
 
         if($result === true){
             return $db->lastInsertId();
         } else {
-            throw new Exception('impossible de de creer l enregistrement du user');
+            throw new Exception('impossible de creer l enregistrement du user');
         }
     }
 
