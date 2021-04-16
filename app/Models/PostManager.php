@@ -46,20 +46,29 @@ class PostManager extends Manager
         return $post;
     }
 
-    /**
-     * Method deletePost delete a post 
-     *
-     * @param int $id post id to delete 
-     *
-     * @return void
-     */
-    public function deletePost(int $id) : void
+    // ajoute le post (en attribut de cette fonction) a la table post en bdd
+    public function addPost(Post $post)
     {
         $db = $this->dbConnect();
-        $query = $db->prepare('DELETE FROM post WHERE id = :id');
-        $result = $query->execute(['id' => $id]);
-        if($result === false){
-            throw new Exception('impossible de supprimer le post :'.$id.'peut être il n\'existe pas');
+        $query = $db->prepare('INSERT INTO post SET title = :title, 
+                                                  introduction = :introduction,
+                                                  content = :content,
+                                                  dateCreate = :dateCreate,
+                                                  dateChange = :dateChange,
+                                                  user_id = :user_id');
+        $result = $query->execute([
+            'title' => $post->getTitle(),
+            'introduction' => $post->getIntroduction(),
+            'content' => $post->getContent(),
+            'dateCreate' => $post->getDateCreate()->format('Y-m-d H:i:s'),
+            'dateChange' => $post->getDateChange(),
+            'user_id' => $post->getUser_id()
+            ]);
+
+        if($result === true){
+            return $db->lastInsertId();
+        } else {
+            throw new Exception('impossible de de creer l enregistrement du nouveau post');
         }
     }
    
@@ -71,7 +80,6 @@ class PostManager extends Manager
      *  
      * @return void
      */
-    // public function updatePost(Post $post, int $idUser): void
     public function updatePost(Post $post): void
     {
         $db = $this->dbConnect();
@@ -98,35 +106,20 @@ class PostManager extends Manager
         }
     }
 
-// --------------------------------------------------------------------------------------
-
-    // ajoute le post (en attribut de cette fonction) a la table post en bdd
-    public function addPost(Post $post)
-    // public function addPost(Post $post, int $idUser)
+    /**
+     * Method deletePost delete a post 
+     *
+     * @param int $id post id to delete 
+     *
+     * @return void
+     */
+    public function deletePost(int $id) : void
     {
         $db = $this->dbConnect();
-        $query = $db->prepare('INSERT INTO post SET title = :title, 
-                                                  introduction = :introduction,
-                                                  content = :content,
-                                                  dateCreate = :dateCreate,
-                                                  dateChange = :dateChange,
-                                                  user_id = :user_id');
-        $result = $query->execute([
-            'title' => $post->getTitle(),
-            'introduction' => $post->getIntroduction(),
-            'content' => $post->getContent(),
-            'dateCreate' => $post->getDateCreate()->format('Y-m-d H:i:s'),
-            'dateChange' => $post->getDateChange(),
-            'user_id' => $post->getUser_id()
-            // 'user_id' => $idUser
-            ]);
-
-        if($result === true){
-            return $db->lastInsertId();
-        } else {
-            throw new Exception('impossible de de creer l enregistrement du nouveau post');
+        $query = $db->prepare('DELETE FROM post WHERE id = :id');
+        $result = $query->execute(['id' => $id]);
+        if($result === false){
+            throw new Exception('impossible de supprimer le post :'.$id.'peut être il n\'existe pas');
         }
     }
-
-
 }

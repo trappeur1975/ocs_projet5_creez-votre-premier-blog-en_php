@@ -35,7 +35,27 @@ class Media
      * mediaType
      * @var string $mediaType type of the media
      */
-    private $mediaType;
+    // private $mediaType;
+
+    /**
+     * mediaType_id
+     * @var int $mediaType_id id of the media type to which this media belongs 
+     */
+    private $mediaType_id;
+
+    /**
+     * post_id
+     * @var int $post_id id of the post to which this media belongs
+     */
+    private $post_id;
+
+    /**
+     * user_id
+     * @var int $user_id id of the user to which this media belongs
+     */
+    private $user_id;
+
+
 
     /**
      * Get $id id of the media
@@ -124,10 +144,10 @@ class Media
      *
      * @return  string
      */ 
-    public function getMediaType(): ?string
-    {
-        return $this->type;
-    }
+    // public function getMediaType(): ?string
+    // {
+    //     return $this->type;
+    // }
 
     /**
      * Set $mediaType type of the media
@@ -136,11 +156,83 @@ class Media
      *
      * @return  self
      */ 
-    public function setMediaType(string $type): self
+    // public function setMediaType(string $type): self
+    // {
+    //     $this->type = $type;
+
+    //     return $this;
+    // }
+
+
+    /**
+     * Get $mediaType_id id of the media type to which this media belongs
+     *
+     * @return  int
+     */ 
+    public function getMediaType_id(): ?int
     {
-        $this->type = $type;
+        return $this->mediaType_id;
+    }
+
+    /**
+     * Set $mediaType_id id of the media type to which this media belongs
+     *
+     * @param  int  $mediaType_id  $mediaType_id id of the media type to which this media belongs
+     *
+     * @return  self
+     */ 
+    public function setMediaType_id(int $mediaType_id): self
+    {
+        $this->mediaType_id = $mediaType_id;
 
         return $this;
     }
 
+    /**
+     * Get $post_id id of the post to which this media belongs
+     *
+     * @return  int
+     */ 
+    public function getPost_id(): ?int
+    {
+        return $this->post_id;
+    }
+
+    /**
+     * Set $post_id id of the post to which this media belongs
+     *
+     * @param  int  $post_id  $post_id id of the post to which this media belongs
+     *
+     * @return  self
+     */ 
+    public function setPost_id(int $post_id): self
+    {
+        $this->post_id = $post_id;
+
+        return $this;
+    }
+
+    /**
+     * Get $user_id id of the user to which this media belongs
+     *
+     * @return  int
+     */ 
+    public function getUser_id(): ?int
+    {
+        return $this->user_id;
+    }
+
+    /**
+     * Set $user_id id of the user to which this media belongs
+     *
+     * @param  int  $user_id  $user_id id of the user to which this media belongs
+     *
+     * @return  self
+     */ 
+    public function setUser_id(int $user_id): self
+    {
+        $this->user_id = $user_id;
+
+        return $this;
+    }
 }

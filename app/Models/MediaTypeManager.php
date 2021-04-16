@@ -102,7 +102,7 @@ class MediaTypeManager extends Manager
     }
 
     // methode pour recuperer un tableau que l on va utiliser dans le select
-    public function list(): array
+    public function listMediaType(): array
     {
         $mediaTypes = $this->getListMediatypes();
         $results = [];

@@ -7,10 +7,19 @@ namespace App\Entities;
 class Form
 {
     private $data;
+        
+    /**
+     * edit
+     *
+     * @var boolean $edit to check if the creation of the form will be done in the case of a creation or an edition (of post for example).
+     * by default this variable is false via the constructor because we are not in the case of creating a form for an edit 
+     */
+    private $edit;
     
-    public function __construct($data)
+    public function __construct($data, $edit = false)
     {
         $this->data = $data;
+        $this->edit = $edit;
     }
 
     //pour creer un champ input
@@ -18,21 +27,7 @@ class Form
     public function input(string $key, string $label, string $title): string
     {
         $value = $this->getValue($key);
-        $type = $key === "password" ? "password" : "text"; //CODE ORIGINAL GRAFIKART
-        // -------------------- DEBUT DE MON CODE PERSO remplace code origien grafikart --------------------------
-        // if($key === "password"){
-        //     $type = "password";
-        // } else if ($key === "number") {
-        //     $type = "number";
-        // } else if ($key === "email") {
-        //     $type = "email";
-        // } else if ($key === "url") {
-        //     $type = "url";
-        // }     
-        // else {
-        //     $type = "text";
-        // }
-        // -------------------- FIN DE MON CODE PERSO remplace code origien grafikart --------------------------
+        $type = $key === "password" ? "password" : "text";
         
         // modif perso j ai remplacé name="{$key}" par name="{$label}" ATTENTION VOIR L IMPLICATION QUE CELA A SUR LE SELECT MEDIA POUR L EDIT DE POST
         // modif perso j ai remplacé for="{$key}" par for="{$label}"
@@ -41,6 +36,22 @@ class Form
             <label for="{$label}">{$title}</label>
             <input type={$type} id="{$label}" class="form-control" name="{$label}" value="{$value}">
             <!-- <input type={$type} id="{$label}" class="form-control" name="{$label}" value="{$value}"> -->
+        </div>
+HTML;
+    }
+
+    //pour creer un champ input de type file
+    public function inputFile(string $id, string $label, string $title): string
+    {
+        // $value = $this->getValue($key);
+        // $type = $key === "password" ? "password" : "text"; //CODE ORIGINAL GRAFIKART
+        
+        // modif perso j ai remplacé name="{$key}" par name="{$label}" ATTENTION VOIR L IMPLICATION QUE CELA A SUR LE SELECT MEDIA POUR L EDIT DE POST
+        // modif perso j ai remplacé for="{$key}" par for="{$label}"
+        return <<<HTML
+        <div class="form-group">
+            <label for="{$label}">{$title}</label>
+            <input type=file id="{$id}" class="form-control" name="{$label}">
         </div>
 HTML;
     }
@@ -146,5 +157,13 @@ HTML;
         }
 
         return $value;
+    }
+
+    /**
+     * Get the value of edit
+     */ 
+    public function getEdit()
+    {
+        return $this->edit;
     }
 }

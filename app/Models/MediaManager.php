@@ -60,34 +60,70 @@ class MediaManager extends Manager
         return $media;
     }
 
-// ----------------------------- methode specifique --------------------------
+    public function getLastMedia()
+    {
+        $db = $this->dbConnect();  
+        $query = $db->prepare("SHOW TABLE STATUS WHERE name='media'");
+        $query->execute();
+        $result = $query->fetch();
+        $id = $result["Auto_increment"];
+        return $id;
+        // return $result;
+    }
 
     // ajoute le media (en attribut de cette fonction) a la table media en bdd
-    // public function addMedia(Media $media)
-    // {
-    //     $db = $this->dbConnect();
+    public function addMedia(Media $media, array $file, String  $newNameUploaderFile)
+    {
+        $db = $this->dbConnect();
         
-    //     $query = $db->prepare('INSERT INTO post SET path = :path, 
-    //                                               alt = :alt,
-    //                                               type = :type,
-    //                                               post_id = :post_id,
-    //                                               user_id = :user_id');
-    //     $result = $query->execute([
-    //         'path' => $post->getPath(),
-    //         'alt' => $post->getAlt(),
-    //         'mediaType_id' => $post->getType(),
-    //         'post_id' => $post->getDateCreate()->format('Y-m-d H:i:s'),
-    //         'dateChange' => $post->getDateChange(),
-    //         'user_id' => $post->getUser_id()
-    //         ]);
+        $query = $db->prepare('INSERT INTO media SET path = :path, 
+                                                    alt = :alt,
+                                                    statutActif = :statutActif,
+                                                    mediaType_id = :mediaType_id,
+                                                    post_id = :post_id,
+                                                    user_id = :user_id');
+        $result = $query->execute([
+            'path' => $media->getPath(),
+            'alt' => $media->getAlt(),
+            'statutActif'=> $media->getStatutActif(),
+            'mediaType_id' => $media->getMediaType_id(),
+            'post_id' => $media->getPost_id(),
+            'user_id' => $media->getUser_id()
+            ]);
 
-    //     if($result === true){
-    //         return $db->lastInsertId();
-    //     } else {
-    //         throw new Exception('impossible de de creer l enregistrement du post');
-    //     }
-    // }
+        if($result === true){           
+            $storagePath = './media/';
+            $extensionsAllowed = array('jpg', 'jpeg', 'gif','png', 'JPG');
+            $maxFileSize = 500000;
+            
+            // $newNameUploaderFile = 'media-'.$this->getLastMedia();   // concatenation "media-" + ID du dernier media enregistrer en bdd   
+            // $pathFile = $this->uploadFile($file, $storagePath, $extensionsAllowed, $maxFileSize, $newNameUploaderFile);
+            $this->uploadFile($file, $storagePath, $extensionsAllowed, $maxFileSize, $newNameUploaderFile);
+            
+            // return $db->lastInsertId();
+        } else {
+            throw new Exception('impossible de de creer l enregistrement du media');
+        }
+    }
 
+    /**
+     * Method deleteMedia delete a media 
+     *
+     * @param int $id media id to delete 
+     *
+     * @return void
+     */
+    public function deleteMedia(int $id) : void
+    {
+        $db = $this->dbConnect();
+        $query = $db->prepare('DELETE FROM media WHERE id = :id');
+        $result = $query->execute(['id' => $id]);
+        if($result === false){
+            throw new Exception('impossible de supprimer le media :'.$id.'peut être il n\'existe pas');
+        }
+    }
+
+// ----------------------------- methode specifique --------------------------
     /**
      * Method getMediasForPost method that returns the list of media linked to a post 
      *
@@ -139,8 +175,8 @@ class MediaManager extends Manager
         return $results;
     }
 
-    // methode pour recuperer les id de la function getListMediasForPost(Post $post) de cette classe
-    public function getIdOftListMediasForPost(int $idPost): array
+    // methode pour recuperer les id (ayant un statut actif) de la function getListMediasForPost(Post $post) de cette classe
+    public function getIdOftListMediasActifForPost(int $idPost): array
     {
         $medias = $this->getListMediasForPost($idPost);
     
@@ -158,7 +194,7 @@ class MediaManager extends Manager
     }
 
     // methode pour changer le statutActif d'un media
-    public function UpdateStatutActifMedia($idMedia,$newStatutActif): void
+    public function updateStatutActifMedia($idMedia,$newStatutActif): void
     {
         $db = $this->dbConnect();
         $query = $db->prepare('UPDATE media SET statutActif = :statutActif WHERE id = :id');
@@ -173,7 +209,7 @@ class MediaManager extends Manager
     }
 
     // pour changer le post_id d'un media
-    public function UpdatePostIdMedia($idMedia,$newPostId): void
+    public function updatePostIdMedia($idMedia,$newPostId): void
     {
         $db = $this->dbConnect();
         $query = $db->prepare('UPDATE media SET post_id = :postid WHERE id = :id');
@@ -186,6 +222,7 @@ class MediaManager extends Manager
             throw new Exception('impossible de d effectuer le changemenent de post_id demander sur le des medias');
         }
     }
+
 
 // ---------------- ! ATTENTION pour le front (pour afficher le contenu d un post) ancienne methode voir si toujours d actualité ou si on ne peux pas la remplacer par une nouvelle methode (qui sontbau dessus)
     /**
