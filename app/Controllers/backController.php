@@ -175,8 +175,9 @@ use App\Models\MediaTypeManager;
 
                             // ajout du media si un upload a ete fait lors de l edit du post
                             if(isset($_FILES['mediaUpload']) AND $_FILES['mediaUpload']['error']== 0){
-                            
-                                $newNameUploaderFile = 'media-'.$mediaManager->getLastMedia();   // concatenation "media-" + ID du dernier media enregistrer en bdd   
+                                $name = 'media-'.pathinfo($_FILES['mediaUpload']['name'])['filename'].'-';
+                                $newNameUploaderFile = uniqid($name , true);    // concatenation "media-" + nom du fichier uploader(sans son extension + identifiant unique (via uniqid) pour avoir un identifiant unique
+                                
                                 $extension_upload = pathinfo($_FILES['mediaUpload']['name'])['extension']; //pour recuperer l'extension du fichier uploader
                                 $pathFile = './media/'.basename($newNameUploaderFile.'.'.$extension_upload); //chemin de stockage  avec nouveau nom du media uploader
 
@@ -189,7 +190,7 @@ use App\Models\MediaTypeManager;
                                     ->setUser_id($_POST['user'])
                                     ;
                                 
-                                $mediaManager->addMedia($mediaUpload, $_FILES['mediaUpload'], $newNameUploaderFile); //adding the media to the database and recovery via the id function of the last media in the database 
+                                $mediaManager->addMedia($mediaUpload, $_FILES['mediaUpload'], './media/', 'image', 400000, $newNameUploaderFile); //adding the media to the database and recovery via the id function of the last media in the database
                             }          
                             
                             // on met tout les medias du post en statutActif = false
@@ -233,7 +234,7 @@ use App\Models\MediaTypeManager;
     function createPost()
     {
         Auth::check();
-
+        
         $post = new Post();
         $post->setDateCreate(new Datetime()); //to assign today's date (in datetime) by default to the post we create 
         $post->setDatechange(NULL); // ------POUR LE TESTE J ASSIGNE LA DATECHANGE A "NULL" VOIR APRES COMMENT FAIRE POUR GERER CELA --------------
@@ -245,7 +246,6 @@ use App\Models\MediaTypeManager;
 
         // pour afficher le champ d'upload de media ------------
         $mediaManager = new MediaManager();
-        // $media = new Media();
         $mediaUpload = new Media(); //pour avoir dans le champ input "texte alternatif du media uploader" (creer apres) un champs vide
 
         // pour afficher le contenu du select des users ------------
@@ -288,8 +288,9 @@ use App\Models\MediaTypeManager;
                     // enregistrement en bdd du media et du fichier upload sur le server dans le dossier media
 
                     if(isset($_FILES['mediaUpload']) AND $_FILES['mediaUpload']['error']== 0){
-                       
-                        $newNameUploaderFile = 'media-'.$mediaManager->getLastMedia();   // concatenation "media-" + ID du dernier media enregistrer en bdd   
+                        $name = 'media-'.pathinfo($_FILES['mediaUpload']['name'])['filename'].'-';
+                        $newNameUploaderFile = uniqid($name , true);    // concatenation "media-" + nom du fichier uploader(sans son extension + identifiant unique (via uniqid) pour avoir un identifiant unique
+                        
                         $extension_upload = pathinfo($_FILES['mediaUpload']['name'])['extension']; //pour recuperer l'extension du fichier uploader
                         $pathFile = './media/'.basename($newNameUploaderFile.'.'.$extension_upload); //chemin de stockage  avec nouveau nom du media uploader
 
@@ -302,8 +303,7 @@ use App\Models\MediaTypeManager;
                             ->setUser_id($_POST['user'])
                             ;
                         
-                        $mediaManager->addMedia($mediaUpload, $_FILES['mediaUpload'], $newNameUploaderFile); //adding the media to the database and recovery via the id function of the last media in the database 
-                        // $lastRecordingMedia = $mediaManager->addMedia($media); //adding the media to the database and recovery via the id function of the last media in the database 
+                        $mediaManager->addMedia($mediaUpload, $_FILES['mediaUpload'], './media/', 'image', 400000, $newNameUploaderFile); //adding the media to the database and recovery via the id function of the last media in the database
                     }
 
                     header('Location: /backend/editPost/'.$lastRecordingPost.'?created=true');

@@ -60,49 +60,33 @@ class MediaManager extends Manager
         return $media;
     }
 
-    public function getLastMedia()
-    {
-        $db = $this->dbConnect();  
-        $query = $db->prepare("SHOW TABLE STATUS WHERE name='media'");
-        $query->execute();
-        $result = $query->fetch();
-        $id = $result["Auto_increment"];
-        return $id;
-        // return $result;
-    }
-
     // ajoute le media (en attribut de cette fonction) a la table media en bdd
-    public function addMedia(Media $media, array $file, String  $newNameUploaderFile)
+    public function addMedia(Media $media, array $file, String $storagePath, String $fileType, int $maxFileSize, $newNameUploaderFile)
     {
-        $db = $this->dbConnect();
-        
-        $query = $db->prepare('INSERT INTO media SET path = :path, 
-                                                    alt = :alt,
-                                                    statutActif = :statutActif,
-                                                    mediaType_id = :mediaType_id,
-                                                    post_id = :post_id,
-                                                    user_id = :user_id');
-        $result = $query->execute([
-            'path' => $media->getPath(),
-            'alt' => $media->getAlt(),
-            'statutActif'=> $media->getStatutActif(),
-            'mediaType_id' => $media->getMediaType_id(),
-            'post_id' => $media->getPost_id(),
-            'user_id' => $media->getUser_id()
-            ]);
+        if($this->validateFileForUpload($file, $fileType, $maxFileSize)){
+        // if(isset($file) AND $file ['error'] == 0 AND $this->validateFileForUpload($file, $fileType, $maxFileSize)){
+            $db = $this->dbConnect();
+            
+            $query = $db->prepare('INSERT INTO media SET path = :path, 
+                                                        alt = :alt,
+                                                        statutActif = :statutActif,
+                                                        mediaType_id = :mediaType_id,
+                                                        post_id = :post_id,
+                                                        user_id = :user_id');
+            $result = $query->execute([
+                'path' => $media->getPath(),
+                'alt' => $media->getAlt(),
+                'statutActif'=> $media->getStatutActif(),
+                'mediaType_id' => $media->getMediaType_id(),
+                'post_id' => $media->getPost_id(),
+                'user_id' => $media->getUser_id()
+                ]);
 
-        if($result === true){           
-            $storagePath = './media/';
-            $extensionsAllowed = array('jpg', 'jpeg', 'gif','png', 'JPG');
-            $maxFileSize = 500000;
-            
-            // $newNameUploaderFile = 'media-'.$this->getLastMedia();   // concatenation "media-" + ID du dernier media enregistrer en bdd   
-            // $pathFile = $this->uploadFile($file, $storagePath, $extensionsAllowed, $maxFileSize, $newNameUploaderFile);
-            $this->uploadFile($file, $storagePath, $extensionsAllowed, $maxFileSize, $newNameUploaderFile);
-            
-            // return $db->lastInsertId();
+            if($result === true){           
+                $this->uploadFile($file, $storagePath, $newNameUploaderFile);
+            }
         } else {
-            throw new Exception('impossible de de creer l enregistrement du media');
+            throw new Exception('impossible de creer l enregistrement du media (peut etre l extension du fichier, son poids, ...)');
         }
     }
 

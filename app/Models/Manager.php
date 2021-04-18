@@ -10,6 +10,14 @@ use PDO;
  */
 class Manager // connection a la base de donnee
 {    
+    
+    // pour le traitement des fichiers uploader
+    private $validExtensionsFileUploader = [
+        ['image', 'jpeg', 'gif', 'png','JPG','jpg'], //[type de fichier, extensions de fichiers valide pour ce type de fichier]
+        ['video', 'youtube', 'vimeo', 'netfif'],
+        ['document', 'txt', 'pdf','xls']
+    ];
+
     /**
      * Method dbConnect
      *
@@ -24,50 +32,52 @@ class Manager // connection a la base de donnee
         return $db;
     }
 
-    // function pour valider un fichier qui vient d etre uploader pour qu'il puisse etre ou non enregistrer en bdd
-    private function validateFileForUpload(array $file, array $extensionsAllowed, int $maxFileSize) {
+    // verifie que l'extension d un fichier (uploadé) appartient bien au tableau des extensions de fichiers autorisé (private $validExtensionsFileUploader) => pour le traitement des fichiers uploader
+    protected function validExtension(array $file, String $fileType){
+        $trouver = false;
+
         $fileName = $file ['name'];
         $fileInfos = pathinfo($fileName);
-        if ($file ['size'] <= $maxFileSize and $extension_upload = $fileInfos['extension']){
+        $extension_upload = $fileInfos['extension'];
+        
+        foreach($this->validExtensionsFileUploader as $infos){    
+            if($infos[0] == $fileType){
+                foreach ($infos as $valeur){  
+                    if($valeur == $extension_upload){
+                        $trouver = true;
+                        break;	//pour sortir de la boucle " foreach ($infos as $valeur)"
+                    }
+                }
+            }
+    
+            if($trouver == true){ 
+                break;	//pour sortir de la boucle "foreach($this->validExtensionsFileUploader as $infos)"
+            }
+        }
+    
+        return $trouver;	
+    }
+    
+    // function pour valider un fichier qui vient d etre uploader pour qu'il puisse etre ou non enregistrer en bdd
+    protected function validateFileForUpload(array $file, String $fileType, int $maxFileSize) {
+        if($file ['size'] <= $maxFileSize and $this->validExtension($file, $fileType)){
             return true;
         } else {
             return false;
         }
     }
-
+    
     // function generique pour enregistrer un fichier (pour nous un media)
-    function uploadFile(array $file, String $StoragePath, array $extensionsAllowed, int $maxFileSize, String $newNameUploaderFile){
-        if(isset($file) AND $file ['error'] == 0 AND $this->validateFileForUpload($file, $extensionsAllowed, $maxFileSize)){  // si un fichier a ete telecharger, qu il n'y a pas eu d'erreur et qu'il a ete declaré valide pour etre enregistrer en bdd  
-            $fileName = $file ['name'];
-            $fileInfos = pathinfo($fileName);
-            $extension_upload = $fileInfos['extension'];
-            
-            $from = $file ['tmp_name']; //chemin temporaire de stockage du fichier uploader + son nom
-            $to = $StoragePath.basename($newNameUploaderFile.'.'.$extension_upload); //chemin de destination du fichier uploader + son nom (on renomme le fichier avec $newNameUploaderFile eton rajoute son extension avec $extension_upload)
-            
-            move_uploaded_file( $from, $to);
-            return $to;
-        }
+    public function uploadFile(array $file, String $storagePath, String $newNameUploaderFile){
+        $fileName = $file ['name'];
+        $fileInfos = pathinfo($fileName);
+        $extension_upload = $fileInfos['extension'];
+        
+        $from = $file ['tmp_name']; //chemin temporaire de stockage du fichier uploader + son nom
+        $to = $storagePath.basename($newNameUploaderFile.'.'.$extension_upload); //chemin de destination du fichier uploader + son nom (on renomme le fichier avec $newNameUploaderFile eton rajoute son extension avec $extension_upload)
+        
+        move_uploaded_file( $from, $to);
+        return $to;
     }
-    
-    
-    // // function generique pour enregistrer un fichier (pour nous un media)
-    // public function uploadFile(array $file, String $StoragePath, array $extensionsAllowed, int $maxFileSize, String $newNameUploaderFile){
-    //     if (isset($file) AND $file ['error'] == 0){  // si un fichier a ete telecharger et qu il n'y a pas eu d'erreur
-    //         if($file ['size'] <= $maxFileSize){ // si le fichier n'est pas trop gros
-    //             $fileName = $file ['name'];
-    //             $fileInfos = pathinfo($fileName);
-    //             $extension_upload = $fileInfos['extension'];
-                
-    //             if (in_array($extension_upload, $extensionsAllowed)){ // si l'extension est autorisée on peut valider le fichier et le stocker définitivement
-    //                 $from = $file ['tmp_name']; //chemin temporaire de stockage du fichier uploader + son nom
-    //                 $to = $StoragePath.basename($newNameUploaderFile.'.'.$extension_upload); //chemin de destination du fichier uploader + son nom (on renomme le fichier avec $newNameUploaderFile eton rajoute son extension avec $extension_upload)
-                    
-    //                 move_uploaded_file( $from, $to);
-    //             }
-    //         }
-    //     }
-    // }
-
-
+ 
 }
