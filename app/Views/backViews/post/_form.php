@@ -20,7 +20,7 @@
 
     <!-- CREATION DES CHAMP POUR LE UPLOAD DE MEDIA (fichier) -->
         <?= $formMediaUpload->inputFile('media', 'mediaUpload', 'rajouter un media a ce post') ?>    <!-- pour la creation du upload du media -->
-        <?= $formMediaType->selectSimple('id', 'mediaType', 'Type du media uploader', $listMediaTypes) ?>   <!-- pour la creation du select des mediaTypes -->
+        <!-- <?//= $formMediaType->selectSimple('id', 'mediaType', 'Type du media uploader', $listMediaTypes) ?>   pour la creation du select des mediaTypes -->
         <?= $formMediaUpload->input('alt', 'alt', 'texte alternatif du media uploader') ?>    <!-- pour la creation du input du text alt du media -->
 
     <button class="btn btn-primary">

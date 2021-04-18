@@ -120,9 +120,9 @@ use App\Models\MediaTypeManager;
         $listSelectMediasForPost =  $mediaManager->getIdOftListMediasActifForPost($post->getId());// on recupere la liste des media pour ce $post
 
         // pour afficher le contenu du select des mediaType ------------
-        $mediaTypeManager = new MediaTypeManager();
-        $mediaType = new MediaType();
-        $listMediaTypes = $mediaTypeManager->listMediaType();
+        // $mediaTypeManager = new MediaTypeManager();
+        // $mediaType = new MediaType();
+        // $listMediaTypes = $mediaTypeManager->listMediaType();
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') { // if a submission of the form (=> a modification of a post) has been made
             //for data validation
@@ -185,7 +185,8 @@ use App\Models\MediaTypeManager;
                                     ->setPath($pathFile)    // ->setPath('./media/media-19.jpg')
                                     ->setAlt($_POST['alt'])
                                     ->setStatutActif(1)
-                                    ->setMediaType_id($_POST['mediaType'])
+                                    // ->setMediaType_id($_POST['mediaType'])
+                                    ->setMediaType_id(1)
                                     ->setPost_id($post->getId())
                                     ->setUser_id($_POST['user'])
                                     ;
@@ -222,7 +223,7 @@ use App\Models\MediaTypeManager;
         $formUser = new Form($user, true);    //pour creer le champs select des users qui sera integrer dans "backView > post > _form.php"     
         $formMediasSelect = new Form($media);  //pour creer le champs select des media qui sera integrer dans "backView > post > _form.php"
         $formMediaUpload = new Form($mediaUpload);  //pour creer le champs input "texte alternatif du media uploader" qui sera integrer dans "backView > post > _form.php"
-        $formMediaType = new Form($mediaType);
+        // $formMediaType = new Form($mediaType);
 
         require('../app/Views/backViews/post/backEditPostView.php');
     }
@@ -248,10 +249,10 @@ use App\Models\MediaTypeManager;
         $mediaManager = new MediaManager();
         $mediaUpload = new Media(); //pour avoir dans le champ input "texte alternatif du media uploader" (creer apres) un champs vide
 
-        // pour afficher le contenu du select des users ------------
-        $mediaTypeManager = new MediaTypeManager();
-        $mediaType = new MediaType();
-        $listMediaTypes = $mediaTypeManager->listMediaType();
+        // pour afficher le contenu du select des mediatype ------------
+        // $mediaTypeManager = new MediaTypeManager();
+        // $mediaType = new MediaType();
+        // $listMediaTypes = $mediaTypeManager->listMediaType();
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') { // if a submission of the form (=> a creation of a post) has been made
             //for data validation
@@ -298,7 +299,8 @@ use App\Models\MediaTypeManager;
                             ->setPath($pathFile)    // ->setPath('./media/media-19.jpg')
                             ->setAlt($_POST['alt'])
                             ->setStatutActif(1)
-                            ->setMediaType_id($_POST['mediaType'])
+                            // ->setMediaType_id($_POST['mediaType'])
+                            ->setMediaType_id(1)
                             ->setPost_id($lastRecordingPost)
                             ->setUser_id($_POST['user'])
                             ;
@@ -316,7 +318,7 @@ use App\Models\MediaTypeManager;
         $formPost = new Form($post);
         $formUser = new Form($user);
         $formMediaUpload = new Form($mediaUpload); //nommer "$formMediaUpload" au lieu de "$formMedia" par rapport a l editPost() et son utilisation dans "_form.php" du dossier "backendViews > post"
-        $formMediaType = new Form($mediaType);
+        // $formMediaType = new Form($mediaType);
 
         require('../app/Views/backViews/post/backCreatePostView.php');
     }
