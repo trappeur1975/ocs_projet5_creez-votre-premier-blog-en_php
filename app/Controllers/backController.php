@@ -110,19 +110,15 @@ use App\Models\MediaTypeManager;
         $user = $userManager->getUser($post->getUser_id());   // sera utiliser dans "$formPost = new Form($post);" ci dessous qui permettra de creer les champs propre au $post (via l entité "Form.php")
         $listSelectUsers = $userManager->listSelect(); //sera utiliser dans "backView > post > _form.php"
 
-        // pour afficher le contenu du select des medias liers a l user qui est lier au post que l on souhaite editer
+        // pour afficher les champs lier aux  medias
         $mediaManager = new MediaManager();             
         $media = $mediaManager->getListMediasForUser($post->getUser_id())[0]; // on recuperer le premier media de l user du post qui sera utiliser dans "$formMedia = new Form($media);" ci dessous qui permettra de creer les champs propre au $media (via l entité "Form.php")
-        $mediaUpload = new Media(); //pour avoir dans le champ input "texte alternatif du media uploader" (creer apres) un champs vide
+        $mediaUploadImage = new Media();
+        $mediaUploadVideo = new Media();
 
         //utiliser dans "backviews > post > _form.php" 
         $listSelectMediasForUser =  $mediaManager->listSelect($post->getUser_id()); // on affiche la liste des media de l'user auteur du post      
         $listSelectMediasForPost =  $mediaManager->getIdOftListMediasActifForPost($post->getId());// on recupere la liste des media pour ce $post
-
-        // pour afficher le contenu du select des mediaType ------------
-        // $mediaTypeManager = new MediaTypeManager();
-        // $mediaType = new MediaType();
-        // $listMediaTypes = $mediaTypeManager->listMediaType();
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') { // if a submission of the form (=> a modification of a post) has been made
             //for data validation
@@ -145,7 +141,7 @@ use App\Models\MediaTypeManager;
                     if($_POST['dateChange'] === ''){
                         $dateChange=NULL;
                     }
-                
+            
                     // enregistrement des modifications (via le select des users) infos sur le post
                         $post
                             ->setTitle($_POST['title'])
@@ -173,26 +169,39 @@ use App\Models\MediaTypeManager;
                         if($userOrigine == $newUser){ //on enregistre la nouvelle liste de media pour le post definit dans le select des medias uniquement si le user n a pas changer
                         // if(!is_null($_POST['path']) and ($userOrigine == $newUser)){ //on enregistre la nouvelle liste de media pour le post definit dans le select des medias uniquement si le user n a pas changer
 
-                            // ajout du media si un upload a ete fait lors de l edit du post
-                            if(isset($_FILES['mediaUpload']) AND $_FILES['mediaUpload']['error']== 0){
-                                $name = 'media-'.pathinfo($_FILES['mediaUpload']['name'])['filename'].'-';
+                            // ajout du media si un upload image a ete fait lors de l edit du post
+                            if(isset($_FILES['mediaUploadImage']) AND $_FILES['mediaUploadImage']['error']== 0){
+                                $name = 'media-'.pathinfo($_FILES['mediaUploadImage']['name'])['filename'].'-';
                                 $newNameUploaderFile = uniqid($name , true);    // concatenation "media-" + nom du fichier uploader(sans son extension + identifiant unique (via uniqid) pour avoir un identifiant unique
                                 
-                                $extension_upload = pathinfo($_FILES['mediaUpload']['name'])['extension']; //pour recuperer l'extension du fichier uploader
+                                $extension_upload = pathinfo($_FILES['mediaUploadImage']['name'])['extension']; //pour recuperer l'extension du fichier uploader
                                 $pathFile = './media/'.basename($newNameUploaderFile.'.'.$extension_upload); //chemin de stockage  avec nouveau nom du media uploader
 
-                                $mediaUpload
+                                $mediaUploadImage
                                     ->setPath($pathFile)    // ->setPath('./media/media-19.jpg')
-                                    ->setAlt($_POST['alt'])
+                                    ->setAlt($_POST['altFileMediaImage'])
                                     ->setStatutActif(1)
-                                    // ->setMediaType_id($_POST['mediaType'])
                                     ->setMediaType_id(1)
                                     ->setPost_id($post->getId())
                                     ->setUser_id($_POST['user'])
                                     ;
                                 
-                                $mediaManager->addMedia($mediaUpload, $_FILES['mediaUpload'], './media/', 'image', 400000, $newNameUploaderFile); //adding the media to the database and recovery via the id function of the last media in the database
+                                $mediaManager->addMediaImage($mediaUploadImage, $_FILES['mediaUploadImage'], './media/', 'image', 400000, $newNameUploaderFile); //adding the media to the database and recovery via the id function of the last media in the database   
                             }          
+                            
+                            // ajout du media si un upload video a ete fait lors de l edit du post
+                            if (!empty($_POST['mediaUploadVideo'])){
+                                $mediaUploadVideo
+                                ->setPath($_POST['mediaUploadVideo'])
+                                ->setAlt($_POST['altFileMediaVideo'])
+                                ->setStatutActif(1)
+                                ->setMediaType_id(3)
+                                ->setPost_id($post->getId())
+                                ->setUser_id($_POST['user'])
+                                ;
+                            
+                                $mediaManager->addMediaVideo($mediaUploadVideo);
+                            }
                             
                             // on met tout les medias du post en statutActif = false
                             foreach($listSelectMediasForPost as $value){                           
@@ -222,8 +231,9 @@ use App\Models\MediaTypeManager;
         $formPost = new Form($post, true);    //pour pouvoir creer le formulaire de post (grace aux fonction qui creer les champs)  
         $formUser = new Form($user, true);    //pour creer le champs select des users qui sera integrer dans "backView > post > _form.php"     
         $formMediasSelect = new Form($media);  //pour creer le champs select des media qui sera integrer dans "backView > post > _form.php"
-        $formMediaUpload = new Form($mediaUpload);  //pour creer le champs input "texte alternatif du media uploader" qui sera integrer dans "backView > post > _form.php"
+        $formMediaUploadImage = new Form($mediaUploadImage);  //pour creer le champs input "texte alternatif du media uploader" qui sera integrer dans "backView > post > _form.php"
         // $formMediaType = new Form($mediaType);
+        $formMediaUploadVideo = new Form($mediaUploadVideo);
 
         require('../app/Views/backViews/post/backEditPostView.php');
     }
@@ -245,16 +255,13 @@ use App\Models\MediaTypeManager;
         $user = new User();
         $listSelectUsers = $userManager->listSelect();
 
-        // pour afficher le champ d'upload de media ------------
+        // pour afficher les champ d'upload de media ------------
         $mediaManager = new MediaManager();
-        $mediaUpload = new Media(); //pour avoir dans le champ input "texte alternatif du media uploader" (creer apres) un champs vide
-
-        // pour afficher le contenu du select des mediatype ------------
-        // $mediaTypeManager = new MediaTypeManager();
-        // $mediaType = new MediaType();
-        // $listMediaTypes = $mediaTypeManager->listMediaType();
+        $mediaUploadImage = new Media(); //pour avoir dans le champ input "texte alternatif du media uploader" (creer apres) un champs vide
+        $mediaUploadVideo = new Media();
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') { // if a submission of the form (=> a creation of a post) has been made
+            
             //for data validation
                 $errors = [];
             
@@ -286,28 +293,40 @@ use App\Models\MediaTypeManager;
                         $postManager = new PostManager();
                         $lastRecordingPost = $postManager->addPost($post);// add the post to the database and get the last id of the posts in the database via the return of the function
                    
-                    // enregistrement en bdd du media et du fichier upload sur le server dans le dossier media
-
-                    if(isset($_FILES['mediaUpload']) AND $_FILES['mediaUpload']['error']== 0){
-                        $name = 'media-'.pathinfo($_FILES['mediaUpload']['name'])['filename'].'-';
+                    // enregistrement en bdd du media IMAGE et du fichier upload sur le server dans le dossier media
+                    if(isset($_FILES['mediaUploadImage']) AND $_FILES['mediaUploadImage']['error']== 0){
+                        $name = 'media-'.pathinfo($_FILES['mediaUploadImage']['name'])['filename'].'-';
                         $newNameUploaderFile = uniqid($name , true);    // concatenation "media-" + nom du fichier uploader(sans son extension + identifiant unique (via uniqid) pour avoir un identifiant unique
                         
-                        $extension_upload = pathinfo($_FILES['mediaUpload']['name'])['extension']; //pour recuperer l'extension du fichier uploader
+                        $extension_upload = pathinfo($_FILES['mediaUploadImage']['name'])['extension']; //pour recuperer l'extension du fichier uploader
                         $pathFile = './media/'.basename($newNameUploaderFile.'.'.$extension_upload); //chemin de stockage  avec nouveau nom du media uploader
 
-                        $mediaUpload
+                        $mediaUploadImage
                             ->setPath($pathFile)    // ->setPath('./media/media-19.jpg')
-                            ->setAlt($_POST['alt'])
+                            ->setAlt($_POST['altFileMediaImage'])
                             ->setStatutActif(1)
-                            // ->setMediaType_id($_POST['mediaType'])
                             ->setMediaType_id(1)
                             ->setPost_id($lastRecordingPost)
                             ->setUser_id($_POST['user'])
                             ;
                         
-                        $mediaManager->addMedia($mediaUpload, $_FILES['mediaUpload'], './media/', 'image', 400000, $newNameUploaderFile); //adding the media to the database and recovery via the id function of the last media in the database
+                        $mediaManager->addMediaImage($mediaUploadImage, $_FILES['mediaUploadImage'], './media/', 'image', 400000, $newNameUploaderFile); //adding the media to the database and recovery via the id function of the last media in the database
                     }
 
+                    if (!empty($_POST['mediaUploadVideo'])){
+                        $mediaUploadVideo
+                            ->setPath($_POST['mediaUploadVideo'])
+                            ->setAlt($_POST['altFileMediaVideo'])
+                            ->setStatutActif(1)
+                            ->setMediaType_id(3)
+                            ->setPost_id($lastRecordingPost)
+                            ->setUser_id($_POST['user'])
+                            ;
+                        
+                        $mediaManager->addMediaVideo($mediaUploadVideo);
+                    }
+                    // -------------fin enregistrement en bdd du media VIDEO --------------------
+           
                     header('Location: /backend/editPost/'.$lastRecordingPost.'?created=true');
                 }else{
                     // ISSUE COMMENT TRANSMETTRE UN TABLEAU $errors=[]; DANS LA REDIRECTION CI DESSOUS POUR AFFICHER DANS LA VIEW LES DIFFERENTES ERREORS
@@ -317,8 +336,9 @@ use App\Models\MediaTypeManager;
 
         $formPost = new Form($post);
         $formUser = new Form($user);
-        $formMediaUpload = new Form($mediaUpload); //nommer "$formMediaUpload" au lieu de "$formMedia" par rapport a l editPost() et son utilisation dans "_form.php" du dossier "backendViews > post"
+        $formMediaUploadImage = new Form($mediaUploadImage); //nommer "$formMediaUploadImage" au lieu de "$formMedia" par rapport a l editPost() et son utilisation dans "_form.php" du dossier "backendViews > post"
         // $formMediaType = new Form($mediaType);
+        $formMediaUploadVideo = new Form($mediaUploadVideo);
 
         require('../app/Views/backViews/post/backCreatePostView.php');
     }
@@ -333,13 +353,12 @@ use App\Models\MediaTypeManager;
 
         $mediaManager = new MediaManager();
         $listMediasDelete =  $mediaManager->getListMediasForPost($id);// on recupere la liste des media pour ce $post
-        // dd($listMediasDelete);
 
-        // on supprime les medias lier au post (si il y en a) dans la base de donnee et sur le serveur dans le dossier media
+        // on supprime les medias lier au post (si il y en a)
         if($listMediasDelete !== []){
             foreach($listMediasDelete as $media){
-                unlink($media->getPath());
-                $mediaManager->deleteMedia($media->getId());
+                $mediaManager->deleteMedia($media->getId());    //suppression de la base de donnée
+                unlink($media->getPath());  //suppression des media sur le serveur dans le dossier media
             }
         }
         

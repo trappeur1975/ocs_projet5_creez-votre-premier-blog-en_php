@@ -15,6 +15,21 @@ use App\Entities\Media;
 class MediaManager extends Manager
 {    
   
+    private $validVideos =['youtube', 'vimeo', 'netfix'];
+
+    private function validateVideo(String $PathVideo){
+        $trouver = false;
+        // if (!empty($PathVideo)){
+            foreach($this->validVideos as $video){
+                if(strpos($PathVideo, $video)){
+                    $trouver = true;
+                    break;
+                }
+            }
+        // }
+        return $trouver;
+    }
+
     /**
      * Method getListMedias which returns the list of media (as an object of type Media) 
      *
@@ -60,11 +75,10 @@ class MediaManager extends Manager
         return $media;
     }
 
-    // ajoute le media (en attribut de cette fonction) a la table media en bdd
-    public function addMedia(Media $media, array $file, String $storagePath, String $fileType, int $maxFileSize, $newNameUploaderFile)
+    // ajoute le media Image (en attribut de cette fonction) a la table media en bdd
+    public function addMediaImage(Media $media, array $file, String $storagePath, String $fileType, int $maxFileSize, $newNameUploaderFile)
     {
         if($this->validateFileForUpload($file, $fileType, $maxFileSize)){
-        // if(isset($file) AND $file ['error'] == 0 AND $this->validateFileForUpload($file, $fileType, $maxFileSize)){
             $db = $this->dbConnect();
             
             $query = $db->prepare('INSERT INTO media SET path = :path, 
@@ -86,7 +100,31 @@ class MediaManager extends Manager
                 $this->uploadFile($file, $storagePath, $newNameUploaderFile);
             }
         } else {
-            throw new Exception('impossible de creer l enregistrement du media (peut etre l extension du fichier, son poids, ...)');
+            throw new Exception('impossible de creer l enregistrement du media Image (peut etre l extension du fichier, son poids, ...)');
+        }
+    }
+
+    // ajoute le media Video (en attribut de cette fonction) a la table media en bdd
+    public function addMediaVideo(Media $media)
+    {
+        if($this->validateVideo($media->getPath())){
+            $db = $this->dbConnect();
+            $query = $db->prepare('INSERT INTO media SET path = :path, 
+                                                        alt = :alt,
+                                                        statutActif = :statutActif,
+                                                        mediaType_id = :mediaType_id,
+                                                        post_id = :post_id,
+                                                        user_id = :user_id');
+            $result = $query->execute([
+                'path' => $media->getPath(),
+                'alt' => $media->getAlt(),
+                'statutActif'=> $media->getStatutActif(),
+                'mediaType_id' => $media->getMediaType_id(),
+                'post_id' => $media->getPost_id(),
+                'user_id' => $media->getUser_id()
+                ]);
+        } else {
+            throw new Exception('impossible de creer l enregistrement du media video');
         }
     }
 

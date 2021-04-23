@@ -10,11 +10,10 @@ use PDO;
  */
 class Manager // connection a la base de donnee
 {    
-    
     // pour le traitement des fichiers uploader
     private $validExtensionsFileUploader = [
         ['image', 'jpeg', 'gif', 'png','JPG','jpg'], //[type de fichier, extensions de fichiers valide pour ce type de fichier]
-        ['video', 'youtube', 'vimeo', 'netfif'],
+        // ['video', 'youtube', 'vimeo', 'netfix'],
         ['document', 'txt', 'pdf','xls']
     ];
 
@@ -66,7 +65,7 @@ class Manager // connection a la base de donnee
             return false;
         }
     }
-    
+   
     // function generique pour enregistrer un fichier (pour nous un media)
     public function uploadFile(array $file, String $storagePath, String $newNameUploaderFile){
         $fileName = $file ['name'];

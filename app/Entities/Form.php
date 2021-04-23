@@ -145,13 +145,9 @@ HTML;
     // private function getValue(string $key) :?string
     private function getValue(string $key): ?string //voir si on garde ce typage de retour car peut poser probleme avec un SELECT
     {
-        // if(is_array($this->data)){
-        //     return $this->data[$key] ?? null;
-        // }
         $method = 'get'.ucfirst($key);
-
-        // return $this->data->$method();
         $value = $this->data->$method();
+        // $value = $this->data->$method();
         if($value instanceof \DateTimeInterface){
            return  $value->format('Y-m-d H:i:s');
         }

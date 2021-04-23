@@ -18,10 +18,13 @@
             }
         ?>
 
-    <!-- CREATION DES CHAMP POUR LE UPLOAD DE MEDIA (fichier) -->
-        <?= $formMediaUpload->inputFile('media', 'mediaUpload', 'rajouter un media a ce post') ?>    <!-- pour la creation du upload du media -->
+    <!-- CREATION DES CHAMP POUR LE UPLOAD DE MEDIA (image) -->
+        <?= $formMediaUploadImage->inputFile('media', 'mediaUploadImage', 'rajouter une image (uploader un fichier max 500ko) a ce post') ?>    <!-- pour la creation du upload du media -->
         <!-- <?//= $formMediaType->selectSimple('id', 'mediaType', 'Type du media uploader', $listMediaTypes) ?>   pour la creation du select des mediaTypes -->
-        <?= $formMediaUpload->input('alt', 'alt', 'texte alternatif du media uploader') ?>    <!-- pour la creation du input du text alt du media -->
+        <?= $formMediaUploadImage->input('alt', 'altFileMediaImage', 'texte alternatif du media IMAGE uploader') ?>    <!-- pour la creation du input du text alt du media image -->
+    <!-- CREATION DES CHAMP POUR LE UPLOAD DE MEDIA (video) -->
+        <?= $formMediaUploadVideo->input('path', 'mediaUploadVideo', 'rajouter une video (lien url youtube ou vimeo uniquement) a ce post') ?>
+        <?= $formMediaUploadVideo->input('alt', 'altFileMediaVideo', 'texte alternatif du media VIDEO uploader') ?>    <!-- pour la creation du input du text alt du media video -->
 
     <button class="btn btn-primary">
         <?php if($post->getId() !==null):?>
