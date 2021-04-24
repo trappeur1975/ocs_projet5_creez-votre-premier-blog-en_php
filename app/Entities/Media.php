@@ -30,12 +30,6 @@ class Media
      * @var bool $statutActif media status (active = boolean true or not active = boolean false) depending on whether the media is used or not in a post 
      */
     private $statutActif;
-     
-    /**
-     * mediaType
-     * @var string $mediaType type of the media
-     */
-    // private $mediaType;
 
     /**
      * mediaType_id
@@ -138,31 +132,6 @@ class Media
 
         return $this;
     }
-
-    /**
-     * Get $mediaType type of the media
-     *
-     * @return  string
-     */ 
-    // public function getMediaType(): ?string
-    // {
-    //     return $this->type;
-    // }
-
-    /**
-     * Set $mediaType type of the media
-     *
-     * @param  string  $mediaType type of the media
-     *
-     * @return  self
-     */ 
-    // public function setMediaType(string $type): self
-    // {
-    //     $this->type = $type;
-
-    //     return $this;
-    // }
-
 
     /**
      * Get $mediaType_id id of the media type to which this media belongs

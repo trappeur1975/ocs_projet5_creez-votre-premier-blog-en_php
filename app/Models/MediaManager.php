@@ -167,7 +167,7 @@ class MediaManager extends Manager
     /**
      * Method getMediasForUser method that returns the list of media linked to a user 
      *
-     * @param int $idUser the id user whose media we want to retrieve 
+     * @param int $idUser the id user whose medias we want to retrieve 
      *
      * @return Media[]
      */
@@ -183,6 +183,57 @@ class MediaManager extends Manager
 
         return $listMediasForUser;
     }
+
+//------------------------------------NOUVEAU--------------------------
+
+
+
+
+    /**
+     * Method getListMediasForUserForType method that returns the list of media for a user for a type (example mediaType "logo")
+     *
+     * @param int $idUser the id user whose medias we want to retrieve 
+     * @param int $idMediaType the id MediaType whose medias we want to retrieve for a user
+     *
+     * @return Media[]
+     */
+    public function getListMediasForUserForType(int $idUser, int $idMediaType): array
+    {
+        $medias = $this->getListMediasForUser($idUser);
+        $results = [];
+        
+        foreach($medias as $media){
+            if($media->getMediaType_id() ===  $idMediaType){
+                $results[] =  $media; 
+            }
+        }
+        return $results;
+    }
+
+    /**
+     * Method getListMediasForUserForType method that returns the list of media "Actif" for a user for a type (example mediaType "logo")
+     *
+     * @param int $idUser the id user whose medias we want to retrieve 
+     * @param int $idMediaType the id MediaType whose medias we want to retrieve for a user
+     * @param int $statusActif the id statusActif whose medias we want to retrieve for a user
+     *
+     * @return Media[]
+     */
+    public function getListMediasForUserForTypeAccordingActiveStatus(int $idUser, int $idMediaType, int $statusActif): array
+    {
+        $medias = $this->getListMediasForUserForType($idUser, $idMediaType);
+        $results = [];
+        
+        foreach($medias as $media){
+            if($media->getStatutActif() ==  1){
+                $results[] =  $media; 
+            }
+        }
+        return $results;
+    }
+
+//------------------------------------fin NOUVEAU--------------------------
+
 
     // methode pour recuperer un tableau de media lier a un utilisateur que l on va utiliser dans le select
     public function listSelect(int $idUser): array

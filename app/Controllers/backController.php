@@ -92,6 +92,125 @@ use App\Models\MediaTypeManager;
     }
 
     /**
+     * function use for road http://localhost:8000/backend/createPost
+     * will display the view backCreatePostView.php  
+     */
+    function createPost()
+    {
+        Auth::check();
+        
+        // post
+        $post = new Post();
+        $post->setDateCreate(new Datetime()); //to assign today's date (in datetime) by default to the post we create 
+        $post->setDatechange(NULL); // ------POUR LE TESTE J ASSIGNE LA DATECHANGE A "NULL" VOIR APRES COMMENT FAIRE POUR GERER CELA --------------
+        
+        // users
+        $userManager = new UserManager();
+        $user = new User();
+        $listSelectUsers = $userManager->listSelect();
+
+        // media (image et video)
+        $mediaManager = new MediaManager();
+        $mediaUploadImage = new Media(); //pour avoir dans le champ input "texte alternatif du media uploader" (creer apres) un champs vide
+        $mediaUploadVideo = new Media();
+
+        // traitement server et affichage des retours d'infos 
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') { // if a submission of the form (=> a creation of a post) has been made
+            
+            //for data validation
+                $errors = [];
+            
+                if(empty($_POST['title'])){
+                    $errors['title'][] = 'Le champs titre ne peut être vide';
+                }
+                if(mb_strlen($_POST['title'])<=3){
+                    $errors['title'][] = 'Le champs titre doit contenir plus de 3 caractere';
+                }
+                
+                if(empty($errors)){
+                                      
+                    //ISSSUE  gestion des date en datetime dans entité post // base de donnee en string pour la create ou l edit d un post (=>voir methode setDateCreate($dateCreate) de la class Post)
+                    //modification pour gerer l enregistrement dans la base de donnee via le Postmanager
+                        $dateCreate = DateTime::createFromFormat('Y-m-d H:i:s',$_POST['dateCreate']); // pour que la date String soit en Datetime
+                        $dateChange = null;
+                               
+                    // enregistrement en bdd du post
+                    $post
+                        ->setTitle($_POST['title'])
+                        ->setIntroduction($_POST['introduction'])
+                        ->setContent($_POST['content'])
+                        ->setDateCreate($dateCreate)
+                        ->setDateChange($dateChange)
+                        ->setUser_id($_POST['user'])
+                        ;
+
+                    $postManager = new PostManager();
+                    $lastRecordingPost = $postManager->addPost($post);// add the post to the database and get the last id of the posts in the database via the return of the function
+                   
+                    //media IMAGE
+                    if(isset($_FILES['mediaUploadImage']) AND $_FILES['mediaUploadImage']['error']== 0){
+                        // variables infos
+                        $file = $_FILES['mediaUploadImage']; //fichier uploader
+                        $storagePath = './media/'; //chemin de stockage du fichier uploader
+                        $fileType = 'image'; //type de fichier uploader
+                        $maxFileSize = 500000; //taille maximum du fichier uploader autorise
+                        
+                        $name = 'mediaImage-'.pathinfo($_FILES['mediaUploadImage']['name'])['filename'].'-';
+                        $newNameUploaderFile = uniqid($name , true);    // concatenation "media-" + nom du fichier uploader(sans son extension + identifiant unique (via uniqid) pour avoir un identifiant unique
+                        
+                        $extension_upload = pathinfo($_FILES['mediaUploadImage']['name'])['extension']; //pour recuperer l'extension du fichier uploader
+                        $pathFile = './media/'.basename($newNameUploaderFile.'.'.$extension_upload); //chemin de stockage  avec nouveau nom du media uploader
+                        
+                        // enregistrement en bdd du media IMAGE et du fichier uploader sur le server dans le dossier media
+                        $mediaUploadImage
+                            ->setPath($pathFile)    // ->setPath('./media/media-19.jpg')
+                            ->setAlt($_POST['altFileMediaImage'])
+                            ->setStatutActif(1) //actif
+                            ->setMediaType_id(1)    //image
+                            ->setPost_id($lastRecordingPost)
+                            ->setUser_id($_POST['user'])
+                            ;
+                        //try{
+                        $mediaManager->addMediaImage($mediaUploadImage, $file, $storagePath, $fileType, $maxFileSize, $newNameUploaderFile); //adding the media to the database and recovery via the id function of the last media in the database
+                    // } catch {
+                    //     $errorMessage  que l on passe a ma vue
+                    // }
+                        
+                    }
+                    
+                    //media VIDEO
+                    if (!empty($_POST['mediaUploadVideo'])){
+                        // enregistrement en bdd du media VIDEO
+                        $mediaUploadVideo
+                            ->setPath($_POST['mediaUploadVideo'])
+                            ->setAlt($_POST['altFileMediaVideo'])
+                            ->setStatutActif(1) //actif
+                            ->setMediaType_id(3)    //video
+                            ->setPost_id($lastRecordingPost)
+                            ->setUser_id($_POST['user'])
+                            ;
+                        
+                        $mediaManager->addMediaVideo($mediaUploadVideo);
+                    }
+                    // -------------fin enregistrement en bdd du media VIDEO --------------------
+           
+                    header('Location: /backend/editPost/'.$lastRecordingPost.'?created=true');
+                }else{
+                    // ISSUE COMMENT TRANSMETTRE UN TABLEAU $errors=[]; DANS LA REDIRECTION CI DESSOUS POUR AFFICHER DANS LA VIEW LES DIFFERENTES ERREORS
+                    header('Location: /backend/createPost?created=false');
+                }
+        }
+
+        //pour l'affichages des champs dans la vue (views > backviews > post > _form.php)
+        $formPost = new Form($post);
+        $formUser = new Form($user);
+        $formMediaUploadImage = new Form($mediaUploadImage); //nommer "$formMediaUploadImage" au lieu de "$formMedia" par rapport a l editPost() et son utilisation dans "_form.php" du dossier "backendViews > post"
+        $formMediaUploadVideo = new Form($mediaUploadVideo);
+
+        require('../app/Views/backViews/post/backCreatePostView.php');
+    }
+
+    /**
      * function use for road road http://localhost:8000/backend/editPost/1 ou http://localhost:8000/backend/editPost/2 ou ....
      * will display the view backEditPostView.php  
      */
@@ -99,18 +218,20 @@ use App\Models\MediaTypeManager;
     {
         Auth::check();
 
+        // post
         $postManager = new PostManager();
         $post = $postManager->getPost($id);
+
         if ( $post->getDateChange() === null){
             $post->setDateChange(new Datetime()); //to assign today's date (in datetime) by default when to edit the post
         }
  
-        // pour afficher le contenu du select des users ------------
+        // users
         $userManager = new UserManager();
         $user = $userManager->getUser($post->getUser_id());   // sera utiliser dans "$formPost = new Form($post);" ci dessous qui permettra de creer les champs propre au $post (via l entité "Form.php")
         $listSelectUsers = $userManager->listSelect(); //sera utiliser dans "backView > post > _form.php"
 
-        // pour afficher les champs lier aux  medias
+        // media (image et video)
         $mediaManager = new MediaManager();             
         $media = $mediaManager->getListMediasForUser($post->getUser_id())[0]; // on recuperer le premier media de l user du post qui sera utiliser dans "$formMedia = new Form($media);" ci dessous qui permettra de creer les champs propre au $media (via l entité "Form.php")
         $mediaUploadImage = new Media();
@@ -120,6 +241,7 @@ use App\Models\MediaTypeManager;
         $listSelectMediasForUser =  $mediaManager->listSelect($post->getUser_id()); // on affiche la liste des media de l'user auteur du post      
         $listSelectMediasForPost =  $mediaManager->getIdOftListMediasActifForPost($post->getId());// on recupere la liste des media pour ce $post
 
+        // traitement server et affichage des retours d'infos 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') { // if a submission of the form (=> a modification of a post) has been made
             //for data validation
                 $errors = [];
@@ -162,7 +284,8 @@ use App\Models\MediaTypeManager;
                         // si l utilisateur a ete modifier on desactive les medias lier a ce post
                         if ($userOrigine != $newUser){
                             foreach($listSelectMediasForPost as $value){                           
-                                $mediaManager->updateStatutActifMedia($value, 0); 
+                                $statutActif = 0; //false
+                                $mediaManager->updateStatutActifMedia($value, $statutActif); 
                             }
                         }
 
@@ -171,46 +294,56 @@ use App\Models\MediaTypeManager;
 
                             // ajout du media si un upload image a ete fait lors de l edit du post
                             if(isset($_FILES['mediaUploadImage']) AND $_FILES['mediaUploadImage']['error']== 0){
-                                $name = 'media-'.pathinfo($_FILES['mediaUploadImage']['name'])['filename'].'-';
+                                // variables infos
+                                $file = $_FILES['mediaUploadImage']; //fichier uploader
+                                $storagePath = './media/'; //chemin de stockage du fichier uploader
+                                $fileType = 'image'; //type de fichier uploader
+                                $maxFileSize = 500000; //taille maximum du fichier uploader autorise    
+                                  
+                                $name = 'mediaImage-'.pathinfo($_FILES['mediaUploadImage']['name'])['filename'].'-';
                                 $newNameUploaderFile = uniqid($name , true);    // concatenation "media-" + nom du fichier uploader(sans son extension + identifiant unique (via uniqid) pour avoir un identifiant unique
                                 
                                 $extension_upload = pathinfo($_FILES['mediaUploadImage']['name'])['extension']; //pour recuperer l'extension du fichier uploader
                                 $pathFile = './media/'.basename($newNameUploaderFile.'.'.$extension_upload); //chemin de stockage  avec nouveau nom du media uploader
 
+                                // enregistrement en bdd du media IMAGE et du fichier uploader sur le server dans le dossier media
                                 $mediaUploadImage
                                     ->setPath($pathFile)    // ->setPath('./media/media-19.jpg')
                                     ->setAlt($_POST['altFileMediaImage'])
-                                    ->setStatutActif(1)
-                                    ->setMediaType_id(1)
+                                    ->setStatutActif(1) //actif
+                                    ->setMediaType_id(1)    //image
                                     ->setPost_id($post->getId())
                                     ->setUser_id($_POST['user'])
                                     ;
                                 
-                                $mediaManager->addMediaImage($mediaUploadImage, $_FILES['mediaUploadImage'], './media/', 'image', 400000, $newNameUploaderFile); //adding the media to the database and recovery via the id function of the last media in the database   
+                                $mediaManager->addMediaImage($mediaUploadImage, $file, $storagePath, $fileType, $maxFileSize, $newNameUploaderFile); //adding the media to the database and recovery via the id function of the last media in the database
                             }          
                             
                             // ajout du media si un upload video a ete fait lors de l edit du post
                             if (!empty($_POST['mediaUploadVideo'])){
+                                // enregistrement en bdd du media VIDEO
                                 $mediaUploadVideo
-                                ->setPath($_POST['mediaUploadVideo'])
-                                ->setAlt($_POST['altFileMediaVideo'])
-                                ->setStatutActif(1)
-                                ->setMediaType_id(3)
-                                ->setPost_id($post->getId())
-                                ->setUser_id($_POST['user'])
-                                ;
+                                    ->setPath($_POST['mediaUploadVideo'])
+                                    ->setAlt($_POST['altFileMediaVideo'])
+                                    ->setStatutActif(1) //actif
+                                    ->setMediaType_id(3)    //video
+                                    ->setPost_id($post->getId())
+                                    ->setUser_id($_POST['user'])
+                                    ;
                             
                                 $mediaManager->addMediaVideo($mediaUploadVideo);
                             }
                             
                             // on met tout les medias du post en statutActif = false
                             foreach($listSelectMediasForPost as $value){                           
-                                $mediaManager->updateStatutActifMedia($value, 0); 
+                                $statutActif = 0; //false
+                                $mediaManager->updateStatutActifMedia($value, $statutActif); 
                             }
                             // on met tout les medias dont leurs id sont dans "$_POST['path']" en statutActif = true 
                             // et on modifie leurs post_id pour bien attribuer au media selectionner dans le select le id du post
                             foreach($_POST['path'] as $value){
-                                $mediaManager->updateStatutActifMedia($value, 1);
+                                $statutActif = 1; //true
+                                $mediaManager->updateStatutActifMedia($value, $statutActif);
                                 $mediaManager->updatePostIdMedia($value, $post->getId());
                             }
                         }
@@ -227,120 +360,15 @@ use App\Models\MediaTypeManager;
                 }
         }
 
-        // display of the form before saving changes 
+        //pour l'affichages des champs dans la vue (views  > backviews > post > _form.php)
         $formPost = new Form($post, true);    //pour pouvoir creer le formulaire de post (grace aux fonction qui creer les champs)  
         $formUser = new Form($user, true);    //pour creer le champs select des users qui sera integrer dans "backView > post > _form.php"     
-        $formMediasSelect = new Form($media);  //pour creer le champs select des media qui sera integrer dans "backView > post > _form.php"
+        $formMediasSelectImage = new Form($media);  //pour creer le champs select des media qui sera integrer dans "backView > post > _form.php"
         $formMediaUploadImage = new Form($mediaUploadImage);  //pour creer le champs input "texte alternatif du media uploader" qui sera integrer dans "backView > post > _form.php"
         // $formMediaType = new Form($mediaType);
         $formMediaUploadVideo = new Form($mediaUploadVideo);
 
         require('../app/Views/backViews/post/backEditPostView.php');
-    }
-
-    /**
-     * function use for road http://localhost:8000/backend/createPost
-     * will display the view backCreatePostView.php  
-     */
-    function createPost()
-    {
-        Auth::check();
-        
-        $post = new Post();
-        $post->setDateCreate(new Datetime()); //to assign today's date (in datetime) by default to the post we create 
-        $post->setDatechange(NULL); // ------POUR LE TESTE J ASSIGNE LA DATECHANGE A "NULL" VOIR APRES COMMENT FAIRE POUR GERER CELA --------------
-        
-        // pour afficher le contenu du select des users ------------
-        $userManager = new UserManager();
-        $user = new User();
-        $listSelectUsers = $userManager->listSelect();
-
-        // pour afficher les champ d'upload de media ------------
-        $mediaManager = new MediaManager();
-        $mediaUploadImage = new Media(); //pour avoir dans le champ input "texte alternatif du media uploader" (creer apres) un champs vide
-        $mediaUploadVideo = new Media();
-
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') { // if a submission of the form (=> a creation of a post) has been made
-            
-            //for data validation
-                $errors = [];
-            
-                if(empty($_POST['title'])){
-                    $errors['title'][] = 'Le champs titre ne peut être vide';
-                }
-                if(mb_strlen($_POST['title'])<=3){
-                    $errors['title'][] = 'Le champs titre doit contenir plus de 3 caractere';
-                }
-                
-                if(empty($errors)){
-                                      
-                    //ISSSUE  gestion des date en datetime dans entité post // base de donnee en string pour la create ou l edit d un post (=>voir methode setDateCreate($dateCreate) de la class Post)
-                    //modification pour gerer l enregistrement dans la base de donnee via le Postmanager
-                        $dateCreate = DateTime::createFromFormat('Y-m-d H:i:s',$_POST['dateCreate']); // pour que la date String soit en Datetime
-                        $dateChange = null;
-
-
-                    // enregistrement en bdd du post
-                        $post
-                        ->setTitle($_POST['title'])
-                        ->setIntroduction($_POST['introduction'])
-                        ->setContent($_POST['content'])
-                        ->setDateCreate($dateCreate)
-                        ->setDateChange($dateChange)
-                        ->setUser_id($_POST['user'])
-                        ;
-
-                        $postManager = new PostManager();
-                        $lastRecordingPost = $postManager->addPost($post);// add the post to the database and get the last id of the posts in the database via the return of the function
-                   
-                    // enregistrement en bdd du media IMAGE et du fichier upload sur le server dans le dossier media
-                    if(isset($_FILES['mediaUploadImage']) AND $_FILES['mediaUploadImage']['error']== 0){
-                        $name = 'media-'.pathinfo($_FILES['mediaUploadImage']['name'])['filename'].'-';
-                        $newNameUploaderFile = uniqid($name , true);    // concatenation "media-" + nom du fichier uploader(sans son extension + identifiant unique (via uniqid) pour avoir un identifiant unique
-                        
-                        $extension_upload = pathinfo($_FILES['mediaUploadImage']['name'])['extension']; //pour recuperer l'extension du fichier uploader
-                        $pathFile = './media/'.basename($newNameUploaderFile.'.'.$extension_upload); //chemin de stockage  avec nouveau nom du media uploader
-
-                        $mediaUploadImage
-                            ->setPath($pathFile)    // ->setPath('./media/media-19.jpg')
-                            ->setAlt($_POST['altFileMediaImage'])
-                            ->setStatutActif(1)
-                            ->setMediaType_id(1)
-                            ->setPost_id($lastRecordingPost)
-                            ->setUser_id($_POST['user'])
-                            ;
-                        
-                        $mediaManager->addMediaImage($mediaUploadImage, $_FILES['mediaUploadImage'], './media/', 'image', 400000, $newNameUploaderFile); //adding the media to the database and recovery via the id function of the last media in the database
-                    }
-
-                    if (!empty($_POST['mediaUploadVideo'])){
-                        $mediaUploadVideo
-                            ->setPath($_POST['mediaUploadVideo'])
-                            ->setAlt($_POST['altFileMediaVideo'])
-                            ->setStatutActif(1)
-                            ->setMediaType_id(3)
-                            ->setPost_id($lastRecordingPost)
-                            ->setUser_id($_POST['user'])
-                            ;
-                        
-                        $mediaManager->addMediaVideo($mediaUploadVideo);
-                    }
-                    // -------------fin enregistrement en bdd du media VIDEO --------------------
-           
-                    header('Location: /backend/editPost/'.$lastRecordingPost.'?created=true');
-                }else{
-                    // ISSUE COMMENT TRANSMETTRE UN TABLEAU $errors=[]; DANS LA REDIRECTION CI DESSOUS POUR AFFICHER DANS LA VIEW LES DIFFERENTES ERREORS
-                    header('Location: /backend/createPost?created=false');
-                }
-        }
-
-        $formPost = new Form($post);
-        $formUser = new Form($user);
-        $formMediaUploadImage = new Form($mediaUploadImage); //nommer "$formMediaUploadImage" au lieu de "$formMedia" par rapport a l editPost() et son utilisation dans "_form.php" du dossier "backendViews > post"
-        // $formMediaType = new Form($mediaType);
-        $formMediaUploadVideo = new Form($mediaUploadVideo);
-
-        require('../app/Views/backViews/post/backCreatePostView.php');
     }
 
     /**
@@ -357,7 +385,7 @@ use App\Models\MediaTypeManager;
         // on supprime les medias lier au post (si il y en a)
         if($listMediasDelete !== []){
             foreach($listMediasDelete as $media){
-                $mediaManager->deleteMedia($media->getId());    //suppression de la base de donnée
+                $mediaManager->deleteMedia($media->getId());    //suppression dans la base de donnée
                 unlink($media->getPath());  //suppression des media sur le serveur dans le dossier media
             }
         }
@@ -384,6 +412,109 @@ use App\Models\MediaTypeManager;
     }
 
     /**
+     * function use for road http://localhost:8000/backend/createUser
+     * will display the view backCreateUserView.php  
+     */
+    function createUser()
+    {
+        Auth::check();
+        
+        // user
+        $user = new user();
+        $userType = new UserType();
+
+        $userTypeManager = new UserTypeManager();
+        $listSelectUserTypes = $userTypeManager->listSelect(); //pour afficher le contenu du select des usertypes, sera utiliser dans "backView > user > _form.php"
+
+        $user->setValidate(new Datetime()); //to assign today's date (in datetime) by default to the user we create 
+        
+        // media (logo)
+        $mediaManager = new MediaManager();
+        $mediaUploadLogo = new Media(); //pour avoir dans le champ input pour uploader un logo (par defaut toute les variables de cette entité Media sont a "null" )
+
+        // traitement server et affichage des retours d'infos 
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') { // if a submission of the form (=> a creation of a user) has been made
+            //for data validation
+                $errors = [];
+            
+                // if(empty($_POST['title'])){
+                //     $errors['title'][] = 'Le champs titre ne peut être vide';
+                // }
+                // if(mb_strlen($_POST['title'])<=3){
+                //     $errors['title'][] = 'Le champs titre doit contenir plus de 3 caractere';
+                // }
+                
+                if(empty($errors)){
+                    
+                    //ISSSUE  gestion des date en datetime dans entité post // base de donnee en string pour la create ou l edit d un post (=>voir methode setDateCreate($dateCreate) de la class Post)
+                    $dateCreate = DateTime::createFromFormat('Y-m-d H:i:s',$_POST['validate']); // pour que la date String soit en Datetime
+
+                    // if($_POST['dateChange'] === ''){
+                    //     $dateChange=NULL;
+                    // }
+
+                    // enregistrement en bdd du user
+                    $user
+                        ->setFirstName($_POST['firstName'])
+                        ->setLastName($_POST['lastName'])
+                        ->setEmail($_POST['email'])
+                        // ->setLogo($_POST['logo'])
+                        ->setSlogan($_POST['slogan'])
+                        // ->setSocialNetworks($_POST['socialNetworks'])
+                        ->setLogin($_POST['login'])
+                        ->setPassword($_POST['password'])
+                        ->setValidate($dateCreate)
+                        ->setUserType_id($_POST['userType_id'][0]); //car on cette donnee est issu d'un select multiple
+                        // ->setValidate(new Datetime()); //to assign today's date (in datetime) by default to the user we create
+                        // ->setValidate(DateTime::createFromFormat('Y-m-d H:i:s',new Datetime())); //to assign today's date (in datetime) by default to the user we create 
+                    
+                    $userManager = new UserManager();
+                    $lastRecordingUser = $userManager->addUser($user);// add the post to the database and get the last id of the posts in the database via the return of the function
+                    
+                    // enregistrement en bdd du media logo et du fichier uploader sur le server dans le dossier media
+                    if(isset($_FILES['mediaUploadLogo']) AND $_FILES['mediaUploadLogo']['error']== 0){
+                        
+                        // variables infos
+                        $file = $_FILES['mediaUploadLogo']; //fichier uploader
+                        $storagePath = './media/'; //chemin de stockage du fichier uploader
+                        $fileType = 'image'; //type de fichier uploader
+                        $maxFileSize = 500000; //taille maximum du fichier uploader autorise
+                        
+                        $name = 'mediaLogo-'.pathinfo($_FILES['mediaUploadLogo']['name'])['filename'].'-';
+                        $newNameUploaderFile = uniqid($name , true);    // concatenation "media-" + nom du fichier uploader(sans son extension + identifiant unique (via uniqid) pour avoir un identifiant unique
+                        
+                        $extension_upload = pathinfo($_FILES['mediaUploadLogo']['name'])['extension']; //pour recuperer l'extension du fichier uploader
+                        $pathFile = './media/'.basename($newNameUploaderFile.'.'.$extension_upload); //chemin de stockage  avec nouveau nom du media uploader
+
+                        // enregistrement en bdd du media LOGO
+                        $mediaUploadLogo
+                            ->setPath($pathFile)    // ->setPath('./media/media-19.jpg')
+                            ->setAlt($_POST['altFileMediaLogo'])
+                            ->setStatutActif(1)
+                            ->setMediaType_id(2)
+                            ->setUser_id($lastRecordingUser)
+                            ;
+                        
+                        $mediaManager->addMediaImage($mediaUploadLogo, $file, $storagePath, $fileType, $maxFileSize, $newNameUploaderFile); //adding the media to the database and recovery via the id function of the last media in the database
+                    }
+                    
+                    
+                    header('Location: /backend/editUser/'.$lastRecordingUser.'?created=true');
+                }else{
+                    // ISSUE COMMENT TRANSMETTRE UN TABLEAU $errors=[]; DANS LA REDIRECTION CI DESSOUS POUR AFFICHER DANS LA VIEW LES DIFFERENTES ERREORS
+                    header('Location: /backend/createUser?created=false');
+                }
+        }
+        
+        //pour l'affichages des champs dans la vue (views > backviews > user >_form.php)
+        $formUser = new Form($user);
+        $formUserType = new Form($userType);
+        $formMediaUploadLogo = new Form($mediaUploadLogo);
+
+        require('../app/Views/backViews/user/backCreateUserView.php');
+    }
+
+    /**
      * function use for road road http://localhost:8000/backend/editUser/1 ou http://localhost:8000/backend/editUser/2 ou ....
      * will display the view backEditUserView.php  
      */
@@ -391,6 +522,11 @@ use App\Models\MediaTypeManager;
     {
         Auth::check();
 
+        // variables infos
+        // $idMediaType = 2;   //logo
+        // $statusActif = 1;   //actif
+        
+        // user
         $userManager = new UserManager();
         $user = $userManager->getUser($id);
 
@@ -398,8 +534,12 @@ use App\Models\MediaTypeManager;
         $userType = $userTypeManager->getUserType($user->getUserType_id()); // sera utiliser dans "$formUserType = new Form($userType);" qui creer les champs propres au userType (via l entité "Form.php") qui seront eux meme integrer pour les integrer (en totalite ou en partie) dans "$formUser = new Form($user);" ci dessous qui permettra de creer les champs propre au $user (via l entité "Form.php")
         $listSelectUserTypes = $userTypeManager->listSelect(); //pour afficher le contenu du select des usertypes, sera utiliser dans "backView > user > _form.php"
 
-   
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') { // if a submission of the form (=> a modification of a post) has been made
+        // media (logo)
+        $mediaManager = new MediaManager();
+        $mediaUploadLogo = new Media(); //pour avoir dans le champ input pour uploader un logo
+
+        // traitement server et affichage des retours d'infos 
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') { // if a submission of the form (=> a modification of a user) has been made
             //for data validation
                 $errors = [];
 
@@ -420,18 +560,59 @@ use App\Models\MediaTypeManager;
                         $validate=NULL;
                     }
 
+                    // enregistrement en bdd du user
                     $user
                         ->setFirstName($_POST['firstName'])
                         ->setLastName($_POST['lastName'])
                         ->setEmail($_POST['email'])
+                        // ->setLogo($_POST['logo'])
                         ->setSlogan($_POST['slogan'])
+                        // ->setSocialNetworks($_POST['socialNetworks'])
                         ->setLogin($_POST['login'])
                         ->setPassword($_POST['password'])
                         ->setValidate($dateValidate)
-                        // ->setValidate($_POST['validate']);
                         ->setUserType_id($_POST['userType_id'][0]); //car on cette donnee est issu d'un select multiple
 
                     $userManager->updateUser($user);
+
+                    // enregistrement en bdd du media logo et du fichier uploader sur le server dans le dossier media
+                    if(isset($_FILES['mediaUploadLogo']) AND $_FILES['mediaUploadLogo']['error']== 0){
+                        
+                        // variables infos
+                        $idMediaType = 2;   //logo
+                        
+                        $file = $_FILES['mediaUploadLogo']; //fichier uploader
+                        $storagePath = './media/'; //chemin de stockage du fichier uploader
+                        $fileType = 'image'; //type de fichier uploader
+                        $maxFileSize = 500000; //taille maximum du fichier uploader autorise
+                        
+                        $name = 'mediaLogo-'.pathinfo($_FILES['mediaUploadLogo']['name'])['filename'].'-';
+                        $newNameUploaderFile = uniqid($name , true);    // concatenation "media-" + nom du fichier uploader(sans son extension + identifiant unique (via uniqid) pour avoir un identifiant unique
+                        
+                        $extension_upload = pathinfo($_FILES['mediaUploadLogo']['name'])['extension']; //pour recuperer l'extension du fichier uploader
+                        $pathFile = './media/'.basename($newNameUploaderFile.'.'.$extension_upload); //chemin de stockage  avec nouveau nom du media uploader
+
+                        // on supprime en base de donnée ainsi que sur le server dans le dossier media l'ancien logo de l'user    
+                        $listLogosDelete = $mediaManager->getListMediasForUserForType($user->getId(), $idMediaType); // on recuperer la liste des logos du user
+        
+                        if(!empty($listLogosDelete)){
+                            foreach($listLogosDelete as $logo){
+                                unlink($logo->getPath());  //suppression des media sur le serveur dans le dossier media
+                                $mediaManager->deleteMedia($logo->getId());    //suppression dans la base de donnée  
+                            }
+                        }
+
+                        // enregistrement en bdd du nouveau LOGO et et de son fichier uploader sur le server dans le dossier media
+                        $mediaUploadLogo
+                            ->setPath($pathFile)    // ->setPath('./media/media-19.jpg')
+                            ->setAlt($_POST['altFileMediaLogo'])
+                            ->setStatutActif(1)
+                            ->setMediaType_id(2)
+                            ->setUser_id($user->getId())
+                            ;
+                        
+                        $mediaManager->addMediaImage($mediaUploadLogo, $file, $storagePath, $fileType, $maxFileSize, $newNameUploaderFile); //adding the media to the database and recovery via the id function of the last media in the database
+                    }
 
                     header('Location: /backend/editUser/'.$user->getId().'?success=true');
                 }else{
@@ -440,79 +621,13 @@ use App\Models\MediaTypeManager;
                 }
         }
 
+        //pour l'affichages des champs dans la vue (views > backviews > user >_form.php)
         $formUser = new Form($user);
         $formUserType = new Form($userType);
+        $formMediaUploadLogo = new Form($mediaUploadLogo);
 
         // require('../app/Views/backViews/post/backEditUserView.php');
         require('../app/Views/backViews/user/backEditUserView.php');
-    }
-
-    /**
-     * function use for road http://localhost:8000/backend/createUser
-     * will display the view backCreateUserView.php  
-     */
-    function createUser()
-    {
-        Auth::check();
-
-        $user = new user();
-        $userType = new UserType();
-
-        $userTypeManager = new UserTypeManager();
-        $listSelectUserTypes = $userTypeManager->listSelect(); //pour afficher le contenu du select des usertypes, sera utiliser dans "backView > user > _form.php"
-
-        $user->setValidate(new Datetime()); //to assign today's date (in datetime) by default to the user we create 
-        
-        // $user->setDatechange(NULL); // ------POUR LE TESTE J ASSIGNE LA DATECHANGE A "NULL" VOIR APRES COMMENT FAIRE POUR GERER CELA --------------
-        // $post->setUser_id(2); // ------POUR LE TESTE J ASSIGNE L UTILISATEUR "2" VOIR APRES COMMENT FAIRE POUR GERER CELA --------------
-
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') { // if a submission of the form (=> a creation of a post) has been made
-            //for data validation
-                $errors = [];
-            
-                // if(empty($_POST['title'])){
-                //     $errors['title'][] = 'Le champs titre ne peut être vide';
-                // }
-                // if(mb_strlen($_POST['title'])<=3){
-                //     $errors['title'][] = 'Le champs titre doit contenir plus de 3 caractere';
-                // }
-                
-                if(empty($errors)){
-                    
-                    //ISSSUE  gestion des date en datetime dans entité post // base de donnee en string pour la create ou l edit d un post (=>voir methode setDateCreate($dateCreate) de la class Post)
-                    $dateCreate = DateTime::createFromFormat('Y-m-d H:i:s',$_POST['validate']); // pour que la date String soit en Datetime
-
-                    // if($_POST['dateChange'] === ''){
-                    //     $dateChange=NULL;
-                    // }
-
-                    $user
-                        ->setFirstName($_POST['firstName'])
-                        ->setLastName($_POST['lastName'])
-                        ->setEmail($_POST['email'])
-                        ->setUserType_id($_POST['userType_id'][0]) //car on cette donnee est issu d'un select multiple
-                        // ->setLogo($_POST['logo'])
-                        ->setSlogan($_POST['slogan'])
-                        // ->setSocialNetworks($_POST['socialNetworks'])
-                        ->setLogin($_POST['login'])
-                        ->setPassword($_POST['password'])
-                        ->setValidate($dateCreate);
-                        // ->setValidate(new Datetime()); //to assign today's date (in datetime) by default to the user we create
-                        // ->setValidate(DateTime::createFromFormat('Y-m-d H:i:s',new Datetime())); //to assign today's date (in datetime) by default to the user we create 
-                    
-                    $userManager = new UserManager();
-                    $lastRecording = $userManager->addUser($user);// add the post to the database and get the last id of the posts in the database via the return of the function
-                    header('Location: /backend/editUser/'.$lastRecording.'?created=true');
-                }else{
-                    // ISSUE COMMENT TRANSMETTRE UN TABLEAU $errors=[]; DANS LA REDIRECTION CI DESSOUS POUR AFFICHER DANS LA VIEW LES DIFFERENTES ERREORS
-                    header('Location: /backend/createUser?created=false');
-                }
-        }
-        
-        $formUser = new Form($user);
-        $formUserType = new Form($userType);
-
-        require('../app/Views/backViews/user/backCreateUserView.php');
     }
 
     /**
@@ -523,8 +638,47 @@ use App\Models\MediaTypeManager;
     {
         Auth::check();
         
+        $postManager = new PostManager();
+        $listPostsForUser = $postManager->getListPostsForUser($id);
+
+        $mediaManager = new MediaManager();
+
+        // recuperation de tout les post (et des medias que leurs sont associés) de l user pour les supprimer
+        if(!empty($listPostsForUser)){
+            foreach($listPostsForUser as $post){    // suppression de tout les post (et des medias que leurs sont associés) de l user
+                // deletePost($post->getId());
+                $listMediasDelete =  $mediaManager->getListMediasForPost($post->getId());// on recupere la liste des media pour ce $post
+
+                // on supprime les medias lier au post (si il y en a)
+                if($listMediasDelete !== []){
+                    foreach($listMediasDelete as $media){
+                        $mediaManager->deleteMedia($media->getId());    //suppression dans la base de donnée
+                        unlink($media->getPath());  //suppression des media sur le serveur dans le dossier media
+                    }
+                }
+                // on supprime le post
+                $post = $postManager->deletePost($post->getId());
+            }
+        }
+
+        // ----------------A FAIRE PLUS TARD => recuperation de tout les commentaires de l user pour les supprimer--------
+        
+        // recuperation de tout les logos pour les supprimer du server (daossier media) et de la base de donnée
+        $idMediaType = 2;   //log
+        // $mediaManager = new MediaManager();
+        $listLogosDelete = $mediaManager->getListMediasForUserForType($id, $idMediaType); // on recuperer la liste des logos du user
+                
+        if(!empty($listLogosDelete)){
+            foreach($listLogosDelete as $logo){
+                unlink($logo->getPath());  //suppression des media sur le serveur dans le dossier media
+                $mediaManager->deleteMedia($logo->getId());    //suppression dans la base de donnée  
+            }
+        }
+
+        // suppression de l'user
         $userManager = new UserManager();
         $user = $userManager->deleteUser($id);
+
         require('../app/Views/backViews/user/backDeleteUserView.php');
     }
 

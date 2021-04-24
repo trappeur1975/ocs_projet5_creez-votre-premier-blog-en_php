@@ -13,8 +13,6 @@ use App\Entities\User;
  */
 class UserManager extends Manager
 {
-
-
     /**
      * Method getListUsers which returns the list of user (as an object of type user) 
      *
@@ -48,6 +46,83 @@ class UserManager extends Manager
         return $user;
     }
 
+    // ajoute le user (en attribut de cette fonction) a la table user en bdd
+    public function addUser(User $user)
+    {
+        $db = $this->dbConnect();
+        
+        $query = $db->prepare('INSERT INTO user SET firstName = :firstName, 
+                                                    lastName = :lastName,
+                                                    email = :email,
+                                                    -- logo = :logo,
+                                                    slogan = :slogan,
+                                                    -- socialNetworks = :socialNetworks,
+                                                    login = :login,
+                                                    password = :password,
+                                                    validate = :validate,
+                                                    userType_id = :userType_id');
+        $result = $query->execute([
+            'firstName' => $user->getFirstName(),
+            'lastName' => $user->getLastName(),
+            'email' => $user->getEmail(),
+            // 'logo' => $user->getLogo(),
+            'slogan' => $user->getSlogan(),
+            // 'socialNetworks' => $user->getSocialNetworks(),
+            'login' => $user->getLogin(),
+            'password' => $user->getPassword(),
+            'validate' => $user->getValidate()->format('Y-m-d H:i:s'),
+            // 'validate' => $user->getValidate()
+            'userType_id' => $user->getUserType_id()
+            ]);
+
+        if($result === true){
+            return $db->lastInsertId();
+        } else {
+            throw new Exception('impossible de creer l enregistrement du user');
+        }
+    }
+
+    /**
+     * Method updateUser update the content of a user 
+     *
+     * @param User $user user to update 
+     *
+     * @return void
+     */
+    public function updateUser(User $user): void
+    {
+        $db = $this->dbConnect();
+        $query = $db->prepare('UPDATE user SET firstName = :firstName, 
+                                                lastName = :lastName,
+                                                email = :email,
+                                                -- logo = :logo,
+                                                slogan = :slogan,
+                                                -- socialNetworks = :socialNetworks,
+                                                login = :login,
+                                                password = :password,
+                                                validate = :validate,
+                                                userType_id = :userType_id
+                            WHERE id = :id');
+        $result = $query->execute([
+            'firstName' => $user->getFirstName(),
+            'lastName' => $user->getLastName(),
+            'email' => $user->getEmail(),
+            // 'logo' => $user->getLogo(),
+            'slogan' => $user->getSlogan(),
+            // 'socialNetworks' => $user->getSocialNetworks(),
+            'login' => $user->getLogin(),
+            'password' => $user->getPassword(),
+            'validate' => $user->getValidate()->format('Y-m-d H:i:s'),
+            // 'validate' => $user->getValidate(),
+            'userType_id' => $user->getUserType_id(),
+            'id' => $user->getId()
+        ]);
+        
+        if($result === false){
+            throw new Exception('impossible de modifier le user'.$user->getId());
+        }
+    }
+
     /**
      * Method deleteUser delete a user 
      *
@@ -65,80 +140,7 @@ class UserManager extends Manager
         }
     }
 
-
-    /**
-     * Method updateUser update the content of a user 
-     *
-     * @param User $user user to update 
-     *
-     * @return void
-     */
-    public function updateUser(User $user): void
-    {
-        $db = $this->dbConnect();
-        $query = $db->prepare('UPDATE user SET firstName = :firstName, 
-                                                lastName = :lastName,
-                                                email = :email,
-                                                slogan = :slogan,
-                                                login = :login,
-                                                password = :password,
-                                                validate = :validate,
-                                                userType_id = :userType_id
-                            WHERE id = :id');
-        $result = $query->execute([
-            'firstName' => $user->getFirstName(),
-            'lastName' => $user->getLastName(),
-            'email' => $user->getEmail(),
-            'slogan' => $user->getSlogan(),
-            'login' => $user->getLogin(),
-            'password' => $user->getPassword(),
-            'validate' => $user->getValidate()->format('Y-m-d H:i:s'),
-            // 'validate' => $user->getValidate(),
-            'userType_id' => $user->getUserType_id(),
-            'id' => $user->getId()
-        ]);
-        
-        if($result === false){
-            throw new Exception('impossible de modifier le user'.$user->getId());
-        }
-    }
-
 // --------------------------------------------------------------------------------------
-    // ajoute le user (en attribut de cette fonction) a la table post en bdd
-    public function addUser(User $user)
-    {
-        $db = $this->dbConnect();
-        
-        $query = $db->prepare('INSERT INTO user SET firstName = :firstName, 
-                                                    lastName = :lastName,
-                                                    email = :email,
-                                                    userType_id = :userType_id,
-                                                    -- logo = :logo,
-                                                    slogan = :slogan,
-                                                    -- socialNetworks = :socialNetworks,
-                                                    login = :login,
-                                                    password = :password,
-                                                    validate = :validate');
-        $result = $query->execute([
-            'firstName' => $user->getFirstName(),
-            'lastName' => $user->getLastName(),
-            'email' => $user->getEmail(),
-            'userType_id' => $user->getUserType_id(),
-            // 'logo' => $user->getLogo(),
-            'slogan' => $user->getSlogan(),
-            // 'socialNetworks' => $user->getSocialNetworks(),
-            'login' => $user->getLogin(),
-            'password' => $user->getPassword(),
-            'validate' => $user->getValidate()->format('Y-m-d H:i:s')
-            // 'validate' => $user->getValidate()
-            ]);
-
-        if($result === true){
-            return $db->lastInsertId();
-        } else {
-            throw new Exception('impossible de creer l enregistrement du user');
-        }
-    }
 
     public function findByUserLogin(string $login)
     {

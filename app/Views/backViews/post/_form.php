@@ -14,13 +14,12 @@
         <?= $formUser->selectSimple('id', 'user', 'auteur', $listSelectUsers) ?>   <!-- pour la creation du select des users -->
         <?php 
             if ($formUser->getEdit() === true){ //pour gerer le cas si on edit un post (on affiche le select) ou si on cree un post (on n affiche pas le select car on integrera un champs pour integrer des media au post que l on cree)
-                echo $formMediasSelect->selectMultiple('id', 'path','medias', $listSelectMediasForUser, $listSelectMediasForPost); //pour la creation du select des medias
+                echo $formMediasSelectImage->selectMultiple('id', 'path','medias', $listSelectMediasForUser, $listSelectMediasForPost); //pour la creation du select des medias
             }
         ?>
 
     <!-- CREATION DES CHAMP POUR LE UPLOAD DE MEDIA (image) -->
         <?= $formMediaUploadImage->inputFile('media', 'mediaUploadImage', 'rajouter une image (uploader un fichier max 500ko) a ce post') ?>    <!-- pour la creation du upload du media -->
-        <!-- <?//= $formMediaType->selectSimple('id', 'mediaType', 'Type du media uploader', $listMediaTypes) ?>   pour la creation du select des mediaTypes -->
         <?= $formMediaUploadImage->input('alt', 'altFileMediaImage', 'texte alternatif du media IMAGE uploader') ?>    <!-- pour la creation du input du text alt du media image -->
     <!-- CREATION DES CHAMP POUR LE UPLOAD DE MEDIA (video) -->
         <?= $formMediaUploadVideo->input('path', 'mediaUploadVideo', 'rajouter une video (lien url youtube ou vimeo uniquement) a ce post') ?>

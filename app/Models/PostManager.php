@@ -122,4 +122,27 @@ class PostManager extends Manager
             throw new Exception('impossible de supprimer le post :'.$id.'peut être il n\'existe pas');
         }
     }
+
+    // ------------------------------------------
+    
+    /**
+     * Method getListPostsForUser method that returns the list of post linked to a user 
+     *
+     * @param int $idUser the id user whose post we want to retrieve 
+     *
+     * @return Post[]
+     */
+
+    public function getListPostsForUser(int $idUser): array
+    {
+        $db = $this->dbConnect();
+
+        $query = $db->prepare('SELECT * FROM post WHERE user_id = :id');
+        $query->execute(['id' => $idUser]);
+
+        $listPostForUser = $query ->fetchAll(PDO::FETCH_CLASS, Post::class);
+
+        return $listPostForUser;
+    }
+
 }

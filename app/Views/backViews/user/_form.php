@@ -1,10 +1,14 @@
-<form action="" method="post">
+<form action="" method="post" enctype="multipart/form-data">
     <?= $formUser->input('firstName', 'firstName','firstName' ) ?>
     <?= $formUser->input('lastName', 'lastName', 'lastName') ?>
     <?= $formUser->input('email', 'email', 'email') ?>
     <?= $formUserType->selectSimple('id', 'userType_id', 'statut', $listSelectUserTypes) ?> <!--select des userType -->
     <?= $formUser->input('slogan', 'slogan', 'slogan') ?>
-    <?= $formUser->input('login', 'login', 'login') ?>
+
+    <?= $formMediaUploadLogo->inputFile('logo', 'mediaUploadLogo', 'rajouter un logo (uploader un fichier image max 500ko) a cette user') ?>    <!-- pour la creation du upload du logo -->
+    <?= $formMediaUploadLogo->input('alt', 'altFileMediaLogo', 'texte alternatif pour le logo uploader') ?>    <!-- pour la creation du input du text alt du media logo -->
+    
+    <?= $formUser->input('login', 'login', 'login') ?> 
     <?= $formUser->input('password', 'password', 'password') ?>
     <?= $formUser->input('validate', 'validate', 'validate') ?> <!--  DOIT ETRE UN DATETIME -->
 
@@ -16,5 +20,5 @@
         <?php endif?>
     </button>
 
-    <a href="/backend/adminPosts" class="btn btn-primary">Administration des post</a>
+    <a href="/backend/adminUsers" class="btn btn-primary">Administration des users</a>
 </form>
