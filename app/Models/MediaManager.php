@@ -186,9 +186,6 @@ class MediaManager extends Manager
 
 //------------------------------------NOUVEAU--------------------------
 
-
-
-
     /**
      * Method getListMediasForUserForType method that returns the list of media for a user for a type (example mediaType "logo")
      *

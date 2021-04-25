@@ -40,11 +40,45 @@ class UserManager extends Manager
         $query->execute(['id' => $id]);
         $query->setFetchMode(PDO::FETCH_CLASS, User::class);
         $user = $query->fetch();
+
         if($user === false){
             throw new Exception('aucun user ne correspond a cet ID');
         }
         return $user;
     }
+
+    // public function getUser(int $id)
+    // {
+    //     $db = $this->dbConnect();
+    //     $query = $db->prepare('SELECT user.id As id, user.firstName, user.lastName, user.email, user.slogan, user.login, user.password, user.validate, user.userType_id, media.id As idmedia, media.path, media.alt, media.statutActif, mediaType_id, media.post_id, media.user_id FROM user
+    //                             INNER JOIN media
+    //                             ON user.id = media.user_id
+    //                             WHERE user.id = :id and media.mediatype_id = 2');
+    //     $query->execute(['id' => $id]);
+        
+    //     // dd($query->fetch());
+
+    //     $query->setFetchMode(PDO::FETCH_CLASS, User::class);
+    //     $user = $query->fetch();
+
+    //     dd($user);
+
+    //     // $mediaManager = new MediaManager();
+    //     // $logo = $mediaManager->getMedia($user->idmedia);
+        
+    //     // dd($logo);
+
+    //     // $user->setLogo($logo);
+        
+    //     // dd($user);
+    //     // dd($user->idmedia);
+        
+
+    //     if($user === false){
+    //         throw new Exception('aucun user ne correspond a cet ID');
+    //     }
+    //     return $user;
+    // }
 
     // ajoute le user (en attribut de cette fonction) a la table user en bdd
     public function addUser(User $user)

@@ -49,8 +49,6 @@ class Media
      */
     private $user_id;
 
-
-
     /**
      * Get $id id of the media
      *

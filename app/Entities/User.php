@@ -42,6 +42,13 @@ class User
     private $slogan;
 
     /**
+     * logo
+     *
+     * @var Media $logo logo of the user
+     */
+    private $logo;
+
+    /**
      * login
      * 
      * @var string $login login of the user
@@ -69,12 +76,7 @@ class User
      */
     private $userType_id;
     
-    // /**
-    //  * logo
-    //  *
-    //  * @var Media $logo logo of the user
-    //  */
-    // private $logo;
+
 
     /** 
      * Get $id id of the user
@@ -280,27 +282,27 @@ class User
         return $this;
     }
 
-    // /**
-    //  * Get $logo logo of the user
-    //  *
-    //  * @return  Media
-    //  */ 
-    // public function getLogo()
-    // {
-    //     return $this->logo;
-    // }
+    /**
+     * Get $logo logo of the user
+     *
+     * @return  Media
+     */ 
+    public function getLogo(): ?Media
+    {
+        return $this->logo;
+    }
 
-    // /**
-    //  * Set $logo logo of the user
-    //  *
-    //  * @param  Media  $logo  $logo logo of the user
-    //  *
-    //  * @return  self
-    //  */ 
-    // public function setLogo(Media $logo): self
-    // {
-    //     $this->logo = $logo;
+    /**
+     * Set $logo logo of the user
+     *
+     * @param  Media  $logo  $logo logo of the user
+     *
+     * @return  self
+     */ 
+    public function setLogo(Media $logo): self
+    {
+        $this->logo = $logo;
 
-    //     return $this;
-    // }
+        return $this;
+    }
 }

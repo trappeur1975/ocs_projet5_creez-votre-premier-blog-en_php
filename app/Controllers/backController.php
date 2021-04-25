@@ -7,11 +7,13 @@ use App\Entities\User;
 use App\Entities\Media;
 use App\Entities\MediaType;
 use App\Entities\UserType;
+use App\Entities\SocialNetwork;
 use App\Models\PostManager;
 use App\Models\UserManager;
 use App\Models\MediaManager;
 use App\Models\UserTypeManager;
 use App\Models\MediaTypeManager;
+use App\Models\SocialNetworkManager;
 
 // CONNECTION / DECONNECTION AU SITE
     /**
@@ -420,7 +422,7 @@ use App\Models\MediaTypeManager;
         Auth::check();
         
         // user
-        $user = new user();
+        $user = new User();
         $userType = new UserType();
 
         $userTypeManager = new UserTypeManager();
@@ -431,6 +433,10 @@ use App\Models\MediaTypeManager;
         // media (logo)
         $mediaManager = new MediaManager();
         $mediaUploadLogo = new Media(); //pour avoir dans le champ input pour uploader un logo (par defaut toute les variables de cette entité Media sont a "null" )
+
+        // socialNetwork
+        $socialNetwork = new SocialNetwork();
+        $socialNetworkManager = new SocialNetworkManager();
 
         // traitement server et affichage des retours d'infos 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') { // if a submission of the form (=> a creation of a user) has been made
@@ -467,7 +473,7 @@ use App\Models\MediaTypeManager;
                         ->setUserType_id($_POST['userType_id'][0]); //car on cette donnee est issu d'un select multiple
                         // ->setValidate(new Datetime()); //to assign today's date (in datetime) by default to the user we create
                         // ->setValidate(DateTime::createFromFormat('Y-m-d H:i:s',new Datetime())); //to assign today's date (in datetime) by default to the user we create 
-                    
+
                     $userManager = new UserManager();
                     $lastRecordingUser = $userManager->addUser($user);// add the post to the database and get the last id of the posts in the database via the return of the function
                     
@@ -498,7 +504,16 @@ use App\Models\MediaTypeManager;
                         $mediaManager->addMediaImage($mediaUploadLogo, $file, $storagePath, $fileType, $maxFileSize, $newNameUploaderFile); //adding the media to the database and recovery via the id function of the last media in the database
                     }
                     
-                    
+                    // enregistrement en bdd du socialNetwork
+                    if(!empty($_POST['socialNetwork'])){
+                        $socialNetwork
+                            ->setUrl($_POST['socialNetwork'])
+                            ->setUser_id($user->getId())
+                            ;
+                        
+                        $socialNetworkManager->addSocialNetwork($socialNetwork);
+                    }
+
                     header('Location: /backend/editUser/'.$lastRecordingUser.'?created=true');
                 }else{
                     // ISSUE COMMENT TRANSMETTRE UN TABLEAU $errors=[]; DANS LA REDIRECTION CI DESSOUS POUR AFFICHER DANS LA VIEW LES DIFFERENTES ERREORS
@@ -510,6 +525,8 @@ use App\Models\MediaTypeManager;
         $formUser = new Form($user);
         $formUserType = new Form($userType);
         $formMediaUploadLogo = new Form($mediaUploadLogo);
+        $formSocialNetwork = new Form($socialNetwork);
+
 
         require('../app/Views/backViews/user/backCreateUserView.php');
     }
@@ -521,11 +538,7 @@ use App\Models\MediaTypeManager;
     function editUser($id)
     {
         Auth::check();
-
-        // variables infos
-        // $idMediaType = 2;   //logo
-        // $statusActif = 1;   //actif
-        
+              
         // user
         $userManager = new UserManager();
         $user = $userManager->getUser($id);
@@ -538,8 +551,18 @@ use App\Models\MediaTypeManager;
         $mediaManager = new MediaManager();
         $mediaUploadLogo = new Media(); //pour avoir dans le champ input pour uploader un logo
 
+        // socialNetwork
+        $socialNetworkManager = new SocialNetworkManager();
+        $socialNetwork = new SocialNetwork();
+        $socialNetworkForSelect = $socialNetworkManager->getListSocialNetworksForUser($user->getId())[0];
+        
+        //utiliser dans "backviews > user > _form.php" 
+        $listSocialNetworksForUser =  $socialNetworkManager->listSelect($user->getId()); // on affiche la liste des media de l'user auteur du post      
+        // $listSelectMediasForPost =  $mediaManager->getIdOftListMediasActifForPost($post->getId());// on recupere la liste des media pour ce $post
+
         // traitement server et affichage des retours d'infos 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') { // if a submission of the form (=> a modification of a user) has been made
+
             //for data validation
                 $errors = [];
 
@@ -614,6 +637,25 @@ use App\Models\MediaTypeManager;
                         $mediaManager->addMediaImage($mediaUploadLogo, $file, $storagePath, $fileType, $maxFileSize, $newNameUploaderFile); //adding the media to the database and recovery via the id function of the last media in the database
                     }
 
+                    // enregistrement en bdd socialNetwork des modifications qui ont etait apporté dans l'editUser()
+                    
+                    // supression du ou des socialNetwork de l'user
+                    if(!empty($_POST['socialNetworksUser'])){ 
+                        foreach($_POST['socialNetworksUser'] as $idSsocialNetwork){
+                            $socialNetworkManager->deleteSocialNetwork($idSsocialNetwork);
+                        }
+                    }
+                      
+                    // ajout d'un socialNetwork a l'user
+                    if(!empty($_POST['socialNetwork'])){
+                        $socialNetwork
+                            ->setUrl($_POST['socialNetwork'])
+                            ->setUser_id($user->getId())
+                            ;
+                        
+                        $socialNetworkManager->addSocialNetwork($socialNetwork);
+                    }
+
                     header('Location: /backend/editUser/'.$user->getId().'?success=true');
                 }else{
                     // ISSUE COMMENT TRANSMETTRE UN TABLEAU $errors=[]; DANS LA REDIRECTION CI DESSOUS POUR AFFICHER DANS LA VIEW LES DIFFERENTES ERREORS
@@ -622,9 +664,11 @@ use App\Models\MediaTypeManager;
         }
 
         //pour l'affichages des champs dans la vue (views > backviews > user >_form.php)
-        $formUser = new Form($user);
+        $formUser = new Form($user, true);
         $formUserType = new Form($userType);
         $formMediaUploadLogo = new Form($mediaUploadLogo);
+        $formSocialNetwork = new Form($socialNetwork);
+        $formSocialNetworkSelect = new Form($socialNetworkForSelect);
 
         // require('../app/Views/backViews/post/backEditUserView.php');
         require('../app/Views/backViews/user/backEditUserView.php');
@@ -664,14 +708,23 @@ use App\Models\MediaTypeManager;
         // ----------------A FAIRE PLUS TARD => recuperation de tout les commentaires de l user pour les supprimer--------
         
         // recuperation de tout les logos pour les supprimer du server (daossier media) et de la base de donnée
-        $idMediaType = 2;   //log
-        // $mediaManager = new MediaManager();
+        $idMediaType = 2;   //logo
         $listLogosDelete = $mediaManager->getListMediasForUserForType($id, $idMediaType); // on recuperer la liste des logos du user
                 
         if(!empty($listLogosDelete)){
             foreach($listLogosDelete as $logo){
                 unlink($logo->getPath());  //suppression des media sur le serveur dans le dossier media
                 $mediaManager->deleteMedia($logo->getId());    //suppression dans la base de donnée  
+            }
+        }
+
+        // suppression de la base de donnee de tout les socialNetworks de l'user
+        $socialNetworkManager = new SocialNetworkManager();
+        $listSocialNetworksForUserDelete = $socialNetworkManager->getListSocialNetworksForUser($id);
+        
+        if(!empty($listSocialNetworksForUserDelete)){
+            foreach($listSocialNetworksForUserDelete as $socialnetwork){
+                $socialNetworkManager->deleteSocialNetwork($socialnetwork->getId());    //suppression dans la base de donnée  
             }
         }
 
