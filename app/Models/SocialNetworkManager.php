@@ -49,6 +49,7 @@ class SocialNetworkManager extends Manager
     }
 
      // ----------------------------- methode specifique --------------------------
+    
     /**
      * Method getListSocialNetworksForUser method that returns the list of socialnetwork linked to a user 
      *
@@ -67,9 +68,9 @@ class SocialNetworkManager extends Manager
         return $listSocialNetworksForUser;
     }
 
-     // methode pour recuperer un tableau de soacialNetwork lier a un utilisateur que l on va utiliser dans le select
-     public function listSelect(int $idUser): array
-     {
+    // methode pour recuperer un tableau de soacialNetwork lier a un utilisateur que l on va utiliser dans le select
+    public function listSelect(int $idUser): array
+    {
          $socialNetworks = $this->getListSocialNetworksForUser($idUser);
          $results = [];
          
@@ -78,5 +79,20 @@ class SocialNetworkManager extends Manager
          }
  
          return $results;
-     }
+    }
+
+    // methode pour recuperer un tableau de soacialNetwork lier a un utilisateur que l on va utiliser dans le select
+    // methode similaire a celle de au dessus mais on transmet ici un tableau en parametre de la methode
+    public function listSelect2(array $listSocialNetworksForUser): array
+    {
+        $results = [];
+        
+        foreach($listSocialNetworksForUser as $socialNetwork){
+            $results[$socialNetwork->getId()] = $socialNetwork->getUrl(); 
+        }
+
+        return $results;
+    }
+
+
 }

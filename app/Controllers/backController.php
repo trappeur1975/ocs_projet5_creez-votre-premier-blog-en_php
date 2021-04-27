@@ -440,6 +440,7 @@ use App\Models\SocialNetworkManager;
 
         // traitement server et affichage des retours d'infos 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') { // if a submission of the form (=> a creation of a user) has been made
+                
             //for data validation
                 $errors = [];
             
@@ -506,11 +507,12 @@ use App\Models\SocialNetworkManager;
                     
                     // enregistrement en bdd du socialNetwork
                     if(!empty($_POST['socialNetwork'])){
+                        
                         $socialNetwork
                             ->setUrl($_POST['socialNetwork'])
-                            ->setUser_id($user->getId())
+                            ->setUser_id($lastRecordingUser)
                             ;
-                        
+
                         $socialNetworkManager->addSocialNetwork($socialNetwork);
                     }
 
@@ -549,16 +551,22 @@ use App\Models\SocialNetworkManager;
 
         // media (logo)
         $mediaManager = new MediaManager();
-        $mediaUploadLogo = new Media(); //pour avoir dans le champ input pour uploader un logo
+            // pour rajouter avec le input un nouveau logo
+            $mediaUploadLogo = new Media(); //pour avoir dans le champ input pour uploader un logo
+
+            // pour recuperer le logo du usuer ---------ATTENTION FAUDRA TESTER SI USER A DEJA UN LOGO, SI NON NE PAS FAIRE------------
+            $listLogos = $mediaManager->getListMediasForUserForType($user->getId(), 2);
+            $logoUser = $listLogos[0];
 
         // socialNetwork
         $socialNetworkManager = new SocialNetworkManager();
         $socialNetwork = new SocialNetwork();
-        $socialNetworkForSelect = $socialNetworkManager->getListSocialNetworksForUser($user->getId())[0];
-        
-        //utiliser dans "backviews > user > _form.php" 
-        $listSocialNetworksForUser =  $socialNetworkManager->listSelect($user->getId()); // on affiche la liste des media de l'user auteur du post      
-        // $listSelectMediasForPost =  $mediaManager->getIdOftListMediasActifForPost($post->getId());// on recupere la liste des media pour ce $post
+        // $socialNetworkForSelect = $socialNetworkManager->getListSocialNetworksForUser($user->getId())[0];    
+        // //utiliser dans "backviews > user > _form.php" 
+        // $listSocialNetworksForUser =  $socialNetworkManager->listSelect($user->getId()); // on affiche la liste des social network de l'user 
+        // // $listSelectMediasForPost =  $mediaManager->getIdOftListMediasActifForPost($post->getId());// on recupere la liste des media pour ce $post
+        $listSocialNetworksForUser = $socialNetworkManager->getListSocialNetworksForUser($user->getId());
+        $listSocialNetworksForUserForSelect =  $socialNetworkManager->listSelect2($listSocialNetworksForUser); // on affiche la liste des social network de l'user 
 
         // traitement server et affichage des retours d'infos 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') { // if a submission of the form (=> a modification of a user) has been made
@@ -615,9 +623,11 @@ use App\Models\SocialNetworkManager;
                         $extension_upload = pathinfo($_FILES['mediaUploadLogo']['name'])['extension']; //pour recuperer l'extension du fichier uploader
                         $pathFile = './media/'.basename($newNameUploaderFile.'.'.$extension_upload); //chemin de stockage  avec nouveau nom du media uploader
 
+                        
+
                         // on supprime en base de donnée ainsi que sur le server dans le dossier media l'ancien logo de l'user    
                         $listLogosDelete = $mediaManager->getListMediasForUserForType($user->getId(), $idMediaType); // on recuperer la liste des logos du user
-        
+
                         if(!empty($listLogosDelete)){
                             foreach($listLogosDelete as $logo){
                                 unlink($logo->getPath());  //suppression des media sur le serveur dans le dossier media
@@ -637,24 +647,23 @@ use App\Models\SocialNetworkManager;
                         $mediaManager->addMediaImage($mediaUploadLogo, $file, $storagePath, $fileType, $maxFileSize, $newNameUploaderFile); //adding the media to the database and recovery via the id function of the last media in the database
                     }
 
-                    // enregistrement en bdd socialNetwork des modifications qui ont etait apporté dans l'editUser()
-                    
-                    // supression du ou des socialNetwork de l'user
-                    if(!empty($_POST['socialNetworksUser'])){ 
-                        foreach($_POST['socialNetworksUser'] as $idSsocialNetwork){
-                            $socialNetworkManager->deleteSocialNetwork($idSsocialNetwork);
+                    // enregistrement en bdd socialNetwork des modifications qui ont etait apporté dans l'editUser()   
+                        // supression du ou des socialNetwork de l'user
+                        if(!empty($_POST['socialNetworksUser'])){ 
+                            foreach($_POST['socialNetworksUser'] as $idSsocialNetwork){
+                                $socialNetworkManager->deleteSocialNetwork($idSsocialNetwork);
+                            }
                         }
-                    }
-                      
-                    // ajout d'un socialNetwork a l'user
-                    if(!empty($_POST['socialNetwork'])){
-                        $socialNetwork
-                            ->setUrl($_POST['socialNetwork'])
-                            ->setUser_id($user->getId())
-                            ;
                         
-                        $socialNetworkManager->addSocialNetwork($socialNetwork);
-                    }
+                        // ajout d'un socialNetwork a l'user
+                        if(!empty($_POST['socialNetwork'])){
+                            $socialNetwork
+                                ->setUrl($_POST['socialNetwork'])
+                                ->setUser_id($user->getId())
+                                ;
+                            
+                            $socialNetworkManager->addSocialNetwork($socialNetwork);
+                        }
 
                     header('Location: /backend/editUser/'.$user->getId().'?success=true');
                 }else{
@@ -666,9 +675,19 @@ use App\Models\SocialNetworkManager;
         //pour l'affichages des champs dans la vue (views > backviews > user >_form.php)
         $formUser = new Form($user, true);
         $formUserType = new Form($userType);
+
+        $formMediaLogoUser = new Form($logoUser);   // ATTENTION FAUDRA TESTE SI USER A UN LOGO, SI NON PAS AFFICHER
         $formMediaUploadLogo = new Form($mediaUploadLogo);
+
         $formSocialNetwork = new Form($socialNetwork);
-        $formSocialNetworkSelect = new Form($socialNetworkForSelect);
+
+        if(!empty($listSocialNetworksForUser)){
+            $socialNetworkForSelect = $listSocialNetworksForUser[0];
+            $formSocialNetworkSelect = new Form($socialNetworkForSelect);
+        }
+        
+
+
 
         // require('../app/Views/backViews/post/backEditUserView.php');
         require('../app/Views/backViews/user/backEditUserView.php');

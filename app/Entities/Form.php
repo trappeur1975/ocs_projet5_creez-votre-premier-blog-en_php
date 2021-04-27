@@ -6,7 +6,7 @@ namespace App\Entities;
  */
 class Form
 {
-    private $data;
+    // private $data;
         
     /**
      * edit
@@ -52,6 +52,20 @@ HTML;
         <div class="form-group">
             <label for="{$label}">{$title}</label>
             <input type=file id="{$id}" class="form-control" name="{$label}">
+        </div>
+HTML;
+    }
+
+
+    //pour creer un champ input de type image
+    public function inputImage(Media $logo, string $alt, string $label, string $title): string
+    {
+        $path = substr($logo->getPath(),1); //obliger d'utiliser substr pour enlever le point devant le path du logo (=> ./media/...)
+
+        return <<<HTML
+        <div class="form-group">
+            <label for="{$label}">{$title}</label>
+            <input type=image id="{$label}" alt="{$alt}" class="form-control" name="{$label}" src="{$path}">
         </div>
 HTML;
     }

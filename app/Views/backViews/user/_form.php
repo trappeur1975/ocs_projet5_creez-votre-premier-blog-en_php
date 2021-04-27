@@ -5,13 +5,19 @@
     <?= $formUserType->selectSimple('id', 'userType_id', 'statut', $listSelectUserTypes) ?> <!--select des userType -->
     <?= $formUser->input('slogan', 'slogan', 'slogan') ?>
 
+    <!-- affichage du logo du user (faudra verifier que le tableau de logo existe bien-->
+    <?php  
+        echo $formMediaLogoUser->inputImage($logoUser, 'logo de l user', 'logoUser', 'logo actuel de l user');   //pour l'affichage du logo
+    ?>
+
     <?= $formMediaUploadLogo->inputFile('logo', 'mediaUploadLogo', 'rajouter un logo (uploader un fichier image max 500ko) a cette user') ?>    <!-- pour la creation du upload du logo -->
     <?= $formMediaUploadLogo->input('alt', 'altFileMediaLogo', 'texte alternatif pour le logo uploader') ?>    <!-- pour la creation du input du text alt du media logo -->
     
     <?= $formSocialNetwork->input('url', 'socialNetwork','ajouter un socialNetwork' ) ?>
+
     <?php 
-        if ($formUser->getEdit() === true){ //pour gerer le cas si on edit un user (on affiche le select) ou si on cree un user (on n affiche pas le select)
-            echo $formSocialNetworkSelect->selectMultiple('id', 'socialNetworksUser','supprimer un/des socialNetwork', $listSocialNetworksForUser, $listSocialNetworksForUser); //pour la creation du select des medias
+        if ($formUser->getEdit() === true and !empty($listSocialNetworksForUser)){ //pour gerer le cas si on edit un user et que celui ci possede au moins un socialnetwork(on affiche le select) ou si on cree un user ou que celui-ci ne possede pas aumoins un socialNetwork (on n affiche pas le select)
+            echo $formSocialNetworkSelect->selectMultiple('id', 'socialNetworksUser','supprimer un/des socialNetwork', $listSocialNetworksForUserForSelect, $listSocialNetworksForUserForSelect); //pour la creation du select des medias
         }
     ?>
 
