@@ -423,20 +423,28 @@ use App\Models\SocialNetworkManager;
         
         // user
         $user = new User();
-        $userType = new UserType();
-
-        $userTypeManager = new UserTypeManager();
-        $listSelectUserTypes = $userTypeManager->listSelect(); //pour afficher le contenu du select des usertypes, sera utiliser dans "backView > user > _form.php"
-
         $user->setValidate(new Datetime()); //to assign today's date (in datetime) by default to the user we create 
+        $formUser = new Form($user);
+
+        // userType
+        $userType = new UserType();
+        $formUserType = new Form($userType);
+
+        $userTypeManager = new UserTypeManager(); 
+        $listSelectUserTypes = $userTypeManager->listSelect(); //pour afficher le contenu du select des usertypes, sera utiliser dans "backView > user > _form.php"
+        
+
+       
         
         // media (logo)
         $mediaManager = new MediaManager();
         $mediaUploadLogo = new Media(); //pour avoir dans le champ input pour uploader un logo (par defaut toute les variables de cette entité Media sont a "null" )
+        $formMediaUploadLogo = new Form($mediaUploadLogo);
 
         // socialNetwork
         $socialNetwork = new SocialNetwork();
         $socialNetworkManager = new SocialNetworkManager();
+        $formSocialNetwork = new Form($socialNetwork);
 
         // traitement server et affichage des retours d'infos 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') { // if a submission of the form (=> a creation of a user) has been made
@@ -523,13 +531,6 @@ use App\Models\SocialNetworkManager;
                 }
         }
         
-        //pour l'affichages des champs dans la vue (views > backviews > user >_form.php)
-        $formUser = new Form($user);
-        $formUserType = new Form($userType);
-        $formMediaUploadLogo = new Form($mediaUploadLogo);
-        $formSocialNetwork = new Form($socialNetwork);
-
-
         require('../app/Views/backViews/user/backCreateUserView.php');
     }
 
@@ -544,29 +545,39 @@ use App\Models\SocialNetworkManager;
         // user
         $userManager = new UserManager();
         $user = $userManager->getUser($id);
+        $formUser = new Form($user, true);
 
+        // userType
         $userTypeManager = new UserTypeManager();
         $userType = $userTypeManager->getUserType($user->getUserType_id()); // sera utiliser dans "$formUserType = new Form($userType);" qui creer les champs propres au userType (via l entité "Form.php") qui seront eux meme integrer pour les integrer (en totalite ou en partie) dans "$formUser = new Form($user);" ci dessous qui permettra de creer les champs propre au $user (via l entité "Form.php")
         $listSelectUserTypes = $userTypeManager->listSelect(); //pour afficher le contenu du select des usertypes, sera utiliser dans "backView > user > _form.php"
+        $formUserType = new Form($userType);
 
         // media (logo)
         $mediaManager = new MediaManager();
-            // pour rajouter avec le input un nouveau logo
-            $mediaUploadLogo = new Media(); //pour avoir dans le champ input pour uploader un logo
-
-            // pour recuperer le logo du usuer ---------ATTENTION FAUDRA TESTER SI USER A DEJA UN LOGO, SI NON NE PAS FAIRE------------
-            $listLogos = $mediaManager->getListMediasForUserForType($user->getId(), 2);
+        
+        $listLogos = $mediaManager->getListMediasForUserForType($user->getId(), 2); // pour recuperer le logo du user
+        if(!empty($listLogos)){
             $logoUser = $listLogos[0];
+            $formMediaLogoUser = new Form($logoUser);  //pour avoir dans le champ input pour uploader un logo
+        }
 
+        $mediaUploadLogo = new Media();
+        $formMediaUploadLogo = new Form($mediaUploadLogo);  //pour avoir dans le champ input pour uploader un logo
+            
         // socialNetwork
         $socialNetworkManager = new SocialNetworkManager();
         $socialNetwork = new SocialNetwork();
-        // $socialNetworkForSelect = $socialNetworkManager->getListSocialNetworksForUser($user->getId())[0];    
-        // //utiliser dans "backviews > user > _form.php" 
-        // $listSocialNetworksForUser =  $socialNetworkManager->listSelect($user->getId()); // on affiche la liste des social network de l'user 
-        // // $listSelectMediasForPost =  $mediaManager->getIdOftListMediasActifForPost($post->getId());// on recupere la liste des media pour ce $post
+        $formSocialNetwork = new Form($socialNetwork);
+
         $listSocialNetworksForUser = $socialNetworkManager->getListSocialNetworksForUser($user->getId());
         $listSocialNetworksForUserForSelect =  $socialNetworkManager->listSelect2($listSocialNetworksForUser); // on affiche la liste des social network de l'user 
+        
+        if(!empty($listSocialNetworksForUser)){
+            $socialNetworkForSelect = $listSocialNetworksForUser[0];
+            $formSocialNetworkSelect = new Form($socialNetworkForSelect);
+        }
+        
 
         // traitement server et affichage des retours d'infos 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') { // if a submission of the form (=> a modification of a user) has been made
@@ -672,24 +683,6 @@ use App\Models\SocialNetworkManager;
                 }
         }
 
-        //pour l'affichages des champs dans la vue (views > backviews > user >_form.php)
-        $formUser = new Form($user, true);
-        $formUserType = new Form($userType);
-
-        $formMediaLogoUser = new Form($logoUser);   // ATTENTION FAUDRA TESTE SI USER A UN LOGO, SI NON PAS AFFICHER
-        $formMediaUploadLogo = new Form($mediaUploadLogo);
-
-        $formSocialNetwork = new Form($socialNetwork);
-
-        if(!empty($listSocialNetworksForUser)){
-            $socialNetworkForSelect = $listSocialNetworksForUser[0];
-            $formSocialNetworkSelect = new Form($socialNetworkForSelect);
-        }
-        
-
-
-
-        // require('../app/Views/backViews/post/backEditUserView.php');
         require('../app/Views/backViews/user/backEditUserView.php');
     }
 

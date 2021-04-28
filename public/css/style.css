@@ -9,3 +9,8 @@ h2 {
 form{
     display: inline;
 }
+
+input[type=image]{
+    height: 100px;
+    width: 100px;
+}
