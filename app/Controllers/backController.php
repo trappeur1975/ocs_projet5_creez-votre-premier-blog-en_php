@@ -105,16 +105,25 @@ use App\Models\SocialNetworkManager;
         $post = new Post();
         $post->setDateCreate(new Datetime()); //to assign today's date (in datetime) by default to the post we create 
         $post->setDatechange(NULL); // ------POUR LE TESTE J ASSIGNE LA DATECHANGE A "NULL" VOIR APRES COMMENT FAIRE POUR GERER CELA --------------
-        
+        $formPost = new Form($post);
+
         // users
         $userManager = new UserManager();
         $user = new User();
-        $listSelectUsers = $userManager->listSelect();
+        // $listSelectUsers = $userManager->listSelect();
+        $listUsers = $userManager->getListUsers();
+        $listUsersSelect = $userManager->listUsersFormSelect($listUsers);
+        
+        $formUser = new Form($user);
 
         // media (image et video)
         $mediaManager = new MediaManager();
+       
         $mediaUploadImage = new Media(); //pour avoir dans le champ input "texte alternatif du media uploader" (creer apres) un champs vide
+        $formMediaUploadImage = new Form($mediaUploadImage); //nommer "$formMediaUploadImage" au lieu de "$formMedia" par rapport a l editPost() et son utilisation dans "_form.php" du dossier "backendViews > post"
+        
         $mediaUploadVideo = new Media();
+        $formMediaUploadVideo = new Form($mediaUploadVideo);
 
         // traitement server et affichage des retours d'infos 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') { // if a submission of the form (=> a creation of a post) has been made
@@ -203,12 +212,6 @@ use App\Models\SocialNetworkManager;
                 }
         }
 
-        //pour l'affichages des champs dans la vue (views > backviews > post > _form.php)
-        $formPost = new Form($post);
-        $formUser = new Form($user);
-        $formMediaUploadImage = new Form($mediaUploadImage); //nommer "$formMediaUploadImage" au lieu de "$formMedia" par rapport a l editPost() et son utilisation dans "_form.php" du dossier "backendViews > post"
-        $formMediaUploadVideo = new Form($mediaUploadVideo);
-
         require('../app/Views/backViews/post/backCreatePostView.php');
     }
 
@@ -227,21 +230,34 @@ use App\Models\SocialNetworkManager;
         if ( $post->getDateChange() === null){
             $post->setDateChange(new Datetime()); //to assign today's date (in datetime) by default when to edit the post
         }
+        $formPost = new Form($post, true);    //pour pouvoir creer le formulaire de post (grace aux fonction qui creer les champs)
+
  
         // users
         $userManager = new UserManager();
         $user = $userManager->getUser($post->getUser_id());   // sera utiliser dans "$formPost = new Form($post);" ci dessous qui permettra de creer les champs propre au $post (via l entité "Form.php")
-        $listSelectUsers = $userManager->listSelect(); //sera utiliser dans "backView > post > _form.php"
+        $listUsers = $userManager->getListUsers();
+        $listUsersSelect = $userManager->listUsersFormSelect($listUsers);//sera utiliser dans "backView > post > _form.php"
+    
+
+        $formUser = new Form($user, true);    //pour creer le champs select des users qui sera integrer dans "backView > post > _form.php"     
 
         // media (image et video)
         $mediaManager = new MediaManager();             
         $media = $mediaManager->getListMediasForUser($post->getUser_id())[0]; // on recuperer le premier media de l user du post qui sera utiliser dans "$formMedia = new Form($media);" ci dessous qui permettra de creer les champs propre au $media (via l entité "Form.php")
-        $mediaUploadImage = new Media();
-        $mediaUploadVideo = new Media();
+        $formMediasSelectImage = new Form($media);  //pour creer le champs select des media qui sera integrer dans "backView > post > _form.php"
 
+        $mediaUploadImage = new Media();
+        $formMediaUploadImage = new Form($mediaUploadImage);  //pour creer le champs input "texte alternatif du media uploader" qui sera integrer dans "backView > post > _form.php"
+
+        $mediaUploadVideo = new Media();
+        $formMediaUploadVideo = new Form($mediaUploadVideo);
+       
         //utiliser dans "backviews > post > _form.php" 
-        $listSelectMediasForUser =  $mediaManager->listSelect($post->getUser_id()); // on affiche la liste des media de l'user auteur du post      
-        $listSelectMediasForPost =  $mediaManager->getIdOftListMediasActifForPost($post->getId());// on recupere la liste des media pour ce $post
+        $listMediasForUser = $mediaManager->getListMediasForUser($post->getUser_id());
+        $listMediasForUserSelect =  $mediaManager->listMediasFormSelect($listMediasForUser); // on affiche la liste des media de l'user auteur du post      
+        
+        $listMediasForPostSelect =  $mediaManager->getIdOftListMediasActifForPost($post->getId());// on recupere la liste des media pour ce $post
 
         // traitement server et affichage des retours d'infos 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') { // if a submission of the form (=> a modification of a post) has been made
@@ -285,7 +301,7 @@ use App\Models\SocialNetworkManager;
 
                         // si l utilisateur a ete modifier on desactive les medias lier a ce post
                         if ($userOrigine != $newUser){
-                            foreach($listSelectMediasForPost as $value){                           
+                            foreach($listMediasForPostSelect as $value){                           
                                 $statutActif = 0; //false
                                 $mediaManager->updateStatutActifMedia($value, $statutActif); 
                             }
@@ -337,7 +353,7 @@ use App\Models\SocialNetworkManager;
                             }
                             
                             // on met tout les medias du post en statutActif = false
-                            foreach($listSelectMediasForPost as $value){                           
+                            foreach($listMediasForPostSelect as $value){                           
                                 $statutActif = 0; //false
                                 $mediaManager->updateStatutActifMedia($value, $statutActif); 
                             }
@@ -361,14 +377,6 @@ use App\Models\SocialNetworkManager;
                     header('Location: /backend/editPost/'.$post->getId().'?success=false');
                 }
         }
-
-        //pour l'affichages des champs dans la vue (views  > backviews > post > _form.php)
-        $formPost = new Form($post, true);    //pour pouvoir creer le formulaire de post (grace aux fonction qui creer les champs)  
-        $formUser = new Form($user, true);    //pour creer le champs select des users qui sera integrer dans "backView > post > _form.php"     
-        $formMediasSelectImage = new Form($media);  //pour creer le champs select des media qui sera integrer dans "backView > post > _form.php"
-        $formMediaUploadImage = new Form($mediaUploadImage);  //pour creer le champs input "texte alternatif du media uploader" qui sera integrer dans "backView > post > _form.php"
-        // $formMediaType = new Form($mediaType);
-        $formMediaUploadVideo = new Form($mediaUploadVideo);
 
         require('../app/Views/backViews/post/backEditPostView.php');
     }
@@ -431,11 +439,9 @@ use App\Models\SocialNetworkManager;
         $formUserType = new Form($userType);
 
         $userTypeManager = new UserTypeManager(); 
-        $listSelectUserTypes = $userTypeManager->listSelect(); //pour afficher le contenu du select des usertypes, sera utiliser dans "backView > user > _form.php"
-        
+        $listUserTypes = $userTypeManager->getListUserTypes();
+        $listUserTypesSelect = $userTypeManager-> listUserTypesFormSelect($listUserTypes); //pour afficher le contenu du select des usertypes, sera utiliser dans "backView > user > _form.php"
 
-       
-        
         // media (logo)
         $mediaManager = new MediaManager();
         $mediaUploadLogo = new Media(); //pour avoir dans le champ input pour uploader un logo (par defaut toute les variables de cette entité Media sont a "null" )
@@ -550,7 +556,10 @@ use App\Models\SocialNetworkManager;
         // userType
         $userTypeManager = new UserTypeManager();
         $userType = $userTypeManager->getUserType($user->getUserType_id()); // sera utiliser dans "$formUserType = new Form($userType);" qui creer les champs propres au userType (via l entité "Form.php") qui seront eux meme integrer pour les integrer (en totalite ou en partie) dans "$formUser = new Form($user);" ci dessous qui permettra de creer les champs propre au $user (via l entité "Form.php")
-        $listSelectUserTypes = $userTypeManager->listSelect(); //pour afficher le contenu du select des usertypes, sera utiliser dans "backView > user > _form.php"
+        
+        $listUserTypes = $userTypeManager->getListUserTypes();
+        $listUserTypesSelect = $userTypeManager-> listUserTypesFormSelect($listUserTypes); //pour afficher le contenu du select des usertypes, sera utiliser dans "backView > user > _form.php"
+        
         $formUserType = new Form($userType);
 
         // media (logo)
@@ -571,7 +580,7 @@ use App\Models\SocialNetworkManager;
         $formSocialNetwork = new Form($socialNetwork);
 
         $listSocialNetworksForUser = $socialNetworkManager->getListSocialNetworksForUser($user->getId());
-        $listSocialNetworksForUserForSelect =  $socialNetworkManager->listSelect2($listSocialNetworksForUser); // on affiche la liste des social network de l'user 
+        $listSocialNetworksForUserForSelect =  $socialNetworkManager->listSocialNetworksFormSelect($listSocialNetworksForUser); // on affiche la liste des social network de l'user 
         
         if(!empty($listSocialNetworksForUser)){
             $socialNetworkForSelect = $listSocialNetworksForUser[0];
@@ -702,7 +711,6 @@ use App\Models\SocialNetworkManager;
         // recuperation de tout les post (et des medias que leurs sont associés) de l user pour les supprimer
         if(!empty($listPostsForUser)){
             foreach($listPostsForUser as $post){    // suppression de tout les post (et des medias que leurs sont associés) de l user
-                // deletePost($post->getId());
                 $listMediasDelete =  $mediaManager->getListMediasForPost($post->getId());// on recupere la liste des media pour ce $post
 
                 // on supprime les medias lier au post (si il y en a)
@@ -745,233 +753,4 @@ use App\Models\SocialNetworkManager;
         $user = $userManager->deleteUser($id);
 
         require('../app/Views/backViews/user/backDeleteUserView.php');
-    }
-
-// MEDIA
-    /**
-     * function use for road http://localhost:8000/backend/adminMedias
-     * will display the view backAdminMediasView.php  
-     */
-    function adminMedias()
-    {
-        Auth::check();
-        
-        $mediaManager = new MediaManager();
-        $listMedias = $mediaManager->getListMedias();
-        require('../app/Views/backViews/media/backAdminMediasView.php ');
-    }
-
-    /**
-     * function use for road road http://localhost:8000/backend/editMedia/1 ou http://localhost:8000/backend/editMedia/2 ou ....
-     * will display the view backEditMediaView.php  
-     */
-    function editMedia($id)
-    {
-        Auth::check();
-
-        $mediaManager = new MediaManager();
-        $media = $mediaManager->getMedia($id);
-
-        // pour afficher le contenu du select des type de media------------
-        $mediaTypeManager = new MediaTypeManager();
-        $list = $mediaTypeManager->list();
-        
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') { // if a submission of the form (=> a modification of a post) has been made
-            //for data validation
-                $errors = [];
-
-                // if(empty($_POST['title'])){
-                //     $errors['title'][] = 'Le champs titre ne peut être vide';
-                // }
-                // if(mb_strlen($_POST['title'])<=3){
-                //     $errors['title'][] = 'Le champs titre doit contenir plus de 3 caractere';
-                // }
-
-                if(empty($errors)){
-                          
-                    $media
-                        ->setTitle($_POST['title'])
-                        ->setIntroduction($_POST['introduction'])
-                        ->setContent($_POST['content'])
-                        ->setDateCreate($dateCreate)
-                        ->setDateChange($dateChange)
-                        ->setUser_id($_POST['user_id']);
-    
-                    $mediaManager->updateMedia($media);
-                    header('Location: /backend/editMedia/'.$media->getId().'?success=true');
-                }else{
-                    // ISSUE COMMENT TRANSMETTRE UN TABLEAU $errors=[]; DANS LA REDIRECTION CI DESSOUS POUR AFFICHER DANS LA VIEW LES DIFFERENTES ERREORS
-                    header('Location: /backend/editMedia/'.$media->getId().'?success=false');
-                }
-        }
-
-        $form = new Form($media);
-
-        require('../app/Views/backViews/media/backEditMediaView.php');
-
-
-    }
-
-    /**
-     * function use for road http://localhost:8000/backend/createMedia
-     * will display the view backCreateMediaView.php  
-     */
-    function createMedia()
-    {
-        Auth::check();
-
-        $media = new Media();
-        // $media->setUser_id(2); // ------POUR LE TESTE J ASSIGNE L UTILISATEUR "2" VOIR APRES COMMENT FAIRE POUR GERER CELA --------------
-
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') { // if a submission of the form (=> a creation of a post) has been made
-            //for data validation
-                $errors = [];
-            
-                // if(empty($_POST['title'])){
-                //     $errors['title'][] = 'Le champs titre ne peut être vide';
-                // }
-                // if(mb_strlen($_POST['title'])<=3){
-                //     $errors['title'][] = 'Le champs titre doit contenir plus de 3 caractere';
-                // }
-                
-                if(empty($errors)){
-                    
-                    //ISSSUE  gestion des date en datetime dans entité post // base de donnee en string pour la create ou l edit d un post (=>voir methode setDateCreate($dateCreate) de la class Post)
-                    //modification pour gerer l enregistrement dans la base de donnee via le MediaManager
-
-                    $media
-                        ->setTitle($_POST['title'])
-                        ->setIntroduction($_POST['introduction'])
-                        ->setContent($_POST['content'])
-                        ->setDateCreate($dateCreate)
-                        ->setDateChange($dateChange)
-                        ->setUser_id($_POST['user_id']);
-
-                    $mediaManager = new MediaManager();
-                    $lastRecording = $mediaManager->addMedia($media);// add the media to the database and get the last id of the medias in the database via the return of the function
-                    header('Location: /backend/editPost/'.$lastRecording.'?created=true');
-                }else{
-                    // ISSUE COMMENT TRANSMETTRE UN TABLEAU $errors=[]; DANS LA REDIRECTION CI DESSOUS POUR AFFICHER DANS LA VIEW LES DIFFERENTES ERREORS
-                    header('Location: /backend/createMedia?created=false');
-                }
-        }
-        
-        $form = new Form($media);
-
-        require('../app/Views/backViews/media/backCreateMediaView.php');
-    }
-
-    /**
-     * function use for road http://localhost:8000/backend/deleteMedia/1 ou http://localhost:8000/backend/deleteMedia/2 ou ....
-     * will display the view backDeleteMediaView.php  
-     */
-    function deleteMedia($id)
-    {
-        Auth::check();
-        
-        $postManager = new PostManager();
-        $post = $postManager->deletePost($id);
-        require('../app/Views/backViews/media/backDeleteMediaView.php');
-    }
-
-// MEDIATYPE
-    /**
-     * function use for road http://localhost:8000/backend/adminMediaTypes
-     * will display the view backAdminMediaTypesView.php  
-     */
-    function adminMediaTypes()
-    {
-        Auth::check();
-        
-        $mediaTypeManager = new MediaTypeManager();
-        $listMediaTypes = $mediaTypeManager->getListMediatypes();
-        require('../app/Views/backViews/mediaType/backAdminMediaTypesView.php ');
-    }
-
-    /**
-     * function use for road road http://localhost:8000/backend/editMediaType/1 ou http://localhost:8000/backend/editMediaType/2 ou ....
-     * will display the view backEditMediaTypeView.php  
-     */
-    function editMediaType($id)
-    {
-        Auth::check();
-
-        $mediaTypeManager = new MediaTypeManager();
-        $mediaType = $mediaTypeManager->getMediaType($id);
-        
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') { // if a submission of the form (=> a modification of a post) has been made
-            //for data validation
-                $errors = [];
-
-                // if(empty($_POST['title'])){
-                //     $errors['title'][] = 'Le champs titre ne peut être vide';
-                // }
-                // if(mb_strlen($_POST['title'])<=3){
-                //     $errors['title'][] = 'Le champs titre doit contenir plus de 3 caractere';
-                // }
-
-                if(empty($errors)){
-                    $mediaType->setType($_POST['type']);
-                    $mediaTypeManager->updateMediaType($mediaType);
-                    header('Location: /backend/editMediaType/'.$mediaType->getId().'?success=true');
-                }else{
-                    // ISSUE COMMENT TRANSMETTRE UN TABLEAU $errors=[]; DANS LA REDIRECTION CI DESSOUS POUR AFFICHER DANS LA VIEW LES DIFFERENTES ERREORS
-                    header('Location: /backend/editMediaType/'.$mediaType->getId().'?success=false');
-                }
-        }
-
-        $form = new Form($mediaType);
-
-        require('../app/Views/backViews/mediaType/backEditMediaTypeView.php');
-
-
-    }
-
-    /**
-     * function use for road http://localhost:8000/backend/createMediaType
-     * will display the view backCreateMediaTypeView.php  
-     */
-    function createMediaType()
-    {
-        Auth::check();
-
-        $mediaType = new MediaType();
-
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') { // if a submission of the form (=> a creation of a post) has been made
-            //for data validation
-                $errors = [];
-            
-                // if(empty($_POST['title'])){
-                //     $errors['title'][] = 'Le champs titre ne peut être vide';
-                // }
-                // if(mb_strlen($_POST['title'])<=3){
-                //     $errors['title'][] = 'Le champs titre doit contenir plus de 3 caractere';
-                // }
-                
-                if(empty($errors)){
-                    $mediaType->setType($_POST['type']);
-                    $mediaTypeManager = new MediaTypeManager();
-                    $lastRecording = $mediaTypeManager->addMediaType($mediaType);// add the mediaType to the database and get the last id of the mediaTypes in the database via the return of the function
-                    header('Location: /backend/editMediaType/'.$lastRecording.'?created=true');
-                }else{
-                    // ISSUE COMMENT TRANSMETTRE UN TABLEAU $errors=[]; DANS LA REDIRECTION CI DESSOUS POUR AFFICHER DANS LA VIEW LES DIFFERENTES ERREORS
-                    header('Location: /backend/createMediaType?created=false');
-                }
-        }
-        $form = new Form($mediaType);
-
-        require('../app/Views/backViews/mediaType/backCreateMediaTypeView.php');
-    }
-
-    /**
-     * function use for road road  http://localhost:8000/backend/deleteMediaType/1 ou http://localhost:8000/backend/deleteMediaType/2 ou ....
-     * will display the view backDeleteMediaTypeView.php  
-     */
-    function deleteMediaType($id)
-    {
-        Auth::check();
-        
-        $mediaTypeManager = new MediaTypeManager();
-        $mediaType = $mediaTypeManager->deleteMediaType($id);
-        require('../app/Views/backViews/mediaType/backDeleteMediaTypeView.php');
     }

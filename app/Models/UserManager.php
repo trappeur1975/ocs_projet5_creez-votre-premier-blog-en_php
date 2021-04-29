@@ -190,11 +190,10 @@ class UserManager extends Manager
     }
 
     // methode pour recuperer un tableau des users que l on va utiliser dans le select
-    public function listSelect(): array
+    public function listUsersFormSelect(array $listUsers): array
     {
-        $users = $this->getListUsers();
         $results = [];
-        foreach($users as $user){
+        foreach($listUsers as $user){
             $results[$user->getId()] = $user->getLastName();
         }
         return $results;

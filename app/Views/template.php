@@ -16,12 +16,6 @@
                     <a href="<?= '/backend/adminPosts'?>"class="nav-link">articles</a>
                 </li>
                 <li class="nav-item">
-                    <a href="<?= '/backend/adminMedias'?>"class="nav-link">medias</a>
-                </li>
-                <li class="nav-item">
-                    <a href="<?= '/backend/adminMediaTypes'?>"class="nav-link">mediaTypes</a>
-                </li>
-                <li class="nav-item">
                     <a href="<?= '/backend/adminUsers'?>"class="nav-link">users</a>
                 </li>
                 <li class="nav-item">

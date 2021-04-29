@@ -11,10 +11,10 @@
         ?>
 
     <!-- CREATION DES CHAMPS  SELECT -->
-        <?= $formUser->selectSimple('id', 'user', 'auteur', $listSelectUsers) ?>   <!-- pour la creation du select des users -->
+        <?= $formUser->selectSimple('id', 'user', 'auteur', $listUsersSelect) ?>   <!-- pour la creation du select des users -->
         <?php 
             if ($formUser->getEdit() === true){ //pour gerer le cas si on edit un post (on affiche le select) ou si on cree un post (on n affiche pas le select car on integrera un champs pour integrer des media au post que l on cree)
-                echo $formMediasSelectImage->selectMultiple('id', 'path','medias', $listSelectMediasForUser, $listSelectMediasForPost); //pour la creation du select des medias
+                echo $formMediasSelectImage->selectMultiple('id', 'path','medias', $listMediasForUserSelect, $listMediasForPostSelect); //pour la creation du select des medias
             }
         ?>
 

@@ -2,7 +2,7 @@
     <?= $formUser->input('firstName', 'firstName','firstName' ) ?>
     <?= $formUser->input('lastName', 'lastName', 'lastName') ?>
     <?= $formUser->input('email', 'email', 'email') ?>
-    <?= $formUserType->selectSimple('id', 'userType_id', 'statut', $listSelectUserTypes) ?> <!--select des userType -->
+    <?= $formUserType->selectSimple('id', 'userType_id', 'statut', $listUserTypesSelect) ?> <!--select des userType -->
     <?= $formUser->input('slogan', 'slogan', 'slogan') ?>
 
     <!-- affichage du logo du user (faudra verifier que le tableau de logo existe bien-->

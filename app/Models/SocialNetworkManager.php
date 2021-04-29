@@ -69,21 +69,7 @@ class SocialNetworkManager extends Manager
     }
 
     // methode pour recuperer un tableau de soacialNetwork lier a un utilisateur que l on va utiliser dans le select
-    public function listSelect(int $idUser): array
-    {
-         $socialNetworks = $this->getListSocialNetworksForUser($idUser);
-         $results = [];
-         
-         foreach($socialNetworks as $socialNetwork){
-             $results[$socialNetwork->getId()] = $socialNetwork->getUrl(); 
-         }
- 
-         return $results;
-    }
-
-    // methode pour recuperer un tableau de soacialNetwork lier a un utilisateur que l on va utiliser dans le select
-    // methode similaire a celle de au dessus mais on transmet ici un tableau en parametre de la methode
-    public function listSelect2(array $listSocialNetworksForUser): array
+    public function listSocialNetworksFormSelect(array $listSocialNetworksForUser): array
     {
         $results = [];
         

@@ -233,12 +233,11 @@ class MediaManager extends Manager
 
 
     // methode pour recuperer un tableau de media lier a un utilisateur que l on va utiliser dans le select
-    public function listSelect(int $idUser): array
+    public function listMediasFormSelect(array $listMediasForUser): array
     {
-        $medias = $this->getListMediasForUser($idUser);
         $results = [];
         
-        foreach($medias as $media){
+        foreach($listMediasForUser as $media){
             $results[$media->getId()] = $media->getPath(); 
         }
 

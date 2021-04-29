@@ -47,12 +47,10 @@ class UserTypeManager extends Manager
     }
 
     // methode pour recuperer un tableau des userTypes que l on va utiliser dans le select
-    public function listSelect(): array
+    public function listUserTypesFormSelect(array $listUserTypes): array
     {
-        $userTypes = $this->getListUserTypes();
-
         $results = [];
-        foreach($userTypes as $userType){
+        foreach($listUserTypes as $userType){
             $results[$userType->getId()] = $userType->getStatus();
         }
         return $results;
