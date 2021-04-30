@@ -50,6 +50,7 @@ Ce code c'est inspiré fortement des tutorielles suivants :
 
 ----------------- infos site ----------------
 pour lancer le serveur php via la console avec pour dossier racine "public" executer la commande suivante:
+
     php -S localhost:8000 -t public
 
-dernier modif 29/04/2021
+dernier modif 30/04/2021

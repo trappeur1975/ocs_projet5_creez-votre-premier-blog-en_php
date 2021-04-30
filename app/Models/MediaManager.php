@@ -187,50 +187,25 @@ class MediaManager extends Manager
 //------------------------------------NOUVEAU--------------------------
 
     /**
-     * Method getListMediasForUserForType method that returns the list of media for a user for a type (example mediaType "logo")
+     * Method getListMediasForUserForType method that returns the list of media for a user for the type (example mediaType "image" + "video")
      *
-     * @param int $idUser the id user whose medias we want to retrieve 
-     * @param int $idMediaType the id MediaType whose medias we want to retrieve for a user
+     * @param array $mediasUser media list of a user 
+     * @param array  $idsMediaType list of id of the mediaTypes we want to have 
      *
      * @return Media[]
      */
-    public function getListMediasForUserForType(int $idUser, int $idMediaType): array
+    public function getListMediasForUserForType(array $mediasUser, array $idsMediaType): array
     {
-        $medias = $this->getListMediasForUser($idUser);
         $results = [];
-        
-        foreach($medias as $media){
-            if($media->getMediaType_id() ===  $idMediaType){
-                $results[] =  $media; 
+        foreach($idsMediaType as $idMediaType){
+            foreach($mediasUser as $mediaUser){
+                if($mediaUser->getMediaType_id() ===  $idMediaType){
+                    $results[] =  $mediaUser; 
+                }
             }
         }
         return $results;
     }
-
-    /**
-     * Method getListMediasForUserForType method that returns the list of media "Actif" for a user for a type (example mediaType "logo")
-     *
-     * @param int $idUser the id user whose medias we want to retrieve 
-     * @param int $idMediaType the id MediaType whose medias we want to retrieve for a user
-     * @param int $statusActif the id statusActif whose medias we want to retrieve for a user
-     *
-     * @return Media[]
-     */
-    public function getListMediasForUserForTypeAccordingActiveStatus(int $idUser, int $idMediaType, int $statusActif): array
-    {
-        $medias = $this->getListMediasForUserForType($idUser, $idMediaType);
-        $results = [];
-        
-        foreach($medias as $media){
-            if($media->getStatutActif() ==  1){
-                $results[] =  $media; 
-            }
-        }
-        return $results;
-    }
-
-//------------------------------------fin NOUVEAU--------------------------
-
 
     // methode pour recuperer un tableau de media lier a un utilisateur que l on va utiliser dans le select
     public function listMediasFormSelect(array $listMediasForUser): array

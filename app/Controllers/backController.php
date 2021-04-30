@@ -110,7 +110,7 @@ use App\Models\SocialNetworkManager;
         // users
         $userManager = new UserManager();
         $user = new User();
-        // $listSelectUsers = $userManager->listSelect();
+
         $listUsers = $userManager->getListUsers();
         $listUsersSelect = $userManager->listUsersFormSelect($listUsers);
         
@@ -244,8 +244,18 @@ use App\Models\SocialNetworkManager;
 
         // media (image et video)
         $mediaManager = new MediaManager();             
-        $media = $mediaManager->getListMediasForUser($post->getUser_id())[0]; // on recuperer le premier media de l user du post qui sera utiliser dans "$formMedia = new Form($media);" ci dessous qui permettra de creer les champs propre au $media (via l entité "Form.php")
-        $formMediasSelectImage = new Form($media);  //pour creer le champs select des media qui sera integrer dans "backView > post > _form.php"
+        $listMediasForUser = $mediaManager->getListMediasForUser($post->getUser_id());
+        $listIdsMediaType = [1,3];  //image et video
+        $listMediasForUserForType = $mediaManager->getListMediasForUserForType($listMediasForUser, $listIdsMediaType);
+
+        if(!empty($listMediasForUserForType)){
+            $media = $listMediasForUserForType[0]; // on recuperer le premier media de l user du post qui sera utiliser dans "$formMedia = new Form($media);" ci dessous qui permettra de creer les champs propre au $media (via l entité "Form.php")
+            $formMediasImageSelect = new Form($media);  //pour creer le champs select des media qui sera integrer dans "backView > post > _form.php"
+        }
+
+        //utiliser dans "backviews > post > _form.php" 
+        $listMediasForUserSelect =  $mediaManager->listMediasFormSelect($listMediasForUserForType); // on affiche la liste des media de l'user auteur du post (uniquement les image et les video)     
+        $listMediasForPostSelect =  $mediaManager->getIdOftListMediasActifForPost($post->getId());// on recupere la liste des media pour ce $post
 
         $mediaUploadImage = new Media();
         $formMediaUploadImage = new Form($mediaUploadImage);  //pour creer le champs input "texte alternatif du media uploader" qui sera integrer dans "backView > post > _form.php"
@@ -253,12 +263,6 @@ use App\Models\SocialNetworkManager;
         $mediaUploadVideo = new Media();
         $formMediaUploadVideo = new Form($mediaUploadVideo);
        
-        //utiliser dans "backviews > post > _form.php" 
-        $listMediasForUser = $mediaManager->getListMediasForUser($post->getUser_id());
-        $listMediasForUserSelect =  $mediaManager->listMediasFormSelect($listMediasForUser); // on affiche la liste des media de l'user auteur du post      
-        
-        $listMediasForPostSelect =  $mediaManager->getIdOftListMediasActifForPost($post->getId());// on recupere la liste des media pour ce $post
-
         // traitement server et affichage des retours d'infos 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') { // if a submission of the form (=> a modification of a post) has been made
             //for data validation
@@ -308,8 +312,6 @@ use App\Models\SocialNetworkManager;
                         }
 
                         if($userOrigine == $newUser){ //on enregistre la nouvelle liste de media pour le post definit dans le select des medias uniquement si le user n a pas changer
-                        // if(!is_null($_POST['path']) and ($userOrigine == $newUser)){ //on enregistre la nouvelle liste de media pour le post definit dans le select des medias uniquement si le user n a pas changer
-
                             // ajout du media si un upload image a ete fait lors de l edit du post
                             if(isset($_FILES['mediaUploadImage']) AND $_FILES['mediaUploadImage']['error']== 0){
                                 // variables infos
@@ -357,6 +359,7 @@ use App\Models\SocialNetworkManager;
                                 $statutActif = 0; //false
                                 $mediaManager->updateStatutActifMedia($value, $statutActif); 
                             }
+                            
                             // on met tout les medias dont leurs id sont dans "$_POST['path']" en statutActif = true 
                             // et on modifie leurs post_id pour bien attribuer au media selectionner dans le select le id du post
                             foreach($_POST['path'] as $value){
@@ -564,8 +567,11 @@ use App\Models\SocialNetworkManager;
 
         // media (logo)
         $mediaManager = new MediaManager();
+       
+        $listMediasForUser = $mediaManager->getListMediasForUser($user->getId());
+        $listIdsMediaType = [2];  //logo
+        $listLogos = $mediaManager->getListMediasForUserForType($listMediasForUser, $listIdsMediaType); // pour recuperer le logo du user
         
-        $listLogos = $mediaManager->getListMediasForUserForType($user->getId(), 2); // pour recuperer le logo du user
         if(!empty($listLogos)){
             $logoUser = $listLogos[0];
             $formMediaLogoUser = new Form($logoUser);  //pour avoir dans le champ input pour uploader un logo
@@ -642,12 +648,12 @@ use App\Models\SocialNetworkManager;
                         
                         $extension_upload = pathinfo($_FILES['mediaUploadLogo']['name'])['extension']; //pour recuperer l'extension du fichier uploader
                         $pathFile = './media/'.basename($newNameUploaderFile.'.'.$extension_upload); //chemin de stockage  avec nouveau nom du media uploader
-
-                        
-
+                       
                         // on supprime en base de donnée ainsi que sur le server dans le dossier media l'ancien logo de l'user    
-                        $listLogosDelete = $mediaManager->getListMediasForUserForType($user->getId(), $idMediaType); // on recuperer la liste des logos du user
-
+                        $listMediasForUser = $mediaManager->getListMediasForUser($user->getId());
+                        // $listIdsMediaType = [2];  //logo
+                        $listLogosDelete = $mediaManager->getListMediasForUserForType($listMediasForUser, $listIdsMediaType);   // on recuperer la liste des logos du user
+                       
                         if(!empty($listLogosDelete)){
                             foreach($listLogosDelete as $logo){
                                 unlink($logo->getPath());  //suppression des media sur le serveur dans le dossier media
@@ -703,6 +709,7 @@ use App\Models\SocialNetworkManager;
     {
         Auth::check();
         
+  
         $postManager = new PostManager();
         $listPostsForUser = $postManager->getListPostsForUser($id);
 
@@ -727,14 +734,13 @@ use App\Models\SocialNetworkManager;
 
         // ----------------A FAIRE PLUS TARD => recuperation de tout les commentaires de l user pour les supprimer--------
         
-        // recuperation de tout les logos pour les supprimer du server (daossier media) et de la base de donnée
-        $idMediaType = 2;   //logo
-        $listLogosDelete = $mediaManager->getListMediasForUserForType($id, $idMediaType); // on recuperer la liste des logos du user
-                
-        if(!empty($listLogosDelete)){
-            foreach($listLogosDelete as $logo){
-                unlink($logo->getPath());  //suppression des media sur le serveur dans le dossier media
-                $mediaManager->deleteMedia($logo->getId());    //suppression dans la base de donnée  
+        // recuperation des dernieres medias de user non encore supprimer(les logos, image desactiver, ...) pour les supprimer du server (daossier media) et de la base de donnée
+        $listMedias = $mediaManager->getListMediasForUser($id); // on recuperer la liste des logos du user
+        
+        if(!empty($listMedias)){
+            foreach($listMedias as $media){
+                unlink($media->getPath());  //suppression des media sur le serveur dans le dossier media
+                $mediaManager->deleteMedia($media->getId());    //suppression dans la base de donnée  
             }
         }
 
