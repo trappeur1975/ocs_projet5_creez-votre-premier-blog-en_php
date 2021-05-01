@@ -46,7 +46,7 @@ class User
      *
      * @var Media $logo logo of the user
      */
-    private $logo;
+    // private $logo;
 
     /**
      * login
@@ -287,10 +287,10 @@ class User
      *
      * @return  Media
      */ 
-    public function getLogo(): ?Media
-    {
-        return $this->logo;
-    }
+    // public function getLogo(): ?Media
+    // {
+    //     return $this->logo;
+    // }
 
     /**
      * Set $logo logo of the user
@@ -299,10 +299,10 @@ class User
      *
      * @return  self
      */ 
-    public function setLogo(Media $logo): self
-    {
-        $this->logo = $logo;
+    // public function setLogo(Media $logo): self
+    // {
+    //     $this->logo = $logo;
 
-        return $this;
-    }
+    //     return $this;
+    // }
 }

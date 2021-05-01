@@ -1,5 +1,5 @@
 <?php 
-$title = 'Administration des posts';
+$title = 'Post administration';
 ob_start(); 
 ?>
         
@@ -19,8 +19,6 @@ ob_start();
                 <th>Titre</th>
                 <th>
                     <a href="/backend/createPost" class="btn btn-primary">nouveau post</a>
-                <th>
-
                 </th>
             </thead>
             <tbody>
@@ -49,6 +47,9 @@ ob_start();
                                     onsubmit="return confirm('Souhaitez vous vraiment executer cette action?')">
                                     <button type="submit" class="btn btn-danger">Supprimer</button>
                                 </form>
+                        <a href="<?= '/backend/editCommentsPost/'. $post->getId()?>" class="btn btn-success"> <!-- ISSUE faudra changer cela (ce qu il y a en php) avec l utilisation des nom de route -->
+                            Voir les commentaires
+                        </a>
                     </td>
                 </tr>
                 <?php endforeach ?>

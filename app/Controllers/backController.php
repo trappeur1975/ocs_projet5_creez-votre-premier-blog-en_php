@@ -5,14 +5,13 @@ use App\Entities\Form;
 use App\Entities\Post;
 use App\Entities\User;
 use App\Entities\Media;
-use App\Entities\MediaType;
 use App\Entities\UserType;
-use App\Entities\SocialNetwork;
 use App\Models\PostManager;
 use App\Models\UserManager;
 use App\Models\MediaManager;
+use App\Models\CommentManager;
+use App\Entities\SocialNetwork;
 use App\Models\UserTypeManager;
-use App\Models\MediaTypeManager;
 use App\Models\SocialNetworkManager;
 
 // CONNECTION / DECONNECTION AU SITE
@@ -554,6 +553,8 @@ use App\Models\SocialNetworkManager;
         // user
         $userManager = new UserManager();
         $user = $userManager->getUser($id);
+
+        
         $formUser = new Form($user, true);
 
         // userType
@@ -759,4 +760,35 @@ use App\Models\SocialNetworkManager;
         $user = $userManager->deleteUser($id);
 
         require('../app/Views/backViews/user/backDeleteUserView.php');
+    }
+
+// COMMENT
+    /**
+     * function use for road road http://localhost:8000/backend/editCommentsPost/1 ou http://localhost:8000/backend/editCommentsPost/2 ou ....
+     * will display the view backEditCommentsPostView.php
+     * display all the comments of a post 
+     */
+    function editCommentsPost($id)
+    {
+        Auth::check();
+  
+        $commentManager = new CommentManager();
+        $listCommentsForPost = $commentManager->getListCommentsForPost($id);
+
+        require('../app/Views/backViews/comment/backEditCommentsPostView.php');
+    }
+
+    /**
+     * function use for road road  http://localhost:8000/backend/deleteComment/1 ou http://localhost:8000/backend/deleteComment/2 ou ....
+     * will display the view backDeleteCommentView.php  
+     */
+    function deleteComment($id)
+    {
+        Auth::check();
+    
+        // on supprime le commentaire
+        $commentManager = new CommentManager();
+        $comment = $commentManager->deleteComment($id);
+
+        require('../app/Views/backViews/comment/backDeleteCommentView.php');
     }

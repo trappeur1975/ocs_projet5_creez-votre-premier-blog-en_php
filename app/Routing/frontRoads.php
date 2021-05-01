@@ -7,6 +7,6 @@ $router->map('GET', '/listposts', function (){  // for the road  http://localhos
     listPosts();
 }, 'listpots');
 
-$router->map('GET', '/post/[i:id]', function ($id){  // for the road http://localhost:8000/post/1 ou http://localhost:8000/post/2 ou ....
+$router->map('POST|GET', '/post/[i:id]', function ($id){  // for the road http://localhost:8000/post/1 ou http://localhost:8000/post/2 ou ....
     post($id);
 }, 'blog');

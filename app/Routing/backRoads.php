@@ -57,3 +57,14 @@ $router->map('GET', '/backend', function (){  // for the road  http://localhost:
     $router->map('POST|GET', '/backend/deleteUser/[i:id]', function ($id){  // for the road http://localhost:8000/backend/deleteUser/1 ou http://localhost:8000/backend/deleteUser/2 ou ....
         deleteUser($id);
     });
+
+// COMMENT
+    // function to display all the comments of a post
+    $router->map('GET', '/backend/editCommentsPost/[i:id]', function ($id){  // for the road http://localhost:8000/backend/editCommentsPost/1 ou http://localhost:8000/backend/editCommentsPost/2 ou ....
+        editCommentsPost($id);
+    });
+
+    //function to delete a post
+    $router->map('POST|GET', '/backend/deleteComment/[i:id]', function ($id){  // for the road http://localhost:8000/backend/deleteComment/1 ou http://localhost:8000/backend/deleteComment/2 ou ....
+        deleteComment($id);
+    });

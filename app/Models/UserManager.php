@@ -58,7 +58,8 @@ class UserManager extends Manager
         
     //     // dd($query->fetch());
 
-    //     $query->setFetchMode(PDO::FETCH_CLASS, User::class);
+    //     // $query->setFetchMode(PDO::FETCH_CLASS, User::class);
+    //     $query->setFetchMode(PDO::FETCH_ASSOC);
     //     $user = $query->fetch();
 
     //     dd($user);
@@ -74,10 +75,10 @@ class UserManager extends Manager
     //     // dd($user->idmedia);
         
 
-    //     if($user === false){
-    //         throw new Exception('aucun user ne correspond a cet ID');
-    //     }
-    //     return $user;
+    //     // if($user === false){
+    //     //     throw new Exception('aucun user ne correspond a cet ID');
+    //     // }
+    //     // return $user;
     // }
 
     // ajoute le user (en attribut de cette fonction) a la table user en bdd

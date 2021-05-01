@@ -77,9 +77,7 @@ HTML;
         return <<<HTML
         <div class="form-group">
             <label for="{$label}">{$label}</label>
-            <!-- <label for="{$key}">{$label}</label> -->
             <textarea type="text" id="{$label}" class="form-control" name="{$key}">{$value}</textarea>
-            <!-- <textarea type="text" id="{$key}" class="form-control" name="{$key}">{$value}</textarea> -->
         </div>
 HTML;
     }

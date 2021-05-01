@@ -19,8 +19,6 @@ ob_start();
                 <th>User</th>
                 <th>
                     <a href="/backend/createUser" class="btn btn-primary">nouveau user</a>
-                <th>
-
                 </th>
             </thead>
             <tbody>
