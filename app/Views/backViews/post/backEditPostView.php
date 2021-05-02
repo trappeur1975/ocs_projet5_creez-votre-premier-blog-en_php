@@ -28,7 +28,7 @@ ob_start();
 <!-- end the labels on the state of the edition or the creation of the post   -->
 
 <!-- start main content  -->
-    <h1>Edit le post id: <?= $post->getId() ?></h1>
+    <h1>Backend Edit the Post id: <?= $post->getId() ?></h1>
 
     <?php require('../app/Views/backViews/post/_form.php')?>
 <!-- end main content  -->

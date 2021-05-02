@@ -25,7 +25,7 @@ ob_start();
 <!-- end the labels on the state of the edition or the creation of the user   -->
 
 <!-- start main content  -->
-    <h1>Edit le user id: <?= $user->getId() ?></h1>
+    <h1>Backend Edit the User id: <?= $user->getId() ?></h1>
 
     <?php require('../app/Views/backViews/user/_form.php')?>
 <!-- end main content  -->

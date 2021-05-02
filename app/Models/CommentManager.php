@@ -4,6 +4,7 @@ namespace App\Models;
 use PDO;
 use App\Entities\Comment;
 use Exception;
+use \DateTime;
 
 class CommentManager extends Manager
 {
@@ -47,7 +48,6 @@ class CommentManager extends Manager
         return $post;
     }
 
-
     // ajoute le comment (en attribut de cette fonction) a la table comment en bdd
     public function addComment(Comment $comment)
     {   
@@ -90,6 +90,46 @@ class CommentManager extends Manager
         }else {
             throw new Exception('impossible de supprimer le commentaire :'.$idcomment);
         }
+    }
+
+    /**
+     * validates the comment whose id is indicated in the function parameter 
+     *
+     * @param $idComment of the comment we want to validate 
+     *
+     */
+    public function validateComment(int $idComment)
+    {
+        $comment = $this->getComment($idComment);
+        
+        $dateTime = new Datetime();
+        $validate = $dateTime->format('Y-m-d H:i:s');
+  
+        $db = $this->dbConnect();
+        $query = $db->prepare('UPDATE comment SET validate = :validate WHERE id = :idComment');
+        $result = $query->execute([
+            'validate' => $validate,
+            'idComment' => $idComment
+            ]);
+      
+        if($result === true){
+            return $comment;
+        }else {
+            throw new Exception('impossible de valider le commentaire :'.$idComment);
+        }
+    }
+
+    /**
+     * Method ListCommentsWaiteValidate which returns the list of comments awaiting validation   (as an object of type user) 
+     *
+     * @return UComment[] 
+     */
+    public function listCommentsWaiteValidate()
+    {
+        $db = $this->dbConnect();    
+        $query = $db->query('SELECT * FROM comment where validate IS NULL');
+        $listCommentsWaiteValidate = $query->fetchAll(PDO::FETCH_CLASS, Comment::class);
+        return $listCommentsWaiteValidate;
     }
 
 }

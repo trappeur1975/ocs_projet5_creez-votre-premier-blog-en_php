@@ -5,6 +5,7 @@ use PDO;
 use Exception;
 use App\Entities\Post;
 use App\Entities\User;
+use \DateTime;
 
 /**
  * UserManager
@@ -173,6 +174,44 @@ class UserManager extends Manager
         if($result === false){
             throw new Exception('impossible de supprimer l utilisateur :'.$id.'peut être il n\'existe pas');
         }
+    }
+
+    /**
+     * validates the user whose id is indicated in the function parameter 
+     *
+     * @param $id of the the we want to validate 
+     *
+     */
+    public function validateUser(int $idUser)
+    {
+        $user = $this->getUser($idUser);
+        
+        $dateTime = new Datetime();
+        $validate = $dateTime->format('Y-m-d H:i:s');
+  
+        $db = $this->dbConnect();
+        $query = $db->prepare('UPDATE user SET validate = :validate WHERE id = :idUser');
+        $result = $query->execute([
+            'validate' => $validate,
+            'idUser' => $idUser
+            ]);
+
+        if($result === false){
+            throw new Exception('impossible de valider le user :'.$idUser);
+        }
+    }
+
+    /**
+     * Method ListUsersWaiteValidate which returns the list of users awaiting validation (as an object of type user) 
+     *
+     * @return User[] 
+     */
+    public function listUsersWaiteValidate()
+    {
+        $db = $this->dbConnect();    
+        $query = $db->query('SELECT * FROM user where validate IS NULL');
+        $listUsersWaiteValidate = $query->fetchAll(PDO::FETCH_CLASS, User::class);
+        return $listUsersWaiteValidate;
     }
 
 // --------------------------------------------------------------------------------------

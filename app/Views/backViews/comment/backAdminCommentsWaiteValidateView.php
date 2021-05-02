@@ -2,7 +2,7 @@
 
 use App\Entities\Form;
 
-$title = 'Edit the comments of a post ';
+$title = 'Comments waite a validate ';
 
 ob_start(); 
 ?>
@@ -28,21 +28,20 @@ ob_start();
     <?php endif ?>
 
 <!-- start main content  -->
-    <h1>Edit the Comments of the post id: <?= $id ?></h1>
-    <!-- <h1>Edit the comments of the post id: <?//= $user->getId() ?></h1> -->
+    <h1>Backend Comments awaiting validation</h1>
     <table class= "table">
             <thead>
                 <th>Id</th>
-                <th>comment</th>
-                <th>user_id</th>
-                <th>post-id</th>
-                <th>validate</th>
+                <th>Comment</th>
+                <th>User_id</th>
+                <th>Post-id</th>
+                <th>Validate</th>
                 <th>
-                <a href="/backend/adminPosts" class="btn btn-secondary">Administration des posts</a>
+                    <a href="/backend/adminPosts" class="btn btn-secondary">Administration des posts</a>
                 </th>
             </thead>
             <tbody>
-                <?php foreach ($listCommentsForPost as $comment): ?>
+                <?php foreach ($listCommentsWaiteValidate as $comment): ?>
                 <tr>
                     <td>
                         #<?= $comment->getId(); ?>

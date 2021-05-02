@@ -424,6 +424,20 @@ use App\Models\SocialNetworkManager;
     }
 
     /**
+     * function use for road http://localhost:8000/backend/adminUsersWaiteValidate
+     * will display the view backAdminUsersWaiteValidateView.php  
+     */
+    function adminUsersWaiteValidate()
+    {
+        Auth::check();
+        
+        $userManager = new UserManager();
+        $listUsersWaiteValidate = $userManager->listUsersWaiteValidate();
+
+        require('../app/Views/backViews/user/backAdminUsersWaiteValidateView.php');
+    }
+
+    /**
      * function use for road http://localhost:8000/backend/createUser
      * will display the view backCreateUserView.php  
      */
@@ -762,7 +776,36 @@ use App\Models\SocialNetworkManager;
         require('../app/Views/backViews/user/backDeleteUserView.php');
     }
 
+    /**
+     * function use for road http://localhost:8000/backend/validateUser/1 ou http://localhost:8000/backend/validateUser/2 ou ....
+     * will display the view backValidateUserView.php  
+     */
+    function validateUser($id)
+    {
+        Auth::check();
+    
+        // on valide le commentaire
+        $usertManager = new userManager();
+        $usertManager->validateUser($id);
+
+        require('../app/Views/backViews/user/backValidateUserView.php');
+    }
+
 // COMMENT
+    /**
+     * function use for road http://localhost:8000/backend/adminCommentsWaiteValidate
+     * will display the view backAdminCommentsWaiteValidateView.php  
+     */
+    function adminCommentsWaiteValidate()
+    {
+        Auth::check();
+        
+        $commentManager = new CommentManager();
+        $listCommentsWaiteValidate = $commentManager->listCommentsWaiteValidate();
+
+        require('../app/Views/backViews/comment/backAdminCommentsWaiteValidateView.php');
+    }
+
     /**
      * function use for road road http://localhost:8000/backend/editCommentsPost/1 ou http://localhost:8000/backend/editCommentsPost/2 ou ....
      * will display the view backEditCommentsPostView.php
@@ -791,4 +834,19 @@ use App\Models\SocialNetworkManager;
         $comment = $commentManager->deleteComment($id);
 
         require('../app/Views/backViews/comment/backDeleteCommentView.php');
+    }
+
+    /**
+     * function use for road http://localhost:8000/backend/validateComment/1 ou http://localhost:8000/backend/validateComment/2 ou ....
+     * will display the view backValidateCommentView.php  
+     */
+    function validateComment($id)
+    {
+        Auth::check();
+    
+        // on valide le commentaire
+        $commentManager = new CommentManager();
+        $comment = $commentManager->validateComment($id);
+
+        require('../app/Views/backViews/comment/backValidateCommentView.php');
     }

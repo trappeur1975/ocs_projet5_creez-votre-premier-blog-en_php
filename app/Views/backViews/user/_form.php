@@ -35,5 +35,5 @@
         <?php endif?>
     </button>
 
-    <a href="/backend/adminUsers" class="btn btn-primary">Administration des users</a>
+    <a href="/backend/adminUsers" class="btn btn-secondary">Administration des users</a>
 </form>

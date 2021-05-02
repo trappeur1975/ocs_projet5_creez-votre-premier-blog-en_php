@@ -32,5 +32,5 @@
             créer
         <?php endif?>
     </button>
-    <a href="/backend/adminPosts" class="btn btn-primary">Administration des post</a>
+    <a href="/backend/adminPosts" class="btn btn-secondary">Administration des posts</a>
 </form>

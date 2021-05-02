@@ -13,10 +13,10 @@
             <a href="#" class="navbar-brand">Mon site</a>
             <ul class="navbar-nav">
                 <li class="nav-item">
-                    <a href="<?= '/backend/adminPosts'?>"class="nav-link">articles</a>
+                    <a href="<?= '/backend/adminPosts'?>"class="nav-link">Articles</a>
                 </li>
                 <li class="nav-item">
-                    <a href="<?= '/backend/adminUsers'?>"class="nav-link">users</a>
+                    <a href="<?= '/backend/adminUsers'?>"class="nav-link">Users</a>
                 </li>
                 <li class="nav-item">
                     <form action="<?= '/backend/disconnection' ?>" method="post"> <!-- for security to prevent me being forcibly disconnected by sending me this link -->

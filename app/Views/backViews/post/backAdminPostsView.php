@@ -12,13 +12,14 @@ ob_start();
     <?php endif ?>
 
 <!-- start main content  -->
-    <h1>page Admin Post du backend</h1>
+    <h1>Backend Post Administration</h1>
         <table class= "table">
             <thead>
                 <th>Id</th>
-                <th>Titre</th>
+                <th>Title</th>
                 <th>
-                    <a href="/backend/createPost" class="btn btn-primary">nouveau post</a>
+                    <a href="/backend/createPost" class="btn btn-primary">Nouveau post</a>
+                    <a href="/backend/adminCommentsWaiteValidate" class="btn btn-warning">Valider les commentaires en attente</a>
                 </th>
             </thead>
             <tbody>
@@ -49,6 +50,9 @@ ob_start();
                                 </form>
                         <a href="<?= '/backend/editCommentsPost/'. $post->getId()?>" class="btn btn-success"> <!-- ISSUE faudra changer cela (ce qu il y a en php) avec l utilisation des nom de route -->
                             Voir les commentaires
+                        </a>
+                        <a href="<?= '/post/'. $post->getId()?>" class="btn btn-secondary"> <!-- ISSUE faudra changer cela (ce qu il y a en php) avec l utilisation des nom de route -->
+                            Voir le post
                         </a>
                     </td>
                 </tr>

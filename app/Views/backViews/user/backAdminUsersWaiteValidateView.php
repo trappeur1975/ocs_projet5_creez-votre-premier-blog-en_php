@@ -1,5 +1,5 @@
 <?php 
-$title = 'User Administration';
+$title = 'Users waite a valid';
 ob_start(); 
 ?>
 
@@ -19,7 +19,7 @@ ob_start();
     <?php endif ?>
 
 <!-- start main content  -->
-    <h1>Backend User Administration</h1>
+    <h1>Backend Users awaiting validation</h1>
         <table class= "table">
             <thead>
                 <th>Id</th>
@@ -27,11 +27,11 @@ ob_start();
                 <th>Validate</th>
                 <th>
                     <a href="/backend/createUser" class="btn btn-primary">Nouveau user</a>
-                    <a href="/backend/adminUsersWaiteValidate" class="btn btn-warning">Valider les users en attente</a>
+                    <a href="/backend/adminUsers" class="btn btn-secondary">Administration des users</a>
                 </th>
             </thead>
             <tbody>
-                <?php foreach ($listUsers as $user): ?>         
+                <?php foreach ($listUsersWaiteValidate as $user): ?>         
                 <tr>
                     <td>
                         #<?= $user->getId(); ?>
