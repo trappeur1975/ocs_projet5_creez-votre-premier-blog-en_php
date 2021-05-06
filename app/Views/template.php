@@ -19,6 +19,11 @@
                     <a href="<?= '/backend/adminUsers'?>"class="nav-link">Users</a>
                 </li>
                 <li class="nav-item">
+                    <form action="<?= '/backend/connection' ?>" method="post"> <!-- for security to prevent me being forcibly disconnected by sending me this link -->
+                        <button type ="submit" class="nav-link" style="background:transparent; border:none;" >Se connecter</button>
+                    </form>
+                </li>
+                <li class="nav-item">
                     <form action="<?= '/backend/disconnection' ?>" method="post"> <!-- for security to prevent me being forcibly disconnected by sending me this link -->
                         <button type ="submit" class="nav-link" style="background:transparent; border:none;" >Se deconnecter</button>
                     </form>

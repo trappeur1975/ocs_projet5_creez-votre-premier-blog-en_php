@@ -8,7 +8,13 @@ ob_start();
         <?php
         // methode grafikart
         foreach ($listPosts as $post) {
-            echo formatHtml($post->getTitle()) . '</br>'; // ici on affiche que les titres
+        ?>
+            <!-- echo formatHtml($post->getTitle()) . '</br>'; // ici on affiche que les titres -->
+            <a href="<?= '/post/'. $post->getId()?>">
+                <?= formatHtml($post->getTitle()) ?>
+            </a>
+            </br>
+        <?php   
         }
         ?>
 

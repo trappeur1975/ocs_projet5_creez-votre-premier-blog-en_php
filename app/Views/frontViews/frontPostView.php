@@ -32,19 +32,28 @@
         <?= htmlentities($post->getDatechange()); ?>
     <h2>auteur du commentaire :</h2>
         <p><?= formatHtml($userPost->getLastName().' '.$userPost->getFirstName()) ?></p>
-    <h2>les commentaires : </h2>
     
+    <?php //affiche du formulaire de commentaire seulement si on est connecter au site et un status abonner ou administrateur  
+        if(isset($_SESSION['connection'])){
+            if($userManager->getUserSatus($_SESSION['connection'])['status'] === 'administrateur' OR $userManager->getUserSatus($_SESSION['connection'])['status'] === 'abonner'){
+                echo '<h3>laisser un commentaire : </h3>';
+                require('../app/Views/frontViews/_form.php');
+                echo '</br>';
+                echo '</br>';
+            }
+        }  
+    ?>
+    
+    <h3>les commentaires du post: </h3>
     <?php 
         foreach ($listCommentsForPost as $comment){   
             $userComment = $userManager->getUser($comment->getUser_id()); //pour recuperer le user du commentaire
     ?>
-        <h3>commentaire de <?= $userComment->getLastName().' '.$userComment->getFirstName() ?></h3>
-        <!-- <h3>commentaire : <?= $countComment; ?></h3> -->
+        <h4>commentaire de <?= $userComment->getLastName().' '.$userComment->getFirstName() ?></h4>
+        <!-- <h3>commentaire : <?= $countComment; ?></h3> --> 
         <p><?= formatHtml($comment->getComment()); ?></p>
         <?php $countComment++; ?>
     <?php } ?>
-
-    <?php require('../app/Views/frontViews/_form.php')?>
 
     <!-- <a href="/listposts">listposts</a> -->
     <!-- <a href="<?php //echo($router->generate('listposts')) ?>">My listposts</a> -->

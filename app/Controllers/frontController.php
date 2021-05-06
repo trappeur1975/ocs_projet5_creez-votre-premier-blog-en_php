@@ -1,4 +1,5 @@
 <?php
+use App\Entities\Auth;
 use App\Entities\Form;
 use App\Entities\Comment;
 use App\Models\PostManager;
@@ -37,6 +38,8 @@ function listPosts()
  */
 function post($id)
 {
+    session_start();
+    
     // post
     $postManager = new PostManager(); // Création de l'objet manger de post
     $post = $postManager->getPost($id);

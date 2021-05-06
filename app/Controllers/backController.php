@@ -32,11 +32,21 @@ use App\Models\SocialNetworkManager;
 
                 try {
                     $userRegister = $userManager->findByUserLogin($_POST['login']);
+
                     if($userRegister->getPassword() ===  $_POST['password']){
                         session_start();
-                        $_SESSION['connection'] = 'administrateur'. // --------------POUR LE TESTE APRES IL FAUTDRA FAIRE UN TRAITEMENT POUR RECUPERER LE TYPE DE L'USER QUI TENTE DE SE CONNECTER
-                        header('Location: /backend/adminPosts'); //ISSUE faudra changer cela (ce qu il y a en php) avec l utilisation des nom de route
-                        exit();
+                       
+                        $_SESSION['connection'] = $userRegister->getId(); //status du user qui se connecte
+                                         
+                        if($userManager->getUserSatus($_SESSION['connection'])['status'] === 'administrateur'){
+                            header('Location: /backend/adminPosts');    //si user est administrateur il va sur le bachend admin
+                            exit();
+                        }else if($userManager->getUserSatus($_SESSION['connection'])['status'] === 'abonner'){
+                            header('Location: /');    //si user est abonner il va sur le front page home
+                            exit();
+                        }else {
+                            $error = 'votre status ne vous autorise pas a acceder au contenu du site reserver a un certain statut ';
+                        }
                     } else { 
                         $error = 'mot de passe incorrect';
                     }

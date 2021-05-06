@@ -214,6 +214,31 @@ class UserManager extends Manager
         return $listUsersWaiteValidate;
     }
 
+    /**
+     * Method getUserSatus displays the status of the user whose id is in the function parameter 
+     *
+     * @param integer $idUser id of the user whose status we want to know 
+     *
+     * @return String the status of the user
+     */
+    public function getUserSatus(int $idUser)
+    {
+        $db = $this->dbConnect();
+        $query = $db->prepare('SELECT usertype.status FROM user 
+                                INNER JOIN usertype
+                                ON user.userType_id = usertype.id
+                                WHERE user.id = :idUser');
+        $query->execute(['idUser' => $idUser]);
+        $query->setFetchMode(PDO::FETCH_CLASS, UserType::class);
+
+        $status = $query->fetch();
+
+        if($status === false){
+            throw new Exception('aucun user dont vous rechercher le status ne correspond a cet ID');
+        }
+        return $status;
+    }
+
 // --------------------------------------------------------------------------------------
 
     public function findByUserLogin(string $login)
