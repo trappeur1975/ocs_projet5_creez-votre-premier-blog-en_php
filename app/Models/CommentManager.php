@@ -23,9 +23,9 @@ class CommentManager extends Manager
         $query = $db->prepare('SELECT * FROM comment WHERE post_id = :id');
         $query->execute(['id' => $idPost]);
 
-        $listCommentForPost = $query ->fetchAll(PDO::FETCH_CLASS, Comment::class);
+        $listCommentsForPost = $query ->fetchAll(PDO::FETCH_CLASS, Comment::class);
 
-        return $listCommentForPost;
+        return $listCommentsForPost;
     }
 
     /**
@@ -134,6 +134,11 @@ class CommentManager extends Manager
         return $listCommentsWaiteValidate;
     }
 
+    /**
+     * Method listCommentsNotNullForPost return the list of comments validate (validate = not null) 
+     *
+     * @return Comment[] 
+     */
     public function listCommentsNotNullForPost(int $idPost): array
     {
         $db = $this->dbConnect();
@@ -141,9 +146,29 @@ class CommentManager extends Manager
         $query = $db->prepare('SELECT * FROM comment WHERE post_id = :id AND validate IS NOT NULL');
         $query->execute(['id' => $idPost]);
 
-        $listCommentForPost = $query ->fetchAll(PDO::FETCH_CLASS, Comment::class);
+        $listCommentsForPost = $query ->fetchAll(PDO::FETCH_CLASS, Comment::class);
 
-        return $listCommentForPost;
+        return $listCommentsForPost;
+    }
+
+    /**
+     * Method ListCommentsForUser method that returns the list of comment linked to a user 
+     *
+     * @param int $iduser the id of the user whose comments we want to collect 
+     *
+     * @return Comment[]
+     */
+
+    public function ListCommentsForUser(int $iduser): array
+    {
+        $db = $this->dbConnect();
+
+        $query = $db->prepare('SELECT * FROM comment WHERE user_id = :iduser');
+        $query->execute(['iduser' => $iduser]);
+
+        $listCommentsForUser = $query ->fetchAll(PDO::FETCH_CLASS, Comment::class);
+
+        return $listCommentsForUser;
     }
 
 
