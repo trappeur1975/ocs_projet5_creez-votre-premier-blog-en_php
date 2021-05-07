@@ -103,3 +103,19 @@ function post($id)
     }
     require('../app/Views/frontViews/frontPostView.php');
 }
+
+/**
+ * function use for road http://localhost:8000/deleteCommentPostFront/1 ou http://localhost:8000/deleteCommentPostFront/2 ou ....
+ * 
+ */
+function deleteCommentPostFront($id)
+{
+
+    // Auth::check();
+    
+    // on supprime le commentaire
+    $commentManager = new CommentManager();
+    $comment = $commentManager->deleteComment($id);
+
+    require('../app/Views/frontViews/frontDeleteCommentPostView.php');
+}

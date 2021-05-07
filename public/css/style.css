@@ -2,7 +2,7 @@ h1 {
     color: red;
 }
 
-h2 {
+h2, .validate{
     color: green;
 }
 
@@ -13,4 +13,9 @@ form{
 input[type=image]{
     height: 100px;
     width: 100px;
+}
+
+.noValidate{
+    color: red;
+    font-weight: bold;
 }

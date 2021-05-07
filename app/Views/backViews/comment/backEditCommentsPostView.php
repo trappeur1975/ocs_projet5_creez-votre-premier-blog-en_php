@@ -61,7 +61,7 @@ ob_start();
                         #<?= $comment->getPost_id(); ?>
                     </td>
 
-                    <td>
+                    <td <?=($comment->getValidate()) !== null ? 'class = "validate"' : 'class = "noValidate"';?> >
                         <?php
                             if($comment->getValidate() !== null){
                                 echo $comment->getValidate();

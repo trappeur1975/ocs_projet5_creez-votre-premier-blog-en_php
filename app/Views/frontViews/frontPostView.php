@@ -13,6 +13,15 @@
             <div class="alert alert-danger">
                 le commentaire n'a pu être créé.
             </div>
+        
+        <?php elseif(isset($_GET['deleteComment'])and($_GET['deleteComment'])==='true'): ?>
+            <div class="alert alert-success">
+                le commentaire a bien été supprimer.
+            </div>    
+        <?php elseif(isset($_GET['deleteComment'])and($_GET['deleteComment'])==='false'): ?>
+            <div class="alert alert-danger">
+                le commentaire n'a pu être supprimer.
+            </div>
     <?php endif ?>
 
 <h1><?= $title = formatHtml($post->getTitle()).' (post '. $id.')'; ?></h1>  <!-- we display here the title of the post but also to integrate this title in the browser tab by putting this title in the variable $ title  -->       
@@ -23,7 +32,13 @@
         <?= formatHtml($post->getIntroduction()); ?> 
     <h2>image</h2>
         <!-- <img src="/media/post_top_javascript_img1.png" alt="Photo de montagne" /> -->
-        <img src="<?='/'.$listMediasForPost[0]->getPath(); ?>" alt="<?=$listMediasForPost[0]->getAlt(); ?>" />
+        <!-- <img src="<?//='/'.$listMediasForPost[0]->getPath(); ?>" alt="<?//=$listMediasForPost[0]->getAlt(); ?>"/> -->
+        <?php
+            if(!empty($listMediasForPost)){
+                echo '<img src=/'.$listMediasForPost[0]->getPath().' alt="'.$listMediasForPost[0]->getAlt().'">';
+            }
+        ?>
+        
     <h2>content</h2>
         <?= formatHtml($post->getContent()); ?>
     <h2>DateCreate</h2>
@@ -50,9 +65,24 @@
             $userComment = $userManager->getUser($comment->getUser_id()); //pour recuperer le user du commentaire
     ?>
         <h4>commentaire de <?= $userComment->getLastName().' '.$userComment->getFirstName() ?></h4>
-        <!-- <h3>commentaire : <?= $countComment; ?></h3> --> 
+
+        <?php
+            if(isset($_SESSION['connection'])){
+                if($_SESSION['connection'] === $comment->getUser_id()){
+        ?>
+                    <form action="<?= '/deleteCommentPostFront/'. $comment->getId()?>" methode="POST"
+                        onsubmit="return confirm('Souhaitez vous vraiment executer cette action?')">
+                        <button type="submit" class="btn btn-danger">Supprimer votre commentaire</button>
+                    </form>
+        <?php
+                }
+            }
+        ?>
+
         <p><?= formatHtml($comment->getComment()); ?></p>
+
         <?php $countComment++; ?>
+
     <?php } ?>
 
     <!-- <a href="/listposts">listposts</a> -->
