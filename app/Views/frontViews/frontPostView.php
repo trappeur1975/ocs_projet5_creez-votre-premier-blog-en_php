@@ -30,7 +30,7 @@
         <?= htmlentities($post->getDateCreate()); ?>
     <h2>Datechange</h2>
         <?= htmlentities($post->getDatechange()); ?>
-    <h2>auteur du commentaire :</h2>
+    <h2>auteur du Post :</h2>
         <p><?= formatHtml($userPost->getLastName().' '.$userPost->getFirstName()) ?></p>
     
     <?php //affiche du formulaire de commentaire seulement si on est connecter au site et un status abonner ou administrateur  

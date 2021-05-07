@@ -809,7 +809,7 @@ use App\Models\SocialNetworkManager;
     function adminCommentsWaiteValidate()
     {
         Auth::check();
-        
+
         $commentManager = new CommentManager();
         $listCommentsWaiteValidate = $commentManager->listCommentsWaiteValidate();
 

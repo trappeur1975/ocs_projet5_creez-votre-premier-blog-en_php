@@ -95,8 +95,8 @@ class CommentManager extends Manager
     /**
      * validates the comment whose id is indicated in the function parameter 
      *
-     * @param $idComment of the comment we want to validate 
-     *
+     * @param $idComment of the comment we want to validate
+     * 
      */
     public function validateComment(int $idComment)
     {
@@ -120,16 +120,31 @@ class CommentManager extends Manager
     }
 
     /**
-     * Method ListCommentsWaiteValidate which returns the list of comments awaiting validation   (as an object of type user) 
+     * Method ListCommentsWaiteValidate which returns the list of comments awaiting validation 
      *
-     * @return UComment[] 
+     * @return Comment[] 
      */
-    public function listCommentsWaiteValidate()
+    public function listCommentsWaiteValidate(): array
     {
         $db = $this->dbConnect();    
+          
         $query = $db->query('SELECT * FROM comment where validate IS NULL');
         $listCommentsWaiteValidate = $query->fetchAll(PDO::FETCH_CLASS, Comment::class);
+        
         return $listCommentsWaiteValidate;
     }
+
+    public function listCommentsNotNullForPost(int $idPost): array
+    {
+        $db = $this->dbConnect();
+
+        $query = $db->prepare('SELECT * FROM comment WHERE post_id = :id AND validate IS NOT NULL');
+        $query->execute(['id' => $idPost]);
+
+        $listCommentForPost = $query ->fetchAll(PDO::FETCH_CLASS, Comment::class);
+
+        return $listCommentForPost;
+    }
+
 
 }

@@ -54,7 +54,8 @@ function post($id)
 
     // comment
     $commentManager = new CommentManager();
-    $listCommentsForPost = $commentManager->getListCommentsForPost($id);
+    $listCommentsForPost = $commentManager->listCommentsNotNullForPost($id);
+    // $listCommentsForPost = $commentManager->getListCommentsForPost($id);
    
     $comment = new Comment();
     $formComment = new Form($comment);
@@ -68,24 +69,33 @@ function post($id)
         // $dateCreate = DateTime::createFromFormat('Y-m-d H:i:s',new Datetime()); // pour que la date String soit en Datetime
         // $dateCreate = new Datetime();
         
-        if(empty($errors)){
-            
-            $dateTime = new Datetime();
-            $date = $dateTime->format('Y-m-d H:i:s');  
-            // $dateCreate = DateTime::createFromFormat('Y-m-d H:i:s',new Datetime()); // pour que la date String soit en Datetime
-            
-            // enregistrement en bdd du comment    
-            $comment
-                ->setComment($_POST['comment'])
-                ->setDateCompletion($date)
-                ->setValidate(NULL)
-                ->setUser_id(3) // --------------POUR LE TESTE J AI MIS USER 3 MAIS IL FAUDRA RECUPERER LE ID DE L USER CONNECTER-----------
-                ->setPost_id($post->getId())
-                ;
-            
-            $commentManager->addComment($comment);// add the comment to the database and get the last id of the comments in the database via the return of the function
-            
-            header('Location: /post/'.$id.'?createdComment=true');
+        if(empty($errors) AND isset($_SESSION['connection'])){
+            if($userManager->getUserSatus($_SESSION['connection'])['status'] === 'administrateur' OR $userManager->getUserSatus($_SESSION['connection'])['status'] === 'abonner'){
+                $dateTime = new Datetime();
+                $date = $dateTime->format('Y-m-d H:i:s');  
+                // $dateCreate = DateTime::createFromFormat('Y-m-d H:i:s',new Datetime()); // pour que la date String soit en Datetime
+                $validate = null;
+                if($userManager->getUserSatus($_SESSION['connection'])['status'] === 'administrateur'){ //pour valider automatiquement le commentaire si le commentateur a un status "administrateur"
+                    $validate = $date;
+                }
+
+                // enregistrement en bdd du comment    
+                $comment
+                    ->setComment($_POST['comment'])
+                    ->setDateCompletion($date)
+                    ->setValidate($validate)
+                    ->setUser_id($_SESSION['connection']) // --------------POUR LE TESTE J AI MIS USER 3 MAIS IL FAUDRA RECUPERER LE ID DE L USER CONNECTER-----------
+                    ->setPost_id($post->getId())
+                    ;
+                
+                $commentManager->addComment($comment);// add the comment to the database and get the last id of the comments in the database via the return of the function
+                
+                header('Location: /post/'.$id.'?createdComment=true');
+            }else{
+
+                header('Location: /post/'.$id.'?createdComment=false');
+            }
+
         }else{
             // ISSUE COMMENT TRANSMETTRE UN TABLEAU $errors=[]; DANS LA REDIRECTION CI DESSOUS POUR AFFICHER DANS LA VIEW LES DIFFERENTES ERREORS
             header('Location: /post/'.$id.'?createdComment=false');
