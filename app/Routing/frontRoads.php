@@ -15,3 +15,9 @@ $router->map('POST|GET', '/post/[i:id]', function ($id){  // for the road http:/
 $router->map('POST|GET', '/deleteCommentPostFront/[i:id]', function ($id){  // for the road http://localhost:8000/deleteCommentPostFront/1 ou http://localhost:8000/deleteCommentPostFront/2 ou ....
     deleteCommentPostFront($id);
 });
+
+
+//function to edit a comment
+$router->map('POST|GET', '/editCommentPostFront/[i:id]', function ($id){  // for the road http://localhost:8000/editCommentPostFront/1 ou http://localhost:8000/editCommentPostFront/2 ou ....
+    editCommentPostFront($id);
+});

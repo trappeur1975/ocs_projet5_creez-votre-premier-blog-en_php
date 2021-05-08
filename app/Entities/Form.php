@@ -6,8 +6,6 @@ namespace App\Entities;
  */
 class Form
 {
-    // private $data;
-        
     /**
      * edit
      *

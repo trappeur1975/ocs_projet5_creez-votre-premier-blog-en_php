@@ -53,4 +53,4 @@ pour lancer le serveur php via la console avec pour dossier racine "public" exec
 
     php -S localhost:8000 -t public
 
-dernier modif 07/05/2021 version 3
+dernier modif 08/05/2021

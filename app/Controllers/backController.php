@@ -753,7 +753,7 @@ use App\Models\SocialNetworkManager;
 
         // suppression de la base de donnee de tout les commentaires de l'user
         
-        $listCommentsDelete = $commentManager->ListCommentsForUser($id);
+        $listCommentsDelete = $commentManager->listCommentsForUser($id);
 
         if($listCommentsDelete !== []){
             foreach($listCommentsDelete as $comment){

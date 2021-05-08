@@ -6,16 +6,16 @@ h2, .validate{
     color: green;
 }
 
-form{
+form {
     display: inline;
 }
 
-input[type=image]{
+input[type=image] {
     height: 100px;
     width: 100px;
 }
 
-.noValidate{
+.noValidate {
     color: red;
     font-weight: bold;
 }

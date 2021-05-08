@@ -77,20 +77,57 @@ class CommentManager extends Manager
      *
      * @return void
      */
-    public function deleteComment(int $idcomment)
-    {
-        $comment = $this->getComment($idcomment);
+    public function deleteComment(int $idComment)
+    {   
+        $comment = $this->getComment($idComment);
 
         $db = $this->dbConnect();
-        $query = $db->prepare('DELETE FROM comment WHERE id = :idcomment');
-        $result = $query->execute(['idcomment' => $idcomment]);
+        $query = $db->prepare('DELETE FROM comment WHERE id = :idComment');
+        $result = $query->execute(['idComment' => $idComment]);
 
         if($result === true){
             return $comment;
         }else {
-            throw new Exception('impossible de supprimer le commentaire :'.$idcomment);
+            throw new Exception('impossible de supprimer le commentaire :'.$idComment);
         }
     }
+
+
+    /**
+     * Method updateComment update the content of a comment 
+     *
+     * @param Comment $comment comment to update 
+     *
+     * @return void
+     */
+    public function updateComment(Comment $comment): void
+    {
+        $db = $this->dbConnect();
+        $query = $db->prepare('UPDATE comment SET comment = :comment, 
+                                                dateCompletion = :dateCompletion,
+                                                validate = :validate,
+                                                user_id = :userId,
+                                                post_id = :postId
+                            WHERE id = :id');
+        $result = $query->execute([
+            'comment' => $comment->getComment(),
+            'dateCompletion' => $comment->getDateCompletion(),
+            // 'dateCompletion' => $comment->getDateCompletion()->format('Y-m-d H:i:s'),
+            'validate' => $comment->getValidate(),
+            // 'validate' => $comment->getValidate()->format('Y-m-d H:i:s'),
+            'userId' => $comment->getUser_id(),
+            'postId' => $comment->getPost_id(),
+            'id' => $comment->getId()
+        ]);
+        
+        if($result === false){
+            throw new Exception('impossible de modifier le commentaire'.$comment->getId());
+        }
+    }
+
+
+
+
 
     /**
      * validates the comment whose id is indicated in the function parameter 
@@ -152,24 +189,47 @@ class CommentManager extends Manager
     }
 
     /**
-     * Method ListCommentsForUser method that returns the list of comment linked to a user 
+     * Method listCommentsForUser method that returns the list of comment linked to a user 
      *
      * @param int $iduser the id of the user whose comments we want to collect 
      *
      * @return Comment[]
      */
 
-    public function ListCommentsForUser(int $iduser): array
+    public function listCommentsForUser(int $idUser): array
     {
         $db = $this->dbConnect();
 
-        $query = $db->prepare('SELECT * FROM comment WHERE user_id = :iduser');
-        $query->execute(['iduser' => $iduser]);
+        $query = $db->prepare('SELECT * FROM comment WHERE user_id = :idUser');
+        $query->execute(['idUser' => $idUser]);
 
         $listCommentsForUser = $query ->fetchAll(PDO::FETCH_CLASS, Comment::class);
 
         return $listCommentsForUser;
     }
 
+    /**
+     * Method listCommentsForUserForPost method that returns the list of comment linked to a user and linked to a post
+     *
+     * @param int $iduser the id of the user whose comments we want to collect 
+     * @param int $idPost the id of the post whose comments we want to collect 
+     * 
+     * @return Comment[]
+     */
+
+    public function listCommentsForUserForPost(int $idUser, int $idPost): array
+    {
+        $db = $this->dbConnect();
+
+        $query = $db->prepare('SELECT * FROM comment WHERE user_id = :idUser and post_id = :idPost');
+        $query->execute([
+            'idUser' => $idUser,
+            'idPost' => $idPost
+            ]);
+
+        $listCommentsForUserForPost = $query ->fetchAll(PDO::FETCH_CLASS, Comment::class);
+
+        return $listCommentsForUserForPost;
+    }
 
 }

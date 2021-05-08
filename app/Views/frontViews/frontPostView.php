@@ -1,6 +1,6 @@
 <?php 
     ob_start(); 
-    $countComment = 1;    
+    // $countComment = 1;    
 ?>
 
 <!-- start the labels on the state of the comment of the post   -->
@@ -13,7 +13,6 @@
             <div class="alert alert-danger">
                 le commentaire n'a pu être créé.
             </div>
-        
         <?php elseif(isset($_GET['deleteComment'])and($_GET['deleteComment'])==='true'): ?>
             <div class="alert alert-success">
                 le commentaire a bien été supprimer.
@@ -21,6 +20,14 @@
         <?php elseif(isset($_GET['deleteComment'])and($_GET['deleteComment'])==='false'): ?>
             <div class="alert alert-danger">
                 le commentaire n'a pu être supprimer.
+            </div>
+        <?php elseif(isset($_GET['successUploadComment'])and($_GET['successUploadComment'])==='true'): ?>
+            <div class="alert alert-success">
+                le commentaire a bien été modifier.
+            </div>    
+        <?php elseif(isset($_GET['successUploadComment'])and($_GET['successUploadComment'])==='false'): ?>
+            <div class="alert alert-danger">
+                le commentaire n'a pu être modifier.
             </div>
     <?php endif ?>
 
@@ -51,8 +58,8 @@
     <?php //affiche du formulaire de commentaire seulement si on est connecter au site et un status abonner ou administrateur  
         if(isset($_SESSION['connection'])){
             if($userManager->getUserSatus($_SESSION['connection'])['status'] === 'administrateur' OR $userManager->getUserSatus($_SESSION['connection'])['status'] === 'abonner'){
-                echo '<h3>laisser un commentaire : </h3>';
-                require('../app/Views/frontViews/_form.php');
+                echo '<h3>laisser un nouveau commentaire : </h3>';
+                require('../app/Views/frontViews/_formComment.php');
                 echo '</br>';
                 echo '</br>';
             }
@@ -60,34 +67,37 @@
     ?>
     
     <h3>les commentaires du post: </h3>
+    
     <?php 
         foreach ($listCommentsForPost as $comment){   
             $userComment = $userManager->getUser($comment->getUser_id()); //pour recuperer le user du commentaire
     ?>
-        <h4>commentaire de <?= $userComment->getLastName().' '.$userComment->getFirstName() ?></h4>
+            <h5>commentaire de <?= $userComment->getLastName().' '.$userComment->getFirstName() ?></h5>
 
-        <?php
-            if(isset($_SESSION['connection'])){
-                if($_SESSION['connection'] === $comment->getUser_id()){
-        ?>
-                    <form action="<?= '/deleteCommentPostFront/'. $comment->getId()?>" methode="POST"
-                        onsubmit="return confirm('Souhaitez vous vraiment executer cette action?')">
-                        <button type="submit" class="btn btn-danger">Supprimer votre commentaire</button>
-                    </form>
-        <?php
-                }
-            }
-        ?>
+            
 
-        <p><?= formatHtml($comment->getComment()); ?></p>
+            <p><?= formatHtml($comment->getComment()); ?></p>
 
-        <?php $countComment++; ?>
+
+            <!-- <?php //$countComment++; ?> -->
+
+            <?php
+                if(isset($_SESSION['connection'])){
+                    if($_SESSION['connection'] === $comment->getUser_id()){
+            ?>
+                        <form action="<?= '/deleteCommentPostFront/'. $comment->getId()?>" methode="POST"
+                            onsubmit="return confirm('Souhaitez vous vraiment executer cette action?')">
+                            <button type="submit" class="btn btn-danger">Supprimer votre commentaire</button>
+                        </form>
+                        <a href="<?= '/editCommentPostFront/'. $comment->getId()?>" class="btn btn-primary">
+                            Modifier votre commentaire
+                        </a>
+            <?php
+                    }
+                }        
+            ?>
 
     <?php } ?>
-
-    <!-- <a href="/listposts">listposts</a> -->
-    <!-- <a href="<?php //echo($router->generate('listposts')) ?>">My listposts</a> -->
-    <?php //$router->generate('listposts') ?>
 
 <?php 
 $content = ob_get_clean();
