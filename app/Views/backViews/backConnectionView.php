@@ -7,7 +7,7 @@ ob_start();
     <!-- to manage the case where users (not identified) on the site wish to access content where they must be logged in (see the "check ()" function of the "Auth" class  -->
      <?php  if(isset($_GET['badConnection'])): ?> 
         <div class="alert alert-danger">
-            vous n'étes identifié sur le site ou votre statut ne vous autorise pas a acceder a l administration du site
+            vous n'étes identifié sur le site ou votre statut ne vous autorise pas a acceder à la fonctionnalité ou à la partie du site que vous demandez
         </div>
     <?php endif ?>
 

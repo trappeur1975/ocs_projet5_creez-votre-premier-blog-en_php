@@ -70,8 +70,10 @@ function post($id)
         // $dateCreate = DateTime::createFromFormat('Y-m-d H:i:s',new Datetime()); // pour que la date String soit en Datetime
         // $dateCreate = new Datetime();
         
-        if(empty($errors) AND isset($_SESSION['connection'])){
-            if($userManager->getUserSatus($_SESSION['connection'])['status'] === 'administrateur' OR $userManager->getUserSatus($_SESSION['connection'])['status'] === 'abonner'){
+        if(empty($errors)){
+            Auth::check(['administrateur','abonner']);    
+        // if(empty($errors) AND isset($_SESSION['connection'])){
+        //     if($userManager->getUserSatus($_SESSION['connection'])['status'] === 'administrateur' OR $userManager->getUserSatus($_SESSION['connection'])['status'] === 'abonner'){
                 $dateTime = new Datetime();
                 $date = $dateTime->format('Y-m-d H:i:s');
                 $validate = null;
@@ -91,10 +93,10 @@ function post($id)
                 $commentManager->addComment($comment);// add the comment to the database and get the last id of the comments in the database via the return of the function
                 
                 header('Location: /post/'.$id.'?createdComment=true');
-            }else{
+            // }else{
 
-                header('Location: /post/'.$id.'?createdComment=false');
-            }
+            //     header('Location: /post/'.$id.'?createdComment=false');
+            // }
 
         }else{
             // ISSUE COMMENT TRANSMETTRE UN TABLEAU $errors=[]; DANS LA REDIRECTION CI DESSOUS POUR AFFICHER DANS LA VIEW LES DIFFERENTES ERREORS
@@ -110,14 +112,20 @@ function post($id)
  */
 function deleteCommentPostFront($id)
 {
-    session_start();
-    // Auth::check();
-
+    Auth::check(['administrateur','abonner']);
+    
     // on supprime le commentaire
     $commentManager = new CommentManager();
-    $comment = $commentManager->deleteComment($id);
+    $comment = $commentManager->getComment($id);
+    
+    if($comment->getUser_id() === $_SESSION['connection']){ //on verifier que le commentaire que le user souhaite modifier lui appartient bien
+        $commentManager->deleteComment($id);
+        // $comment = $commentManager->deleteComment($id);
 
-    require('../app/Views/frontViews/frontDeleteCommentPostView.php');
+        require('../app/Views/frontViews/frontDeleteCommentPostView.php');
+    }else {
+        throw new Exception('impossible de supprimmer le commentaire :'.$comment->getId().'par le user :'.$_SESSION['connection']);
+    }
 }
 
 /**
@@ -126,42 +134,46 @@ function deleteCommentPostFront($id)
  */
 function editCommentPostFront($id)
 {
-    // Auth::check();
+    Auth::check(['administrateur','abonner']);
     
     // on edit le commentaire (a travers son formulaire)
     $commentManager = new CommentManager();
     $comment = $commentManager->getComment($id);
 
-    $formComment = new Form($comment, true);
+    if($comment->getUser_id() === $_SESSION['connection']){ //on verifier que le commentaire que le user souhaite modifier lui appartient bien
 
+        $formComment = new Form($comment, true);
 
-    if ($_SERVER['REQUEST_METHOD'] === 'POST') { // if a submission of the form (=> a modification of a comment) has been made
-        //for data validation
-            $errors = [];
+        if($_SERVER['REQUEST_METHOD'] === 'POST') { // if a submission of the form (=> a modification of a comment) has been made
+            //for data validation
+                $errors = [];
 
-            // if(empty($_POST['title'])){
-            //     $errors['title'][] = 'Le champs titre ne peut être vide';
-            // }
-            // if(mb_strlen($_POST['title'])<=3){
-            //     $errors['title'][] = 'Le champs titre doit contenir plus de 3 caractere';
-            // }
+                // if(empty($_POST['title'])){
+                //     $errors['title'][] = 'Le champs titre ne peut être vide';
+                // }
+                // if(mb_strlen($_POST['title'])<=3){
+                //     $errors['title'][] = 'Le champs titre doit contenir plus de 3 caractere';
+                // }
 
-            if(empty($errors)){
-                // enregistrement des modifications du commentaire
-                if (!empty($_POST['comment'])){
-                    $comment->setComment($_POST['comment']);
-                                        
-                    $commentManager->updateComment($comment);
+                if(empty($errors)){
+                    // enregistrement des modifications du commentaire
+                    if (!empty($_POST['comment'])){
+                        $comment->setComment($_POST['comment']);
+                                            
+                        $commentManager->updateComment($comment);
+                    }
+                        
+                    header('Location: /post/'.$comment->getPost_id().'?successUploadComment=true');
+                }else{
+                    // ISSUE COMMENT TRANSMETTRE UN TABLEAU $errors=[]; DANS LA REDIRECTION CI DESSOUS POUR AFFICHER DANS LA VIEW LES DIFFERENTES ERREORS
+                    header('Location: /post/'.$comment->getPost_id().'?successUploadComment=false');
                 }
-                     
-                header('Location: /post/'.$comment->getPost_id().'?successUploadComment=true');
-            }else{
-                // ISSUE COMMENT TRANSMETTRE UN TABLEAU $errors=[]; DANS LA REDIRECTION CI DESSOUS POUR AFFICHER DANS LA VIEW LES DIFFERENTES ERREORS
-                header('Location: /post/'.$comment->getPost_id().'?successUploadComment=false');
-            }
+        }
+        require('../app/Views/frontViews/frontEditCommentPostView.php');
+    }else {
+        throw new Exception('impossible de modifier le commentaire :'.$comment->getId().'par le user :'.$_SESSION['connection']);
     }
 
-    require('../app/Views/frontViews/frontEditCommentPostView.php');
 }
 
 

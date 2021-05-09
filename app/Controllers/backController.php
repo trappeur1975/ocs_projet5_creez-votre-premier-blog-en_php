@@ -83,7 +83,8 @@ use App\Models\SocialNetworkManager;
      */
     function backHome()
     {
-        Auth::check();
+        Auth::check(['administrateur']);
+        // Auth::check();
 
         require('../app/Views/backViews/backHomeView.php');
     }
@@ -95,7 +96,8 @@ use App\Models\SocialNetworkManager;
      */
     function adminPosts()
     {
-        Auth::check();
+        Auth::check(['administrateur']);
+        // Auth::check();
         
         $postManager = new PostManager();
         $listPosts = $postManager->getListPosts();
@@ -108,7 +110,8 @@ use App\Models\SocialNetworkManager;
      */
     function createPost()
     {
-        Auth::check();
+        Auth::check(['administrateur']);
+        // Auth::check();
         
         // post
         $post = new Post();
@@ -230,7 +233,8 @@ use App\Models\SocialNetworkManager;
      */
     function editPost($id)
     {
-        Auth::check();
+        Auth::check(['administrateur']);
+        // Auth::check();
 
         // post
         $postManager = new PostManager();
@@ -399,7 +403,8 @@ use App\Models\SocialNetworkManager;
      */
     function deletePost($id)
     {
-        Auth::check();
+        Auth::check(['administrateur']);
+        // Auth::check();
 
         // on supprime les commentaires lier au post (si il y en a)
         $commentManager = new CommentManager();
@@ -436,7 +441,8 @@ use App\Models\SocialNetworkManager;
      */
     function adminUsers()
     {
-        Auth::check();
+        Auth::check(['administrateur']);
+        // Auth::check();
         
         $userManager = new UserManager();
         $listUsers = $userManager->getListUsers();
@@ -449,7 +455,8 @@ use App\Models\SocialNetworkManager;
      */
     function adminUsersWaiteValidate()
     {
-        Auth::check();
+        Auth::check(['administrateur']);
+        // Auth::check();
         
         $userManager = new UserManager();
         $listUsersWaiteValidate = $userManager->listUsersWaiteValidate();
@@ -463,7 +470,8 @@ use App\Models\SocialNetworkManager;
      */
     function createUser()
     {
-        Auth::check();
+        Auth::check(['administrateur']);
+        // Auth::check();
         
         // user
         $user = new User();
@@ -582,7 +590,8 @@ use App\Models\SocialNetworkManager;
      */
     function editUser($id)
     {
-        Auth::check();
+        Auth::check(['administrateur']);
+        // Auth::check();
               
         // user
         $userManager = new UserManager();
@@ -628,7 +637,6 @@ use App\Models\SocialNetworkManager;
             $formSocialNetworkSelect = new Form($socialNetworkForSelect);
         }
         
-
         // traitement server et affichage des retours d'infos 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') { // if a submission of the form (=> a modification of a user) has been made
 
@@ -742,7 +750,8 @@ use App\Models\SocialNetworkManager;
      */
     function deleteUser($id)
     {
-        Auth::check();
+        Auth::check(['administrateur']);
+        // Auth::check();
   
         $postManager = new PostManager();
         $listPostsForUser = $postManager->getListPostsForUser($id);
@@ -822,7 +831,8 @@ use App\Models\SocialNetworkManager;
      */
     function validateUser($id)
     {
-        Auth::check();
+        Auth::check(['administrateur']);
+        // Auth::check();
     
         // on valide le commentaire
         $usertManager = new userManager();
@@ -838,7 +848,8 @@ use App\Models\SocialNetworkManager;
      */
     function adminCommentsWaiteValidate()
     {
-        Auth::check();
+        Auth::check(['administrateur']);
+        // Auth::check();
 
         $commentManager = new CommentManager();
         $listCommentsWaiteValidate = $commentManager->listCommentsWaiteValidate();
@@ -853,7 +864,8 @@ use App\Models\SocialNetworkManager;
      */
     function editCommentsPost($id)
     {
-        Auth::check();
+        Auth::check(['administrateur']);
+        // Auth::check();
   
         $commentManager = new CommentManager();
         $listCommentsForPost = $commentManager->getListCommentsForPost($id);
@@ -867,7 +879,8 @@ use App\Models\SocialNetworkManager;
      */
     function deleteComment($id)
     {
-        Auth::check();
+        Auth::check(['administrateur']);
+        // Auth::check();
     
         // on supprime le commentaire
         $commentManager = new CommentManager();
@@ -882,7 +895,8 @@ use App\Models\SocialNetworkManager;
      */
     function validateComment($id)
     {
-        Auth::check();
+        Auth::check(['administrateur']);
+        // Auth::check();
     
         // on valide le commentaire
         $commentManager = new CommentManager();

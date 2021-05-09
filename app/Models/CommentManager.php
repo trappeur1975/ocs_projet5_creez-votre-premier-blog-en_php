@@ -79,19 +79,21 @@ class CommentManager extends Manager
      */
     public function deleteComment(int $idComment)
     {   
-        $comment = $this->getComment($idComment);
+        // $comment = $this->getComment($idComment);
 
         $db = $this->dbConnect();
         $query = $db->prepare('DELETE FROM comment WHERE id = :idComment');
         $result = $query->execute(['idComment' => $idComment]);
 
-        if($result === true){
-            return $comment;
-        }else {
+        if($result === false){
             throw new Exception('impossible de supprimer le commentaire :'.$idComment);
         }
+        // if($result === true){
+        //     return $comment;
+        // }else {
+        //     throw new Exception('impossible de supprimer le commentaire :'.$idComment);
+        // }
     }
-
 
     /**
      * Method updateComment update the content of a comment 
@@ -124,10 +126,6 @@ class CommentManager extends Manager
             throw new Exception('impossible de modifier le commentaire'.$comment->getId());
         }
     }
-
-
-
-
 
     /**
      * validates the comment whose id is indicated in the function parameter 

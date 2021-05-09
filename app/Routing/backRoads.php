@@ -78,7 +78,7 @@ $router->map('GET', '/backend', function (){  // for the road  http://localhost:
         editCommentsPost($id);
     });
 
-    //function to delete a post
+    //function to delete a comment
     $router->map('POST|GET', '/backend/deleteComment/[i:id]', function ($id){  // for the road http://localhost:8000/backend/deleteComment/1 ou http://localhost:8000/backend/deleteComment/2 ou ....
         deleteComment($id);
     });
