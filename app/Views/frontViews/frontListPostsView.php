@@ -1,5 +1,5 @@
 <?php
-$title = 'Liste des posts';
+$title = 'Font Liste des posts';
 ob_start(); 
 ?>
     <h1>Test listpost nico</h1>

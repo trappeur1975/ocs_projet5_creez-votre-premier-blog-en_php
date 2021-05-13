@@ -1,5 +1,5 @@
 <?php 
-$title = 'Post administration';
+$title = 'Backend Post administration';
 ob_start(); 
 ?>
         

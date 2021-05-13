@@ -2,47 +2,47 @@
 
 use App\Entities\Form;
 
-$title = 'Backend Edit the comments of a post ';
+$title = 'Front user dashboard';
 
 ob_start(); 
 ?>
-
-<!-- start the labels on the state of the comment of the post   -->
-    <!-- to manage the display of the success or not of the comment of a post -->
-    <?php  if(isset($_GET['deleteComment'])and($_GET['deleteComment'])==='true'): ?>
+    <!-- start the labels on the state of the edition of the user   -->
+    <!-- to manage the display of the success or not of the EDITING of a user -->
+    <?php  if(isset($_GET['successEditUser'])and($_GET['successEditUser'])==='true'): ?>
             <div class="alert alert-success">
-                le commentaire a bien été supprimer.
+                le user a bien été modifié.
             </div>
-        <?php elseif(isset($_GET['deleteComment'])and($_GET['deleteComment'])==='false'): ?>
+        <?php elseif(isset($_GET['successEditUser'])and($_GET['successEditUser'])==='false'): ?>
             <div class="alert alert-danger">
-                le commentaire n'a pu être supprimer.
+                le user n'a pu être modifié.
             </div>
-        <?php  elseif(isset($_GET['validateComment'])and($_GET['validateComment'])==='true'): ?>
-            <div class="alert alert-success">
-                le commentaire a bien été validé.
-            </div>
-        <?php elseif(isset($_GET['validateComment'])and($_GET['validateComment'])==='false'): ?>
-            <div class="alert alert-danger">
-                le commentaire n'a pu être validé.
-            </div>     
-    <?php endif ?>
+        <?php endif ?>
+<!-- end the labels on the state of the edition of the user   -->
+    
+    <!-- start main content  -->
+        <h1>Front user dashboard with id  <?= $id ?></h1>
+        <h2>Suppression de mon compte user</h2>
+                <form action="<?= '/deleteUserFront/'. $user->getId()?>" methode="POST"
+                    onsubmit="return confirm('Souhaitez vous vraiment executer cette action?')">
+                    <button type="submit" class="btn btn-danger">Supprimer</button>
+                </form>
+            
+        <h2>Mes infos (modification)</h2>
+            <?php require('../app/Views/frontViews/_formUserFront.php')?>
 
-<!-- start main content  -->
-    <h1>Backend Edit the Comments of the post id: <?= $id ?></h1>
-    <!-- <h1>Edit the comments of the post id: <?//= $user->getId() ?></h1> -->
-    <table class= "table">
+        <h2>Mes commentaires</h2>
+
+
+        <table class= "table">
             <thead>
                 <th>Id</th>
                 <th>comment</th>
-                <th>user_id</th>
                 <th>post-id</th>
                 <th>validate</th>
-                <th>
-                <a href="/backend/adminPosts" class="btn btn-secondary">Administration des posts</a>
-                </th>
+                <th>actions</th>
             </thead>
             <tbody>
-                <?php foreach ($listCommentsForPost as $comment): ?>
+                <?php foreach ($listCommentsForUser as $comment): ?>
                 <tr>
                     <td>
                         #<?= $comment->getId(); ?>
@@ -51,10 +51,6 @@ ob_start();
                         <a href="<?= '/post/'. $comment->getPost_id()?>">
                         <?= formatHtml($comment->getComment()); ?>
                         </a>
-                    </td>
-                    <td>
-                    <a href="<?= '/backend/editUser/'. $comment->getUser_id()?>">
-                        #<?= $comment->getUser_id(); ?>
                     </td>
                     <td>
                         <a href="<?= '/post/'. $comment->getPost_id()?>">
@@ -71,8 +67,8 @@ ob_start();
                         ?>
                     </td>
                     <td>
-                        <a href="<?= '/backend/validateComment/'. $comment->getId()?>" class="btn btn-info">
-                            Valider
+                        <a href="<?= '/editCommentPostFront/'. $comment->getId()?>" class="btn btn-warning">
+                            Modifier
                         </a>
                         <!-- si on utilise la methode "post" -->
                         <form action="<?= '/backend/deleteComment/'. $comment->getId()?>" methode="POST"
@@ -84,7 +80,14 @@ ob_start();
                 <?php endforeach ?>
             </tbody>
         </table>
-<!-- end main content  -->
+
+
+
+
+
+
+
+    <!-- end main content  -->
 
 <?php 
 $content = ob_get_clean(); 

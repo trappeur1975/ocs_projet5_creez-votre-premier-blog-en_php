@@ -246,11 +246,11 @@ class User
     /**
      * Set $validate validate of the user
      *
-     * @param  \Datetime  $validate validate of the user
+     * @param $validate validate of the user (can be null or datetime )
      *
      * @return  self
      */ 
-    public function setValidate(\Datetime $validate): self
+    public function setValidate($validate): self
     // public function setValidate($validate): self
     {
         $this->validate = $validate;

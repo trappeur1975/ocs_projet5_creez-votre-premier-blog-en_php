@@ -2,7 +2,7 @@
 
 use App\Entities\Form;
 
-$title = 'Edit post';
+$title = 'Backend Edit post';
 
 ob_start(); 
 ?>

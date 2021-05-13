@@ -1,5 +1,5 @@
 <?php 
-$title = 'Validate a user';
+$title = 'Backend Validate a user';
 
 ob_start(); 
 

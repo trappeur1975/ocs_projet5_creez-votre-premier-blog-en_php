@@ -1,7 +1,7 @@
 <?php 
 use App\Entities\Form;
 
-$title = 'Create user';
+$title = 'Backend Create user';
 ob_start(); 
 ?>
 <!-- label if the creation of the user was not successful -->
@@ -12,7 +12,7 @@ ob_start();
     <?php endif ?>
 
 <!-- start main content  -->
-    <h1>Create a new user</h1>
+    <h1>Backend create a new user</h1>
 
     <?php require('../app/Views/backViews/user/_form.php')?>
 <!-- end main content  -->

@@ -10,23 +10,30 @@
     
     <body>
         <nav class="navbar navbar-expand-lg navbar-dark bg-primary"> 
-            <a href="#" class="navbar-brand">Mon site</a>
+            <a href="/" class="navbar-brand">Mon site</a>
             <ul class="navbar-nav">
                 <li class="nav-item">
-                    <a href="<?= '/backend/adminPosts'?>"class="nav-link">Articles</a>
+                    <a href="/backend/adminPosts" class="nav-link">Articles</a>
+                    <!-- <a href="<?= '/backend/adminPosts'?>"class="nav-link">Articles</a> -->
                 </li>
                 <li class="nav-item">
-                    <a href="<?= '/backend/adminUsers'?>"class="nav-link">Users</a>
+                    <a href="/backend/adminUsers" class="nav-link">Users</a>
+                    <!-- <a href="<?= '/backend/adminUsers'?>"class="nav-link">Users</a> -->
                 </li>
                 <li class="nav-item">
-                    <form action="<?= '/backend/connection' ?>" method="post"> <!-- for security to prevent me being forcibly disconnected by sending me this link -->
+                    <form action="/backend/connection" method="post"> <!-- for security to prevent me being forcibly connected by sending me this link -->
+                    <!-- <form action="<?= '/backend/connection' ?>" method="post"> for security to prevent me being forcibly connected by sending me this link -->
                         <button type ="submit" class="nav-link" style="background:transparent; border:none;" >Se connecter</button>
                     </form>
                 </li>
                 <li class="nav-item">
-                    <form action="<?= '/backend/disconnection' ?>" method="post"> <!-- for security to prevent me being forcibly disconnected by sending me this link -->
+                    <form action="/backend/disconnection" method="post"> <!-- for security to prevent me being forcibly disconnected by sending me this link -->
+                    <!-- <form action="<?= '/backend/disconnection' ?>" method="post"> for security to prevent me being forcibly disconnected by sending me this link -->
                         <button type ="submit" class="nav-link" style="background:transparent; border:none;" >Se deconnecter</button>
                     </form>
+                </li>
+                <li class="nav-item">
+                    <a href="/createUserFront" class="nav-link">Creer un compte</a>
                 </li>
             </ul>
         </nav>

@@ -1,7 +1,7 @@
 <?php 
 use App\Entities\Form;
 
-$title = 'Create post';
+$title = 'Backend Create post';
 ob_start(); 
 ?>
 <!-- label if the creation of the post was not successful -->
@@ -12,7 +12,7 @@ ob_start();
     <?php endif ?>
 
 <!-- start main content  -->
-    <h1>Create a new Post</h1>
+    <h1>Backend Create a new Post</h1>
 
     <?php require('../app/Views/backViews/post/_form.php')?>
 <!-- end main content  -->

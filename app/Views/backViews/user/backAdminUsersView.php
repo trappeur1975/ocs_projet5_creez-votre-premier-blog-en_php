@@ -1,5 +1,5 @@
 <?php 
-$title = 'User Administration';
+$title = 'Backend User Administration';
 ob_start(); 
 ?>
 
@@ -41,7 +41,7 @@ ob_start();
                         <?= formatHtml($user->getLastName()) ?>
                         </a>
                     </td>
-                    <td>
+                    <td <?=($user->getValidate()) !== null ? 'class = "validate"' : 'class = "noValidate"';?> >
                         <?php
                             if($user->getValidate() !== null){
                                 echo $user->getValidate();

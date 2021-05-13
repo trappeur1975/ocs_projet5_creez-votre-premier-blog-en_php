@@ -2,7 +2,7 @@
 
 use App\Entities\Form;
 
-$title = 'Edit comment front';
+$title = 'Front Edit comment front';
 
 ob_start(); 
 ?>

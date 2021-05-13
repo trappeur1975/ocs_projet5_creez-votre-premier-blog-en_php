@@ -1,5 +1,5 @@
 <?php 
-$title = 'Validate a comment';
+$title = 'Backend Validate a comment';
 
 ob_start(); 
 

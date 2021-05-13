@@ -1,5 +1,5 @@
 <?php 
-$title = 'Delete a user';
+$title = 'Backend Delete a user';
 
 ob_start(); 
 

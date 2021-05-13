@@ -90,9 +90,7 @@ class UserManager extends Manager
         $query = $db->prepare('INSERT INTO user SET firstName = :firstName, 
                                                     lastName = :lastName,
                                                     email = :email,
-                                                    -- logo = :logo,
                                                     slogan = :slogan,
-                                                    -- socialNetworks = :socialNetworks,
                                                     login = :login,
                                                     password = :password,
                                                     validate = :validate,
@@ -101,13 +99,11 @@ class UserManager extends Manager
             'firstName' => $user->getFirstName(),
             'lastName' => $user->getLastName(),
             'email' => $user->getEmail(),
-            // 'logo' => $user->getLogo(),
             'slogan' => $user->getSlogan(),
-            // 'socialNetworks' => $user->getSocialNetworks(),
             'login' => $user->getLogin(),
             'password' => $user->getPassword(),
-            'validate' => $user->getValidate()->format('Y-m-d H:i:s'),
-            // 'validate' => $user->getValidate()
+            // 'validate' => $user->getValidate()->format('Y-m-d H:i:s'),
+            'validate' => $user->getValidate(),
             'userType_id' => $user->getUserType_id()
             ]);
 
@@ -131,24 +127,20 @@ class UserManager extends Manager
         $query = $db->prepare('UPDATE user SET firstName = :firstName, 
                                                 lastName = :lastName,
                                                 email = :email,
-                                                -- logo = :logo,
                                                 slogan = :slogan,
-                                                -- socialNetworks = :socialNetworks,
                                                 login = :login,
                                                 password = :password,
-                                                validate = :validate,
+                                                -- validate = :validate,
                                                 userType_id = :userType_id
                             WHERE id = :id');
         $result = $query->execute([
             'firstName' => $user->getFirstName(),
             'lastName' => $user->getLastName(),
             'email' => $user->getEmail(),
-            // 'logo' => $user->getLogo(),
             'slogan' => $user->getSlogan(),
-            // 'socialNetworks' => $user->getSocialNetworks(),
             'login' => $user->getLogin(),
             'password' => $user->getPassword(),
-            'validate' => $user->getValidate()->format('Y-m-d H:i:s'),
+            // 'validate' => $user->getValidate()->format('Y-m-d H:i:s'),
             // 'validate' => $user->getValidate(),
             'userType_id' => $user->getUserType_id(),
             'id' => $user->getId()

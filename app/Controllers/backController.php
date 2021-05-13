@@ -36,13 +36,14 @@ use App\Models\SocialNetworkManager;
                     if($userRegister->getPassword() ===  $_POST['password']){
                         session_start();
                        
-                        $_SESSION['connection'] = $userRegister->getId(); //status du user qui se connecte
-                                         
+                        $_SESSION['connection'] = $userRegister->getId(); //creation de la session qui enregistre le id de user qi vient de se connecter
+                        
                         if($userManager->getUserSatus($_SESSION['connection'])['status'] === 'administrateur'){
                             header('Location: /backend/adminPosts');    //si user est administrateur il va sur le bachend admin
                             exit();
-                        }else if($userManager->getUserSatus($_SESSION['connection'])['status'] === 'abonner'){
-                            header('Location: /');    //si user est abonner il va sur le front page home
+                        }else if($userManager->getUserSatus($_SESSION['connection'])['status'] === 'abonner' and !is_null($userRegister->getValidate())){  //si le user qui se connect est de type "abonner" et que sont compte a était valider par l administrateur du site (=> validate ! null)
+                            header('Location: /userFrontDashboard/'.$userRegister->getId());    //si user est abonner il va sur son dashboard
+                            // header('Location: /');    //si user est abonner il va sur le front page home
                             exit();
                         }else {
                             $error = 'votre status ne vous autorise pas a acceder au contenu du site reserver a un certain statut ';
@@ -475,7 +476,12 @@ use App\Models\SocialNetworkManager;
         
         // user
         $user = new User();
-        $user->setValidate(new Datetime()); //to assign today's date (in datetime) by default to the user we create 
+        
+        $dateTime = new Datetime();
+        $date = $dateTime->format('Y-m-d H:i:s'); 
+        $user->setValidate($date);
+        // $user->setValidate(new Datetime()); //to assign today's date (in datetime) by default to the user we create 
+        
         $formUser = new Form($user);
 
         // userType
@@ -512,7 +518,7 @@ use App\Models\SocialNetworkManager;
                 if(empty($errors)){
                     
                     //ISSSUE  gestion des date en datetime dans entité post // base de donnee en string pour la create ou l edit d un post (=>voir methode setDateCreate($dateCreate) de la class Post)
-                    $dateCreate = DateTime::createFromFormat('Y-m-d H:i:s',$_POST['validate']); // pour que la date String soit en Datetime
+                    // $dateCreate = DateTime::createFromFormat('Y-m-d H:i:s',$_POST['validate']); // pour que la date String soit en Datetime
 
                     // if($_POST['dateChange'] === ''){
                     //     $dateChange=NULL;
@@ -523,18 +529,15 @@ use App\Models\SocialNetworkManager;
                         ->setFirstName($_POST['firstName'])
                         ->setLastName($_POST['lastName'])
                         ->setEmail($_POST['email'])
-                        // ->setLogo($_POST['logo'])
                         ->setSlogan($_POST['slogan'])
-                        // ->setSocialNetworks($_POST['socialNetworks'])
                         ->setLogin($_POST['login'])
                         ->setPassword($_POST['password'])
-                        ->setValidate($dateCreate)
                         ->setUserType_id($_POST['userType_id'][0]); //car on cette donnee est issu d'un select multiple
                         // ->setValidate(new Datetime()); //to assign today's date (in datetime) by default to the user we create
                         // ->setValidate(DateTime::createFromFormat('Y-m-d H:i:s',new Datetime())); //to assign today's date (in datetime) by default to the user we create 
 
                     $userManager = new UserManager();
-                    $lastRecordingUser = $userManager->addUser($user);// add the post to the database and get the last id of the posts in the database via the return of the function
+                    $lastRecordingUser = $userManager->addUser($user);// add the user to the database and get the last id of the users in the database via the return of the function
                     
                     // enregistrement en bdd du media logo et du fichier uploader sur le server dans le dossier media
                     if(isset($_FILES['mediaUploadLogo']) AND $_FILES['mediaUploadLogo']['error']== 0){
@@ -596,7 +599,6 @@ use App\Models\SocialNetworkManager;
         // user
         $userManager = new UserManager();
         $user = $userManager->getUser($id);
-
         
         $formUser = new Form($user, true);
 
@@ -654,11 +656,11 @@ use App\Models\SocialNetworkManager;
                 
                     //ISSSUE  gestion des date en datetime dans entité post // base de donnee en string pour la create ou l edit d un post (=>voir methode setDateCreate($dateCreate) de la class Post)
                     //modification pour gerer l enregistrement dans la base de donnee via le Usermanager
-                    $dateValidate = DateTime::createFromFormat('Y-m-d H:i:s', $_POST['validate']); // pour que la date String soit en Datetime
+                    // $dateValidate = DateTime::createFromFormat('Y-m-d H:i:s', $_POST['validate']); // pour que la date String soit en Datetime
 
-                    if($_POST['validate'] === ''){
-                        $validate=NULL;
-                    }
+                    // if($_POST['validate'] === ''){
+                    //     $validate=NULL;
+                    // }
 
                     // enregistrement en bdd du user
                     $user
@@ -670,8 +672,8 @@ use App\Models\SocialNetworkManager;
                         // ->setSocialNetworks($_POST['socialNetworks'])
                         ->setLogin($_POST['login'])
                         ->setPassword($_POST['password'])
-                        ->setValidate($dateValidate)
-                        ->setUserType_id($_POST['userType_id'][0]); //car on cette donnee est issu d'un select multiple
+                        // ->setValidate($dateValidate)
+                        ->setUserType_id($_POST['userType_id'][0]); //car cette donnee est issu d'un select multiple
 
                     $userManager->updateUser($user);
 

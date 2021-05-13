@@ -2,7 +2,6 @@
     <?= $formUser->input('firstName', 'firstName','firstName' ) ?>
     <?= $formUser->input('lastName', 'lastName', 'lastName') ?>
     <?= $formUser->input('email', 'email', 'email') ?>
-    <?= $formUserType->selectSimple('id', 'userType_id', 'statut', $listUserTypesSelect) ?> <!--select des userType -->
     <?= $formUser->input('slogan', 'slogan', 'slogan') ?>
 
     <!-- affichage du logo du user (faudra verifier que le tableau de logo existe bien-->
@@ -25,7 +24,7 @@
 
     <?= $formUser->input('login', 'login', 'login') ?> 
     <?= $formUser->input('password', 'password', 'password') ?>
-
+  
     <button class="btn btn-primary">
         <?php if($user->getId() !==null):?>
             Modifier
@@ -34,5 +33,5 @@
         <?php endif?>
     </button>
 
-    <a href="/backend/adminUsers" class="btn btn-secondary">Administration des users</a>
+   <a href="/" class="btn btn-secondary">Annuler</a>
 </form>

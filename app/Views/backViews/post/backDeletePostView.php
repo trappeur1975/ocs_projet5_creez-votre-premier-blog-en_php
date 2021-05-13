@@ -1,5 +1,5 @@
 <?php 
-$title = 'Delete a post';
+$title = 'Backend Delete a post';
 
 ob_start(); 
 

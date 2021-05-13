@@ -1,5 +1,5 @@
 <?php 
-$title = 'Delete a comment';
+$title = 'Backend Delete a comment';
 
 ob_start(); 
 

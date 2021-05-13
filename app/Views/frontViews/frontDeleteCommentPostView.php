@@ -1,5 +1,5 @@
 <?php 
-$title = 'Delete a comment frontPostView';
+$title = 'Front Delete a comment frontPostView';
 
 ob_start(); 
 
