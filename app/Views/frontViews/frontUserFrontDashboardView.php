@@ -71,7 +71,7 @@ ob_start();
                             Modifier
                         </a>
                         <!-- si on utilise la methode "post" -->
-                        <form action="<?= '/backend/deleteComment/'. $comment->getId()?>" methode="POST"
+                        <form action="<?= '/deleteCommentPostFront/'. $comment->getId()?>" methode="POST"
                             onsubmit="return confirm('Souhaitez vous vraiment executer cette action?')">
                             <button type="submit" class="btn btn-danger">Supprimer</button>
                         </form>

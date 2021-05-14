@@ -18,6 +18,21 @@ class Auth {
         }
         return $validStatus;
     }
+
+    public static function sessionStart(){
+        if(session_status() === PHP_SESSION_NONE){
+            session_start();
+        }
+        if(isset($_SESSION['connection'])){
+            $userManager = new UserManager();
+            $userLogged = $userManager->getUser($_SESSION['connection']);
+
+            return $userLogged;
+        }
+
+        // return null;
+    }
+
     
     /**
      * verifies that the user is connected and that his status allows him to access a feature or part of the site 
@@ -28,10 +43,11 @@ class Auth {
         $userManager = new UserManager();   //nouveau
         $AuthorizedAccess = false;
         
-        if(session_status() === PHP_SESSION_NONE){
-            session_start();
-        }
-
+        $userLogged = self::sessionStart();
+        // if(session_status() === PHP_SESSION_NONE){
+        //     session_start();
+        // }
+        
         if(!isset($_SESSION['connection'])){
             header('Location: /backend/connection?badConnection=true');
         }
@@ -39,8 +55,11 @@ class Auth {
         $AuthorizedAccess = self::validator($authorizedStatutes, $userManager->getUserSatus($_SESSION['connection'])['status']);
 
         if( $AuthorizedAccess !== true){
+            
             header('Location: /backend/connection?badConnection=true');
         }
+        
+        return $userLogged;
     }
 
 }

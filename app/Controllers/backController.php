@@ -38,6 +38,8 @@ use App\Models\SocialNetworkManager;
                        
                         $_SESSION['connection'] = $userRegister->getId(); //creation de la session qui enregistre le id de user qi vient de se connecter
                         
+                        $userLogged = $userRegister;    //pour avoir l'user logger si par la suite dans le code on ne fait pas appel a la function "Auth::check(['administrateur'])" ou "Auth::sessionStart()"
+
                         if($userManager->getUserSatus($_SESSION['connection'])['status'] === 'administrateur'){
                             header('Location: /backend/adminPosts');    //si user est administrateur il va sur le bachend admin
                             exit();
@@ -46,7 +48,8 @@ use App\Models\SocialNetworkManager;
                             // header('Location: /');    //si user est abonner il va sur le front page home
                             exit();
                         }else {
-                            $error = 'votre status ne vous autorise pas a acceder au contenu du site reserver a un certain statut ';
+                            // $error = 'votre status ne vous autorise pas a acceder au contenu du site reserver a un certain statut ';
+                            header('Location: /?unauthorizedAccess=true');
                         }
                     } else { 
                         $error = 'mot de passe incorrect';
@@ -84,7 +87,8 @@ use App\Models\SocialNetworkManager;
      */
     function backHome()
     {
-        Auth::check(['administrateur']);
+        $userLogged = Auth::check(['administrateur']);
+        // Auth::check(['administrateur']);
         // Auth::check();
 
         require('../app/Views/backViews/backHomeView.php');
@@ -97,7 +101,8 @@ use App\Models\SocialNetworkManager;
      */
     function adminPosts()
     {
-        Auth::check(['administrateur']);
+        $userLogged = Auth::check(['administrateur']);
+        // Auth::check(['administrateur']);
         // Auth::check();
         
         $postManager = new PostManager();
@@ -111,7 +116,8 @@ use App\Models\SocialNetworkManager;
      */
     function createPost()
     {
-        Auth::check(['administrateur']);
+        $userLogged = Auth::check(['administrateur']);
+        // Auth::check(['administrateur']);
         // Auth::check();
         
         // post
@@ -234,7 +240,8 @@ use App\Models\SocialNetworkManager;
      */
     function editPost($id)
     {
-        Auth::check(['administrateur']);
+        $userLogged = Auth::check(['administrateur']);
+        // Auth::check(['administrateur']);
         // Auth::check();
 
         // post
@@ -404,7 +411,8 @@ use App\Models\SocialNetworkManager;
      */
     function deletePost($id)
     {
-        Auth::check(['administrateur']);
+        $userLogged = Auth::check(['administrateur']);
+        // Auth::check(['administrateur']);
         // Auth::check();
 
         // on supprime les commentaires lier au post (si il y en a)
@@ -442,7 +450,8 @@ use App\Models\SocialNetworkManager;
      */
     function adminUsers()
     {
-        Auth::check(['administrateur']);
+        $userLogged = Auth::check(['administrateur']);
+        // Auth::check(['administrateur']);
         // Auth::check();
         
         $userManager = new UserManager();
@@ -456,7 +465,8 @@ use App\Models\SocialNetworkManager;
      */
     function adminUsersWaiteValidate()
     {
-        Auth::check(['administrateur']);
+        $userLogged = Auth::check(['administrateur']);
+        // Auth::check(['administrateur']);
         // Auth::check();
         
         $userManager = new UserManager();
@@ -471,7 +481,8 @@ use App\Models\SocialNetworkManager;
      */
     function createUser()
     {
-        Auth::check(['administrateur']);
+        $userLogged = Auth::check(['administrateur']);
+        // Auth::check(['administrateur']);
         // Auth::check();
         
         // user
@@ -593,7 +604,8 @@ use App\Models\SocialNetworkManager;
      */
     function editUser($id)
     {
-        Auth::check(['administrateur']);
+        $userLogged = Auth::check(['administrateur']);
+        // Auth::check(['administrateur']);
         // Auth::check();
               
         // user
@@ -752,7 +764,8 @@ use App\Models\SocialNetworkManager;
      */
     function deleteUser($id)
     {
-        Auth::check(['administrateur']);
+        $userLogged = Auth::check(['administrateur']);
+        // Auth::check(['administrateur']);
         // Auth::check();
   
         $postManager = new PostManager();
@@ -833,7 +846,8 @@ use App\Models\SocialNetworkManager;
      */
     function validateUser($id)
     {
-        Auth::check(['administrateur']);
+        $userLogged = Auth::check(['administrateur']);
+        // Auth::check(['administrateur']);
         // Auth::check();
     
         // on valide le commentaire
@@ -850,7 +864,8 @@ use App\Models\SocialNetworkManager;
      */
     function adminCommentsWaiteValidate()
     {
-        Auth::check(['administrateur']);
+        $userLogged = Auth::check(['administrateur']);
+        // Auth::check(['administrateur']);
         // Auth::check();
 
         $commentManager = new CommentManager();
@@ -866,7 +881,8 @@ use App\Models\SocialNetworkManager;
      */
     function editCommentsPost($id)
     {
-        Auth::check(['administrateur']);
+        $userLogged = Auth::check(['administrateur']);
+        // Auth::check(['administrateur']);
         // Auth::check();
   
         $commentManager = new CommentManager();
@@ -881,7 +897,8 @@ use App\Models\SocialNetworkManager;
      */
     function deleteComment($id)
     {
-        Auth::check(['administrateur']);
+        $userLogged = Auth::check(['administrateur']);
+        // Auth::check(['administrateur']);
         // Auth::check();
     
         // on supprime le commentaire
@@ -897,7 +914,8 @@ use App\Models\SocialNetworkManager;
      */
     function validateComment($id)
     {
-        Auth::check(['administrateur']);
+        $userLogged = Auth::check(['administrateur']);
+        // Auth::check(['administrateur']);
         // Auth::check();
     
         // on valide le commentaire

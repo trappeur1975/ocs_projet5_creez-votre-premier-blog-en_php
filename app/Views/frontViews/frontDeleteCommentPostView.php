@@ -1,4 +1,5 @@
 <?php 
+
 $title = 'Front Delete a comment frontPostView';
 
 ob_start(); 
