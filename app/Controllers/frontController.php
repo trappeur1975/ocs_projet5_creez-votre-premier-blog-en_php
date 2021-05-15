@@ -22,8 +22,6 @@ use App\Models\SocialNetworkManager;
 
         $error = null;
 
-        // session_start();
-
         require('../app/Views/frontViews/frontHomeView.php');
     }
 
@@ -34,14 +32,10 @@ use App\Models\SocialNetworkManager;
     function listPosts()
     {
         $userLogged = Auth::sessionStart();
-        // session_start();
+
         
         $postManager = new PostManager();
-        /**
-         * will be used in "listPostsView.php" in the foreach loop 
-         * 
-         * @ Post[] 
-         * */
+        
         $listPosts = $postManager->getListPosts();
         require('../app/Views/frontViews/frontListPostsView.php');
     }
@@ -53,9 +47,7 @@ use App\Models\SocialNetworkManager;
     function post($id)
     { 
         $userLogged = Auth::sessionStart();
-
-        // session_start();
-        
+      
         // post
         $postManager = new PostManager(); // Création de l'objet manger de post
         $post = $postManager->getPost($id);
@@ -88,32 +80,27 @@ use App\Models\SocialNetworkManager;
             
             if(empty($errors)){
                 Auth::check(['administrateur','abonner']);    
-            // if(empty($errors) AND isset($_SESSION['connection'])){
-            //     if($userManager->getUserSatus($_SESSION['connection'])['status'] === 'administrateur' OR $userManager->getUserSatus($_SESSION['connection'])['status'] === 'abonner'){
-                    $dateTime = new Datetime();
-                    $date = $dateTime->format('Y-m-d H:i:s');
-                    $validate = null;
-                    if($userManager->getUserSatus($_SESSION['connection'])['status'] === 'administrateur'){ //pour valider automatiquement le commentaire si le commentateur a un status "administrateur"
-                        $validate = $date;
-                    }
 
-                    // enregistrement en bdd du comment    
-                    $comment
-                        ->setComment($_POST['comment'])
-                        ->setDateCompletion($date)
-                        ->setValidate($validate)
-                        ->setUser_id($_SESSION['connection']) // --------------POUR LE TESTE J AI MIS USER 3 MAIS IL FAUDRA RECUPERER LE ID DE L USER CONNECTER-----------
-                        ->setPost_id($post->getId())
-                        ;
-                    
-                    $commentManager->addComment($comment);// add the comment to the database and get the last id of the comments in the database via the return of the function
-                    
-                    header('Location: /post/'.$id.'?createdComment=true');
-                // }else{
+                $dateTime = new Datetime();
+                $date = $dateTime->format('Y-m-d H:i:s');
+                $validate = null;
+                if($userManager->getUserSatus($_SESSION['connection'])['status'] === 'administrateur'){ //pour valider automatiquement le commentaire si le commentateur a un status "administrateur"
+                    $validate = $date;
+                }
 
-                //     header('Location: /post/'.$id.'?createdComment=false');
-                // }
-
+                // enregistrement en bdd du comment    
+                $comment
+                    ->setComment($_POST['comment'])
+                    ->setDateCompletion($date)
+                    ->setValidate($validate)
+                    ->setUser_id($_SESSION['connection'])
+                    ->setPost_id($post->getId())
+                    ;
+                
+                $commentManager->addComment($comment);// add the comment to the database and get the last id of the comments in the database via the return of the function
+                
+                header('Location: /post/'.$id.'?createdComment=true');
+ 
             }else{
                 // ISSUE COMMENT TRANSMETTRE UN TABLEAU $errors=[]; DANS LA REDIRECTION CI DESSOUS POUR AFFICHER DANS LA VIEW LES DIFFERENTES ERREORS
                 header('Location: /post/'.$id.'?createdComment=false');
@@ -130,9 +117,7 @@ use App\Models\SocialNetworkManager;
     function editCommentPostFront($id)
     {
         $userLogged = Auth::check(['administrateur','abonner']);
-        // Auth::check(['administrateur','abonner']);
-
-        
+   
         // on edit le commentaire (a travers son formulaire)
         $commentManager = new CommentManager();
         $comment = $commentManager->getComment($id);
@@ -179,16 +164,13 @@ use App\Models\SocialNetworkManager;
      */
     function deleteCommentPostFront($id)
     {
-
         $userLogged = Auth::check(['administrateur','abonner']);
-        // Auth::check(['administrateur','abonner']);
-        
+    
         // on supprime le commentaire
         $commentManager = new CommentManager();
         $comment = $commentManager->getComment($id);
         
         if($comment->getUser_id() === $_SESSION['connection']){ //on verifier que le commentaire que le user souhaite modifier lui appartient bien
-            // $commentManager->deleteComment($id);
             $comment = $commentManager->deleteComment($id);
 
             require('../app/Views/frontViews/frontDeleteCommentPostView.php');
@@ -205,14 +187,12 @@ use App\Models\SocialNetworkManager;
     function userFrontDashboard($id)
     {
         $userLogged = Auth::check(['abonner']);
-        // Auth::check(['abonner']);
 
         // users
         $userManager = new UserManager();
         $user = $userManager->getUser($id); //user of dashboard
 
         if($user->getId() === $_SESSION['connection']){ //on verifier que le dashboard que le user souhaite visualiser est bien le sien
-        // if($user->getId() === $_SESSION['connection'] OR $userLogged->getUserType_id() == 2){ //on verifier que le dashboard que le user souhaite visualiser est bien le sien ou que le user a un status d'administrateur
 
             // EDIT DU USER DASHBOARD
                 // userDasboard 
@@ -240,7 +220,6 @@ use App\Models\SocialNetworkManager;
                 $formSocialNetwork = new Form($socialNetwork);
 
                 $listSocialNetworksForUser = $socialNetworkManager->getListSocialNetworksForUser($id);
-                // $listSocialNetworksForUser = $socialNetworkManager->getListSocialNetworksForUser($user->getId());
                 $listSocialNetworksForUserForSelect =  $socialNetworkManager->listSocialNetworksFormSelect($listSocialNetworksForUser); // on affiche la liste des social network de l'user 
 
                 if(!empty($listSocialNetworksForUser)){
@@ -277,22 +256,17 @@ use App\Models\SocialNetworkManager;
                             
                             // variables infos
                             $idMediaType = 2;   //logo
-                            
+
                             $file = $_FILES['mediaUploadLogo']; //fichier uploader
-                            $storagePath = './media/'; //chemin de stockage du fichier uploader
-                            $fileType = 'image'; //type de fichier uploader
-                            $maxFileSize = 500000; //taille maximum du fichier uploader autorise
-                            
-                            $name = 'mediaLogo-'.pathinfo($_FILES['mediaUploadLogo']['name'])['filename'].'-';
+                            $storagePath = searchDatasFile('imageStoragePath')[1]; //chemin de stockage du fichier uploader (voir fichier globalFunctions.php)         
+                            $name = 'mediaLogo-'.pathinfo($file['name'])['filename'].'-'; 
                             $newNameUploaderFile = uniqid($name , true);    // concatenation "media-" + nom du fichier uploader(sans son extension + identifiant unique (via uniqid) pour avoir un identifiant unique
-                            
-                            $extension_upload = pathinfo($_FILES['mediaUploadLogo']['name'])['extension']; //pour recuperer l'extension du fichier uploader
-                            $pathFile = './media/'.basename($newNameUploaderFile.'.'.$extension_upload); //chemin de stockage  avec nouveau nom du media uploader
+    
+                            $extension_upload = pathinfo($file['name'])['extension']; //pour recuperer l'extension du fichier uploader   
+                            $pathFile =  $storagePath.basename($newNameUploaderFile.'.'.$extension_upload); //chemin de stockage  avec nouveau nom du media uploader
                         
                             // on supprime en base de donnée ainsi que sur le server dans le dossier media l'ancien logo de l'user    
                             $listMediasForUser = $mediaManager->getListMediasForUser($id);
-                            // $listMediasForUser = $mediaManager->getListMediasForUser($user->getId());
-                            // $listIdsMediaType = [2];  //logo
                             $listLogosDelete = $mediaManager->getListMediasForUserForType($listMediasForUser, $listIdsMediaType);   // on recuperer la liste des logos du user
                         
                             if(!empty($listLogosDelete)){
@@ -307,12 +281,12 @@ use App\Models\SocialNetworkManager;
                                 ->setPath($pathFile)    // ->setPath('./media/media-19.jpg')
                                 ->setAlt($_POST['altFileMediaLogo'])
                                 ->setStatutActif(1)
-                                ->setMediaType_id(2)
+                                ->setMediaType_id($idMediaType)
                                 ->setUser_id($id)
                                 // ->setUser_id($user->getId())
                                 ;
                             
-                            $mediaManager->addMediaImage($mediaUploadLogo, $file, $storagePath, $fileType, $maxFileSize, $newNameUploaderFile); //adding the media to the database and recovery via the id function of the last media in the database
+                            $mediaManager->addMediaImage($mediaUploadLogo, CONFIGFILE, $file); //adding the media to the database and recovery via the id function of the last media in the database
                         }
 
                         // enregistrement en bdd socialNetwork des modifications qui ont etait apporté dans l'editUser()   
@@ -328,18 +302,15 @@ use App\Models\SocialNetworkManager;
                                 $socialNetwork
                                     ->setUrl($_POST['socialNetwork'])
                                     ->setUser_id($id)
-                                    // ->setUser_id($user->getId())
                                     ;
                                 
                                 $socialNetworkManager->addSocialNetwork($socialNetwork);
                             }
 
                         header('Location: /userFrontDashboard/'.$id.'?successEditUser=true');
-                        // header('Location: /userFrontDashboard/'.$user->getId().'?successEditUser=true');
                     }else{
                         // ISSUE COMMENT TRANSMETTRE UN TABLEAU $errors=[]; DANS LA REDIRECTION CI DESSOUS POUR AFFICHER DANS LA VIEW LES DIFFERENTES ERREORS
                         header('Location: /userFrontDashboard/'.$id().'?successEditUser=false');
-                        // header('Location: /userFrontDashboard/'.$user->getId().'?successEditUser=false');
                     }
             }
             
@@ -401,27 +372,26 @@ use App\Models\SocialNetworkManager;
                     if(isset($_FILES['mediaUploadLogo']) AND $_FILES['mediaUploadLogo']['error']== 0){
                         
                         // variables infos
+                        $idMediaType = 2;   //logo
+
                         $file = $_FILES['mediaUploadLogo']; //fichier uploader
-                        $storagePath = './media/'; //chemin de stockage du fichier uploader
-                        $fileType = 'image'; //type de fichier uploader
-                        $maxFileSize = 500000; //taille maximum du fichier uploader autorise
-                        
-                        $name = 'mediaLogo-'.pathinfo($_FILES['mediaUploadLogo']['name'])['filename'].'-';
+                        $storagePath = searchDatasFile('imageStoragePath')[1]; //chemin de stockage du fichier uploader (voir fichier globalFunctions.php)         
+                        $name = 'mediaLogo-'.pathinfo($file['name'])['filename'].'-'; 
                         $newNameUploaderFile = uniqid($name , true);    // concatenation "media-" + nom du fichier uploader(sans son extension + identifiant unique (via uniqid) pour avoir un identifiant unique
-                        
-                        $extension_upload = pathinfo($_FILES['mediaUploadLogo']['name'])['extension']; //pour recuperer l'extension du fichier uploader
-                        $pathFile = './media/'.basename($newNameUploaderFile.'.'.$extension_upload); //chemin de stockage  avec nouveau nom du media uploader
+
+                        $extension_upload = pathinfo($file['name'])['extension']; //pour recuperer l'extension du fichier uploader   
+                        $pathFile =  $storagePath.basename($newNameUploaderFile.'.'.$extension_upload); //chemin de stockage  avec nouveau nom du media uploader
 
                         // enregistrement en bdd du media LOGO
                         $mediaUploadLogo
                             ->setPath($pathFile)    // ->setPath('./media/media-19.jpg')
                             ->setAlt($_POST['altFileMediaLogo'])
                             ->setStatutActif(1)
-                            ->setMediaType_id(2)
+                            ->setMediaType_id($idMediaType)
                             ->setUser_id($lastRecordingUser)
                             ;
                         
-                        $mediaManager->addMediaImage($mediaUploadLogo, $file, $storagePath, $fileType, $maxFileSize, $newNameUploaderFile); //adding the media to the database and recovery via the id function of the last media in the database
+                        $mediaManager->addMediaImage($mediaUploadLogo, CONFIGFILE, $file); //adding the media to the database and recovery via the id function of the last media in the database
                     }
                     
                     // enregistrement en bdd du socialNetwork
@@ -436,11 +406,9 @@ use App\Models\SocialNetworkManager;
                     }
 
                     header('Location: /createUserFront?createdUser=true');
-                    // header('Location: /backend/editUser/'.$lastRecordingUser.'?created=true');
                 }else{
                     // ISSUE COMMENT TRANSMETTRE UN TABLEAU $errors=[]; DANS LA REDIRECTION CI DESSOUS POUR AFFICHER DANS LA VIEW LES DIFFERENTES ERREORS
                     header('Location: /createUserFront?createdUser=false');
-                    // header('Location: /backend/createUser?created=false');
                 }
         }
         
@@ -454,7 +422,6 @@ use App\Models\SocialNetworkManager;
     function deleteUserFront($id){
 
         $userLogged = Auth::check(['abonner']);
-        // Auth::check(['abonner']);
 
         // users
         $userManager = new UserManager();

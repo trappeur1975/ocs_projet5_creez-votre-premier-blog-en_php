@@ -7,6 +7,7 @@ use App\Entities\Post;
 use App\Entities\User;
 use App\Entities\Media;
 
+
 /**
  * MediaManager
  * 
@@ -14,21 +15,6 @@ use App\Entities\Media;
  */
 class MediaManager extends Manager
 {    
-  
-    private $validVideos =['youtube', 'vimeo', 'netfix'];
-
-    private function validateVideo(String $PathVideo){
-        $trouver = false;
-        // if (!empty($PathVideo)){
-            foreach($this->validVideos as $video){
-                if(strpos($PathVideo, $video)){
-                    $trouver = true;
-                    break;
-                }
-            }
-        // }
-        return $trouver;
-    }
 
     /**
      * Method getListMedias which returns the list of media (as an object of type Media) 
@@ -42,10 +28,6 @@ class MediaManager extends Manager
         $query = $db->prepare('SELECT * FROM mediaType 
                                 INNER JOIN media
                                 ON mediaType.id = media.mediaType_id');
-        /*OBLIGER DE le code ci dessus car avec le code ci dessous on ne recupere pas les id de la table "media" mais ceux de la table "mediaType"
-        $query = $db->prepare('SELECT * FROM media 
-                                INNER JOIN mediaType
-                                ON media.mediaType_id = mediaType.id');*/
         $query->execute();
         $listMedias = $query ->fetchAll(PDO::FETCH_CLASS, Media::class);
         return $listMedias;
@@ -75,10 +57,31 @@ class MediaManager extends Manager
         return $media;
     }
 
-    // ajoute le media Image (en attribut de cette fonction) a la table media en bdd
-    public function addMediaImage(Media $media, array $file, String $storagePath, String $fileType, int $maxFileSize, $newNameUploaderFile)
+    /**
+     * ajoute le media Image (en attribut de cette fonction) a la table media en bdd
+     *
+     * @param Media $mediaImage media que l'on souhaite suavegarder en base de donnee
+     * @param $fileConfig fichier de configuration du site qui comporte des infos concernant les media images notamment
+     * @param $fileUploader fichier (media image) qui a été uploader sur le site et que l on souhaite sauvegarder du le serveur dans le dossier (public > media)
+     * 
+     * @return Media the content of the media
+     */
+    public function addMediaImage($mediaImage, $fileConfig, $fileUploader)
     {
-        if($this->validateFileForUpload($file, $fileType, $maxFileSize)){
+        $fileName = $fileUploader ['name'];
+        $fileInfos = pathinfo($fileName);
+        $fileTypeUpload = $fileInfos['extension'];
+        
+        //on verifier que le type du fichier uploader est bien autorisé a etre sauvegardé sur le site (base de donnee et serveur)
+        $authorizedFileTypes = searchDatasFile('image');   //voir fichier globalFunctions.php
+        $validateFile = validateData($authorizedFileTypes, $fileTypeUpload);  //voir fichier globalFunctions.php
+
+        $authorizedMaxFileSize = searchDatasFile('maxFileSizeImage')[1]; //taille maximum du fichier uploader autorise 
+        $validateFileSize = $fileUploader['size'] <= $authorizedMaxFileSize; //VERIFIER SI CELA MARCHE AVEC STRING CAS OU LE CHIFFRE DEVIENT DES STRING
+
+        if($validateFile AND $validateFileSize){
+
+            // on sauvegarde en base de donnee
             $db = $this->dbConnect();
             
             $query = $db->prepare('INSERT INTO media SET path = :path, 
@@ -88,26 +91,35 @@ class MediaManager extends Manager
                                                         post_id = :post_id,
                                                         user_id = :user_id');
             $result = $query->execute([
-                'path' => $media->getPath(),
-                'alt' => $media->getAlt(),
-                'statutActif'=> $media->getStatutActif(),
-                'mediaType_id' => $media->getMediaType_id(),
-                'post_id' => $media->getPost_id(),
-                'user_id' => $media->getUser_id()
+                'path' => $mediaImage->getPath(),
+                'alt' => $mediaImage->getAlt(),
+                'statutActif'=> $mediaImage->getStatutActif(),
+                'mediaType_id' => $mediaImage->getMediaType_id(),
+                'post_id' => $mediaImage->getPost_id(),
+                'user_id' => $mediaImage->getUser_id()
                 ]);
-
-            if($result === true){           
-                $this->uploadFile($file, $storagePath, $newNameUploaderFile);
+            
+            //on transfert le fichier uploader sur le site de son dossier de stockage temporaire a son dossier de stockage définitif
+            if($result === true){
+                $from = $fileUploader ['tmp_name']; //chemin temporaire de stockage du fichier uploader + son nom
+                $to = $mediaImage->getPath();
+              
+                move_uploaded_file( $from, $to);
+                return $to;
             }
         } else {
             throw new Exception('impossible de creer l enregistrement du media Image (peut etre l extension du fichier, son poids, ...)');
         }
     }
-
+    
     // ajoute le media Video (en attribut de cette fonction) a la table media en bdd
-    public function addMediaVideo(Media $media)
+    public function addMediaVideo(Media $mediaVideo)
     {
-        if($this->validateVideo($media->getPath())){
+        //on verifier que le type du fichier uploader est bien autorisé a etre sauvegardé sur le site (base de donnee et serveur)
+        $authorizedFileTypes = searchDatasFile('video');   //voir fichier globalFunctions.php
+        $validateVideo = validateWordinString($authorizedFileTypes, $mediaVideo->getPath());
+
+        if($validateVideo){
             $db = $this->dbConnect();
             $query = $db->prepare('INSERT INTO media SET path = :path, 
                                                         alt = :alt,
@@ -116,12 +128,12 @@ class MediaManager extends Manager
                                                         post_id = :post_id,
                                                         user_id = :user_id');
             $result = $query->execute([
-                'path' => $media->getPath(),
-                'alt' => $media->getAlt(),
-                'statutActif'=> $media->getStatutActif(),
-                'mediaType_id' => $media->getMediaType_id(),
-                'post_id' => $media->getPost_id(),
-                'user_id' => $media->getUser_id()
+                'path' => $mediaVideo->getPath(),
+                'alt' => $mediaVideo->getAlt(),
+                'statutActif'=> $mediaVideo->getStatutActif(),
+                'mediaType_id' => $mediaVideo->getMediaType_id(),
+                'post_id' => $mediaVideo->getPost_id(),
+                'user_id' => $mediaVideo->getUser_id()
                 ]);
         } else {
             throw new Exception('impossible de creer l enregistrement du media video');
@@ -145,7 +157,7 @@ class MediaManager extends Manager
         }
     }
 
-// ----------------------------- methode specifique --------------------------
+    // ----------------------------- methode specifique --------------------------
     /**
      * Method getMediasForPost method that returns the list of media linked to a post 
      *

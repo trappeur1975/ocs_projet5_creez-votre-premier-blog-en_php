@@ -102,11 +102,19 @@ use App\Models\SocialNetworkManager;
     function adminPosts()
     {
         $userLogged = Auth::check(['administrateur']);
-        // Auth::check(['administrateur']);
-        // Auth::check();
+
+        // -----------teste lecture de fichier--------
+        // $myFile = fopen(CONFIGFILE, 'r');
+        // $datas= searchDatasFile($myFile, 'videos');
+        // dd(validateData($datas, 'vimeo'));
+
+        // dd(searchDataFile($myFile, 'videos', 'youtube'));
+        // dd(searchDataFile($myFile, 'imageStoragePath', 'imageStoragePath'));
+        // ----------fin teste lecture de fichier------------
         
         $postManager = new PostManager();
         $listPosts = $postManager->getListPosts();
+        
         require('../app/Views/backViews/post/backAdminPostsView.php');
     }
 
@@ -117,8 +125,6 @@ use App\Models\SocialNetworkManager;
     function createPost()
     {
         $userLogged = Auth::check(['administrateur']);
-        // Auth::check(['administrateur']);
-        // Auth::check();
         
         // post
         $post = new Post();
@@ -179,29 +185,30 @@ use App\Models\SocialNetworkManager;
                    
                     //media IMAGE
                     if(isset($_FILES['mediaUploadImage']) AND $_FILES['mediaUploadImage']['error']== 0){
+                                                 
                         // variables infos
-                        $file = $_FILES['mediaUploadImage']; //fichier uploader
-                        $storagePath = './media/'; //chemin de stockage du fichier uploader
-                        $fileType = 'image'; //type de fichier uploader
-                        $maxFileSize = 500000; //taille maximum du fichier uploader autorise
+                        $idMediaType = 1;   //image
                         
-                        $name = 'mediaImage-'.pathinfo($_FILES['mediaUploadImage']['name'])['filename'].'-';
+                        $file = $_FILES['mediaUploadImage']; //fichier uploader
+                        $storagePath = searchDatasFile('imageStoragePath')[1]; //chemin de stockage du fichier uploader (voir fichier globalFunctions.php)         
+                        $name = 'mediaImage-'.pathinfo($file['name'])['filename'].'-'; 
                         $newNameUploaderFile = uniqid($name , true);    // concatenation "media-" + nom du fichier uploader(sans son extension + identifiant unique (via uniqid) pour avoir un identifiant unique
                         
-                        $extension_upload = pathinfo($_FILES['mediaUploadImage']['name'])['extension']; //pour recuperer l'extension du fichier uploader
-                        $pathFile = './media/'.basename($newNameUploaderFile.'.'.$extension_upload); //chemin de stockage  avec nouveau nom du media uploader
-                        
+                        $extension_upload = pathinfo($file['name'])['extension']; //pour recuperer l'extension du fichier uploader   
+                        $pathFile =  $storagePath.basename($newNameUploaderFile.'.'.$extension_upload); //chemin de stockage  avec nouveau nom du media uploader
+
                         // enregistrement en bdd du media IMAGE et du fichier uploader sur le server dans le dossier media
                         $mediaUploadImage
                             ->setPath($pathFile)    // ->setPath('./media/media-19.jpg')
                             ->setAlt($_POST['altFileMediaImage'])
                             ->setStatutActif(1) //actif
-                            ->setMediaType_id(1)    //image
+                            ->setMediaType_id($idMediaType)
                             ->setPost_id($lastRecordingPost)
                             ->setUser_id($_POST['user'])
                             ;
+                        
                         //try{
-                        $mediaManager->addMediaImage($mediaUploadImage, $file, $storagePath, $fileType, $maxFileSize, $newNameUploaderFile); //adding the media to the database and recovery via the id function of the last media in the database
+                            $mediaManager->addMediaImage($mediaUploadImage, CONFIGFILE, $file); //adding the media to the database and recovery via the id function of the last media in the database
                     // } catch {
                     //     $errorMessage  que l on passe a ma vue
                     // }
@@ -241,8 +248,6 @@ use App\Models\SocialNetworkManager;
     function editPost($id)
     {
         $userLogged = Auth::check(['administrateur']);
-        // Auth::check(['administrateur']);
-        // Auth::check();
 
         // post
         $postManager = new PostManager();
@@ -253,7 +258,6 @@ use App\Models\SocialNetworkManager;
         }
         $formPost = new Form($post, true);    //pour pouvoir creer le formulaire de post (grace aux fonction qui creer les champs)
 
- 
         // users
         $userManager = new UserManager();
         $user = $userManager->getUser($post->getUser_id());   // sera utiliser dans "$formPost = new Form($post);" ci dessous qui permettra de creer les champs propre au $post (via l entité "Form.php")
@@ -336,28 +340,28 @@ use App\Models\SocialNetworkManager;
                             // ajout du media si un upload image a ete fait lors de l edit du post
                             if(isset($_FILES['mediaUploadImage']) AND $_FILES['mediaUploadImage']['error']== 0){
                                 // variables infos
+                                $idMediaType = 1;   //image
+
                                 $file = $_FILES['mediaUploadImage']; //fichier uploader
-                                $storagePath = './media/'; //chemin de stockage du fichier uploader
-                                $fileType = 'image'; //type de fichier uploader
-                                $maxFileSize = 500000; //taille maximum du fichier uploader autorise    
-                                  
-                                $name = 'mediaImage-'.pathinfo($_FILES['mediaUploadImage']['name'])['filename'].'-';
+                                $storagePath = searchDatasFile('imageStoragePath')[1]; //chemin de stockage du fichier uploader (voir fichier globalFunctions.php)         
+                                $name = 'mediaImage-'.pathinfo($file['name'])['filename'].'-';
                                 $newNameUploaderFile = uniqid($name , true);    // concatenation "media-" + nom du fichier uploader(sans son extension + identifiant unique (via uniqid) pour avoir un identifiant unique
                                 
-                                $extension_upload = pathinfo($_FILES['mediaUploadImage']['name'])['extension']; //pour recuperer l'extension du fichier uploader
-                                $pathFile = './media/'.basename($newNameUploaderFile.'.'.$extension_upload); //chemin de stockage  avec nouveau nom du media uploader
+                                $extension_upload = pathinfo($file['name'])['extension']; //pour recuperer l'extension du fichier uploader   
+                                $pathFile =  $storagePath.basename($newNameUploaderFile.'.'.$extension_upload); //chemin de stockage  avec nouveau nom du media uploader
 
                                 // enregistrement en bdd du media IMAGE et du fichier uploader sur le server dans le dossier media
+                                
                                 $mediaUploadImage
                                     ->setPath($pathFile)    // ->setPath('./media/media-19.jpg')
                                     ->setAlt($_POST['altFileMediaImage'])
                                     ->setStatutActif(1) //actif
-                                    ->setMediaType_id(1)    //image
+                                    ->setMediaType_id($idMediaType)
                                     ->setPost_id($post->getId())
                                     ->setUser_id($_POST['user'])
                                     ;
                                 
-                                $mediaManager->addMediaImage($mediaUploadImage, $file, $storagePath, $fileType, $maxFileSize, $newNameUploaderFile); //adding the media to the database and recovery via the id function of the last media in the database
+                                    $mediaManager->addMediaImage($mediaUploadImage, CONFIGFILE, $file); //adding the media to the database and recovery via the id function of the last media in the database
                             }          
                             
                             // ajout du media si un upload video a ete fait lors de l edit du post
@@ -412,9 +416,7 @@ use App\Models\SocialNetworkManager;
     function deletePost($id)
     {
         $userLogged = Auth::check(['administrateur']);
-        // Auth::check(['administrateur']);
-        // Auth::check();
-
+ 
         // on supprime les commentaires lier au post (si il y en a)
         $commentManager = new CommentManager();
         $listCommentsDelete = $commentManager->getListCommentsForPost($id);
@@ -451,8 +453,6 @@ use App\Models\SocialNetworkManager;
     function adminUsers()
     {
         $userLogged = Auth::check(['administrateur']);
-        // Auth::check(['administrateur']);
-        // Auth::check();
         
         $userManager = new UserManager();
         $listUsers = $userManager->getListUsers();
@@ -466,9 +466,7 @@ use App\Models\SocialNetworkManager;
     function adminUsersWaiteValidate()
     {
         $userLogged = Auth::check(['administrateur']);
-        // Auth::check(['administrateur']);
-        // Auth::check();
-        
+      
         $userManager = new UserManager();
         $listUsersWaiteValidate = $userManager->listUsersWaiteValidate();
 
@@ -482,9 +480,7 @@ use App\Models\SocialNetworkManager;
     function createUser()
     {
         $userLogged = Auth::check(['administrateur']);
-        // Auth::check(['administrateur']);
-        // Auth::check();
-        
+ 
         // user
         $user = new User();
         
@@ -554,27 +550,26 @@ use App\Models\SocialNetworkManager;
                     if(isset($_FILES['mediaUploadLogo']) AND $_FILES['mediaUploadLogo']['error']== 0){
                         
                         // variables infos
+                        $idMediaType = 2;   //logo
+
                         $file = $_FILES['mediaUploadLogo']; //fichier uploader
-                        $storagePath = './media/'; //chemin de stockage du fichier uploader
-                        $fileType = 'image'; //type de fichier uploader
-                        $maxFileSize = 500000; //taille maximum du fichier uploader autorise
-                        
-                        $name = 'mediaLogo-'.pathinfo($_FILES['mediaUploadLogo']['name'])['filename'].'-';
+                        $storagePath = searchDatasFile('imageStoragePath')[1]; //chemin de stockage du fichier uploader (voir fichier globalFunctions.php)         
+                        $name = 'mediaLogo-'.pathinfo($file['name'])['filename'].'-'; 
                         $newNameUploaderFile = uniqid($name , true);    // concatenation "media-" + nom du fichier uploader(sans son extension + identifiant unique (via uniqid) pour avoir un identifiant unique
-                        
-                        $extension_upload = pathinfo($_FILES['mediaUploadLogo']['name'])['extension']; //pour recuperer l'extension du fichier uploader
-                        $pathFile = './media/'.basename($newNameUploaderFile.'.'.$extension_upload); //chemin de stockage  avec nouveau nom du media uploader
+
+                        $extension_upload = pathinfo($file['name'])['extension']; //pour recuperer l'extension du fichier uploader   
+                        $pathFile =  $storagePath.basename($newNameUploaderFile.'.'.$extension_upload); //chemin de stockage  avec nouveau nom du media uploader
 
                         // enregistrement en bdd du media LOGO
                         $mediaUploadLogo
                             ->setPath($pathFile)    // ->setPath('./media/media-19.jpg')
                             ->setAlt($_POST['altFileMediaLogo'])
                             ->setStatutActif(1)
-                            ->setMediaType_id(2)
+                            ->setMediaType_id($idMediaType)
                             ->setUser_id($lastRecordingUser)
                             ;
                         
-                        $mediaManager->addMediaImage($mediaUploadLogo, $file, $storagePath, $fileType, $maxFileSize, $newNameUploaderFile); //adding the media to the database and recovery via the id function of the last media in the database
+                        $mediaManager->addMediaImage($mediaUploadLogo, CONFIGFILE, $file); //adding the media to the database and recovery via the id function of the last media in the database
                     }
                     
                     // enregistrement en bdd du socialNetwork
@@ -605,8 +600,6 @@ use App\Models\SocialNetworkManager;
     function editUser($id)
     {
         $userLogged = Auth::check(['administrateur']);
-        // Auth::check(['administrateur']);
-        // Auth::check();
               
         // user
         $userManager = new UserManager();
@@ -679,12 +672,9 @@ use App\Models\SocialNetworkManager;
                         ->setFirstName($_POST['firstName'])
                         ->setLastName($_POST['lastName'])
                         ->setEmail($_POST['email'])
-                        // ->setLogo($_POST['logo'])
                         ->setSlogan($_POST['slogan'])
-                        // ->setSocialNetworks($_POST['socialNetworks'])
                         ->setLogin($_POST['login'])
                         ->setPassword($_POST['password'])
-                        // ->setValidate($dateValidate)
                         ->setUserType_id($_POST['userType_id'][0]); //car cette donnee est issu d'un select multiple
 
                     $userManager->updateUser($user);
@@ -696,19 +686,15 @@ use App\Models\SocialNetworkManager;
                         $idMediaType = 2;   //logo
                         
                         $file = $_FILES['mediaUploadLogo']; //fichier uploader
-                        $storagePath = './media/'; //chemin de stockage du fichier uploader
-                        $fileType = 'image'; //type de fichier uploader
-                        $maxFileSize = 500000; //taille maximum du fichier uploader autorise
-                        
-                        $name = 'mediaLogo-'.pathinfo($_FILES['mediaUploadLogo']['name'])['filename'].'-';
+                        $storagePath = searchDatasFile('imageStoragePath')[1]; //chemin de stockage du fichier uploader (voir fichier globalFunctions.php)         
+                        $name = 'mediaLogo-'.pathinfo($file['name'])['filename'].'-'; 
                         $newNameUploaderFile = uniqid($name , true);    // concatenation "media-" + nom du fichier uploader(sans son extension + identifiant unique (via uniqid) pour avoir un identifiant unique
-                        
-                        $extension_upload = pathinfo($_FILES['mediaUploadLogo']['name'])['extension']; //pour recuperer l'extension du fichier uploader
-                        $pathFile = './media/'.basename($newNameUploaderFile.'.'.$extension_upload); //chemin de stockage  avec nouveau nom du media uploader
+
+                        $extension_upload = pathinfo($file['name'])['extension']; //pour recuperer l'extension du fichier uploader   
+                        $pathFile =  $storagePath.basename($newNameUploaderFile.'.'.$extension_upload); //chemin de stockage  avec nouveau nom du media uploader
                        
                         // on supprime en base de donnée ainsi que sur le server dans le dossier media l'ancien logo de l'user    
                         $listMediasForUser = $mediaManager->getListMediasForUser($user->getId());
-                        // $listIdsMediaType = [2];  //logo
                         $listLogosDelete = $mediaManager->getListMediasForUserForType($listMediasForUser, $listIdsMediaType);   // on recuperer la liste des logos du user
                        
                         if(!empty($listLogosDelete)){
@@ -723,11 +709,11 @@ use App\Models\SocialNetworkManager;
                             ->setPath($pathFile)    // ->setPath('./media/media-19.jpg')
                             ->setAlt($_POST['altFileMediaLogo'])
                             ->setStatutActif(1)
-                            ->setMediaType_id(2)
+                            ->setMediaType_id($idMediaType)
                             ->setUser_id($user->getId())
                             ;
                         
-                        $mediaManager->addMediaImage($mediaUploadLogo, $file, $storagePath, $fileType, $maxFileSize, $newNameUploaderFile); //adding the media to the database and recovery via the id function of the last media in the database
+                        $mediaManager->addMediaImage($mediaUploadLogo, CONFIGFILE, $file); //adding the media to the database and recovery via the id function of the last media in the database
                     }
 
                     // enregistrement en bdd socialNetwork des modifications qui ont etait apporté dans l'editUser()   
@@ -765,8 +751,6 @@ use App\Models\SocialNetworkManager;
     function deleteUser($id)
     {
         $userLogged = Auth::check(['administrateur']);
-        // Auth::check(['administrateur']);
-        // Auth::check();
   
         $postManager = new PostManager();
         $listPostsForUser = $postManager->getListPostsForUser($id);
@@ -775,13 +759,12 @@ use App\Models\SocialNetworkManager;
 
         $commentManager = new CommentManager();
 
-        // suppression de la base de donnee de tout les commentaires de l'user
-        
+        // suppression de la base de donnee de tout les commentaires de l'user    
         $listCommentsDelete = $commentManager->listCommentsForUser($id);
 
         if($listCommentsDelete !== []){
             foreach($listCommentsDelete as $comment){
-                $commentManager->deleteComment($comment->getId());    //suppression dans la base de donnée
+                $commentManager->deleteComment($comment->getId());  //suppression dans la base de donnée
             }
         }
 
@@ -847,8 +830,6 @@ use App\Models\SocialNetworkManager;
     function validateUser($id)
     {
         $userLogged = Auth::check(['administrateur']);
-        // Auth::check(['administrateur']);
-        // Auth::check();
     
         // on valide le commentaire
         $usertManager = new userManager();
@@ -865,8 +846,6 @@ use App\Models\SocialNetworkManager;
     function adminCommentsWaiteValidate()
     {
         $userLogged = Auth::check(['administrateur']);
-        // Auth::check(['administrateur']);
-        // Auth::check();
 
         $commentManager = new CommentManager();
         $listCommentsWaiteValidate = $commentManager->listCommentsWaiteValidate();
@@ -882,8 +861,6 @@ use App\Models\SocialNetworkManager;
     function editCommentsPost($id)
     {
         $userLogged = Auth::check(['administrateur']);
-        // Auth::check(['administrateur']);
-        // Auth::check();
   
         $commentManager = new CommentManager();
         $listCommentsForPost = $commentManager->getListCommentsForPost($id);
@@ -898,8 +875,6 @@ use App\Models\SocialNetworkManager;
     function deleteComment($id)
     {
         $userLogged = Auth::check(['administrateur']);
-        // Auth::check(['administrateur']);
-        // Auth::check();
     
         // on supprime le commentaire
         $commentManager = new CommentManager();
@@ -915,8 +890,6 @@ use App\Models\SocialNetworkManager;
     function validateComment($id)
     {
         $userLogged = Auth::check(['administrateur']);
-        // Auth::check(['administrateur']);
-        // Auth::check();
     
         // on valide le commentaire
         $commentManager = new CommentManager();
