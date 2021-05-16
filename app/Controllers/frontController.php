@@ -428,8 +428,7 @@ use App\Models\SocialNetworkManager;
         $user = $userManager->getUser($id); //user of dashboard
 
         if($user->getId() === $_SESSION['connection']){ //on verifier que le user que l on souhaite supprimer correspond bien au user connecté sur le site
-            $mediaManager = new MediaManager();
-
+            
             // suppression de la base de donnee de tout les commentaires de l'user
             $commentManager = new CommentManager();
             $listCommentsDelete = $commentManager->listCommentsForUser($id);
@@ -441,6 +440,7 @@ use App\Models\SocialNetworkManager;
             }
 
             // suppression de tout les medias lié a l'user (les logos, image desactiver, ...) pour les supprimer du server (dossier media) et de la base de donnée
+            $mediaManager = new MediaManager();
             $listMedias = $mediaManager->getListMediasForUser($id); // on recuperer la liste des logos du user
 
             if(!empty($listMedias)){
@@ -457,6 +457,37 @@ use App\Models\SocialNetworkManager;
             if(!empty($listSocialNetworksForUserDelete)){
                 foreach($listSocialNetworksForUserDelete as $socialnetwork){
                     $socialNetworkManager->deleteSocialNetwork($socialnetwork->getId());    //suppression dans la base de donnée  
+                }
+            }
+
+            //supression de tout les post lier a l'user ATTENTION FONCTIONNALITE NON PREVU PAR LE SUJET MAIS RENDU POSSIBLE PAR MOI CAR ADMINISTRATEUR (en backend) PEUT ATTRIBUER UN POST (avec ses medias et commentaire) A UN USER
+            $postManager = new PostManager();
+            $listPostsForUser = $postManager->getListPostsForUser($id);
+
+            if(!empty($listPostsForUser)){
+                foreach($listPostsForUser as $post){    // suppression de tout les post (et des medias que leurs sont associés) de l user
+                    
+                    // on supprime les medias lier au post (si il y en a)
+                    $listMediasDelete =  $mediaManager->getListMediasForPost($post->getId());// on recupere la liste des media pour ce $post
+
+                    if($listMediasDelete !== []){
+                        foreach($listMediasDelete as $media){
+                            unlink($media->getPath());  //suppression des media sur le serveur dans le dossier media
+                            $mediaManager->deleteMedia($media->getId());    //suppression dans la base de donnée
+                        }
+                    }
+
+                    // on supprime les commentaires lier au post (si il y en a)
+                    $listCommentsDelete =  $commentManager->getListCommentsForPost($post->getId());// on recupere la liste des commentaire pour ce $post
+                    
+                    if($listCommentsDelete !== []){
+                        foreach($listCommentsDelete as $comment){
+                            $commentManager->deleteComment($comment->getId());    //suppression dans la base de donnée
+                        }
+                    }
+
+                    // on supprime le post
+                    $post = $postManager->deletePost($post->getId());
                 }
             }
 

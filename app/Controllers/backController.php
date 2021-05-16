@@ -752,14 +752,8 @@ use App\Models\SocialNetworkManager;
     {
         $userLogged = Auth::check(['administrateur']);
   
-        $postManager = new PostManager();
-        $listPostsForUser = $postManager->getListPostsForUser($id);
-
-        $mediaManager = new MediaManager();
-
-        $commentManager = new CommentManager();
-
         // suppression de la base de donnee de tout les commentaires de l'user    
+        $commentManager = new CommentManager();
         $listCommentsDelete = $commentManager->listCommentsForUser($id);
 
         if($listCommentsDelete !== []){
@@ -769,6 +763,7 @@ use App\Models\SocialNetworkManager;
         }
 
         // suppression de tout les medias lié a l'user (les logos, image desactiver, ...) pour les supprimer du server (dossier media) et de la base de donnée
+        $mediaManager = new MediaManager();
         $listMedias = $mediaManager->getListMediasForUser($id); // on recuperer la liste des logos du user
 
         if(!empty($listMedias)){
@@ -781,7 +776,7 @@ use App\Models\SocialNetworkManager;
         // suppression de la base de donnee de tout les socialNetworks de l'user
         $socialNetworkManager = new SocialNetworkManager();
         $listSocialNetworksForUserDelete = $socialNetworkManager->getListSocialNetworksForUser($id);
-        
+ 
         if(!empty($listSocialNetworksForUserDelete)){
             foreach($listSocialNetworksForUserDelete as $socialnetwork){
                 $socialNetworkManager->deleteSocialNetwork($socialnetwork->getId());    //suppression dans la base de donnée  
@@ -789,6 +784,9 @@ use App\Models\SocialNetworkManager;
         }
 
         //supression de tout les post lier a l'user
+        $postManager = new PostManager();
+        $listPostsForUser = $postManager->getListPostsForUser($id);
+        
         if(!empty($listPostsForUser)){
             foreach($listPostsForUser as $post){    // suppression de tout les post (et des medias que leurs sont associés) de l user
                 
@@ -797,8 +795,8 @@ use App\Models\SocialNetworkManager;
 
                 if($listMediasDelete !== []){
                     foreach($listMediasDelete as $media){
-                        $mediaManager->deleteMedia($media->getId());    //suppression dans la base de donnée
                         unlink($media->getPath());  //suppression des media sur le serveur dans le dossier media
+                        $mediaManager->deleteMedia($media->getId());    //suppression dans la base de donnée
                     }
                 }
 
