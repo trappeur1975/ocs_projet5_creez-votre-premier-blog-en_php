@@ -97,8 +97,12 @@ use App\Models\SocialNetworkManager;
                     ->setPost_id($post->getId())
                     ;
                 
-                $commentManager->addComment($comment);// add the comment to the database and get the last id of the comments in the database via the return of the function
-                
+                try{
+                    $commentManager->addComment($comment);// add the comment to the database and get the last id of the comments in the database via the return of the function
+                } catch (Exception $e) {
+                    setFlashMessage($e->getMessage());
+                }
+
                 header('Location: /post/'.$id.'?createdComment=true');
  
             }else{
@@ -141,8 +145,12 @@ use App\Models\SocialNetworkManager;
                         // enregistrement des modifications du commentaire
                         if (!empty($_POST['comment'])){
                             $comment->setComment($_POST['comment']);
-                                                
-                            $commentManager->updateComment($comment);
+                            
+                            try{
+                                $commentManager->updateComment($comment);
+                            } catch (Exception $e) {
+                                setFlashMessage($e->getMessage());
+                            } 
                         }
                             
                         header('Location: /post/'.$comment->getPost_id().'?successUploadComment=true');
@@ -171,7 +179,11 @@ use App\Models\SocialNetworkManager;
         $comment = $commentManager->getComment($id);
         
         if($comment->getUser_id() === $_SESSION['connection']){ //on verifier que le commentaire que le user souhaite modifier lui appartient bien
-            $comment = $commentManager->deleteComment($id);
+            try{
+                $comment = $commentManager->deleteComment($id);
+            } catch (Exception $e) {
+                setFlashMessage($e->getMessage());
+            }  
 
             require('../app/Views/frontViews/frontDeleteCommentPostView.php');
         }else {
@@ -248,8 +260,12 @@ use App\Models\SocialNetworkManager;
                             ->setSlogan($_POST['slogan'])
                             ->setLogin($_POST['login'])
                             ->setPassword($_POST['password']);
-
-                        $userManager->updateUser($user);
+                        
+                        try{
+                            $userManager->updateUser($user);
+                        } catch (Exception $e) {
+                            setFlashMessage($e->getMessage());
+                        }
 
                         // enregistrement en bdd du media logo et du fichier uploader sur le server dans le dossier media
                         if(isset($_FILES['mediaUploadLogo']) AND $_FILES['mediaUploadLogo']['error']== 0){
@@ -271,8 +287,12 @@ use App\Models\SocialNetworkManager;
                         
                             if(!empty($listLogosDelete)){
                                 foreach($listLogosDelete as $logo){
-                                    unlink($logo->getPath());  //suppression des media sur le serveur dans le dossier media
-                                    $mediaManager->deleteMedia($logo->getId());    //suppression dans la base de donnée  
+                                    try{
+                                        unlink($logo->getPath());  //suppression des media sur le serveur dans le dossier media
+                                        $mediaManager->deleteMedia($logo->getId());    //suppression dans la base de donnée
+                                    } catch (Exception $e) {
+                                        setFlashMessage($e->getMessage());
+                                    }   
                                 }
                             }
 
@@ -286,14 +306,25 @@ use App\Models\SocialNetworkManager;
                                 // ->setUser_id($user->getId())
                                 ;
                             
-                            $mediaManager->addMediaImage($mediaUploadLogo, CONFIGFILE, $file); //adding the media to the database and recovery via the id function of the last media in the database
+                            try{
+                                $mediaManager->addMediaImage($mediaUploadLogo, CONFIGFILE, $file); //adding the media to the database and recovery via the id function of the last media in the database
+                            } catch (Exception $e) {
+                                setFlashMessage($e->getMessage());
+                            } 
                         }
 
                         // enregistrement en bdd socialNetwork des modifications qui ont etait apporté dans l'editUser()   
                             // supression du ou des socialNetwork de l'user
                             if(!empty($_POST['socialNetworksUser'])){ 
                                 foreach($_POST['socialNetworksUser'] as $idSsocialNetwork){
-                                    $socialNetworkManager->deleteSocialNetwork($idSsocialNetwork);
+                                    try
+                                    {
+                                        $socialNetworkManager->deleteSocialNetwork($idSsocialNetwork);
+                                    }
+                                    catch (Exception $e)
+                                    {
+                                        setFlashMessage($e->getMessage());
+                                    } 
                                 }
                             }
                             
@@ -304,7 +335,14 @@ use App\Models\SocialNetworkManager;
                                     ->setUser_id($id)
                                     ;
                                 
-                                $socialNetworkManager->addSocialNetwork($socialNetwork);
+                                try
+                                {
+                                    $socialNetworkManager->addSocialNetwork($socialNetwork);
+                                }
+                                catch (Exception $e)
+                                {
+                                    setFlashMessage($e->getMessage());
+                                }
                             }
 
                         header('Location: /userFrontDashboard/'.$id.'?successEditUser=true');
@@ -366,8 +404,13 @@ use App\Models\SocialNetworkManager;
                         ->setUserType_id(1); //par défaut c est un user de type "abonner"
 
                     $userManager = new UserManager();
-                    $lastRecordingUser = $userManager->addUser($user);// add the user to the database and get the last id of the users in the database via the return of the function
                     
+                    try{
+                        $lastRecordingUser = $userManager->addUser($user);// add the user to the database and get the last id of the users in the database via the return of the function
+                    } catch (Exception $e) {
+                        setFlashMessage($e->getMessage());
+                    }
+
                     // enregistrement en bdd du media logo et du fichier uploader sur le server dans le dossier media
                     if(isset($_FILES['mediaUploadLogo']) AND $_FILES['mediaUploadLogo']['error']== 0){
                         
@@ -390,8 +433,12 @@ use App\Models\SocialNetworkManager;
                             ->setMediaType_id($idMediaType)
                             ->setUser_id($lastRecordingUser)
                             ;
-                        
-                        $mediaManager->addMediaImage($mediaUploadLogo, CONFIGFILE, $file); //adding the media to the database and recovery via the id function of the last media in the database
+                            
+                        try{
+                            $mediaManager->addMediaImage($mediaUploadLogo, CONFIGFILE, $file); //adding the media to the database and recovery via the id function of the last media in the database
+                        } catch (Exception $e) {
+                            setFlashMessage($e->getMessage());
+                        } 
                     }
                     
                     // enregistrement en bdd du socialNetwork
@@ -402,7 +449,14 @@ use App\Models\SocialNetworkManager;
                             ->setUser_id($lastRecordingUser)
                             ;
 
-                        $socialNetworkManager->addSocialNetwork($socialNetwork);
+                        try
+                        {
+                            $socialNetworkManager->addSocialNetwork($socialNetwork);
+                        }
+                        catch (Exception $e)
+                        {
+                            setFlashMessage($e->getMessage());
+                        }
                     }
 
                     header('Location: /createUserFront?createdUser=true');
@@ -435,7 +489,11 @@ use App\Models\SocialNetworkManager;
 
             if($listCommentsDelete !== []){
                 foreach($listCommentsDelete as $comment){
-                    $commentManager->deleteComment($comment->getId());    //suppression dans la base de donnée
+                    try{
+                        $commentManager->deleteComment($comment->getId());    //suppression dans la base de donnée
+                    } catch (Exception $e) {
+                        setFlashMessage($e->getMessage());
+                    }  
                 }
             }
 
@@ -445,8 +503,12 @@ use App\Models\SocialNetworkManager;
 
             if(!empty($listMedias)){
                 foreach($listMedias as $media){
-                    unlink($media->getPath());  //suppression des media sur le serveur dans le dossier media
-                    $mediaManager->deleteMedia($media->getId());    //suppression dans la base de donnée  
+                    try{
+                        unlink($media->getPath());  //suppression des media sur le serveur dans le dossier media
+                        $mediaManager->deleteMedia($media->getId());    //suppression dans la base de donnée
+                    } catch (Exception $e) {
+                        setFlashMessage($e->getMessage());
+                    }   
                 }
             }
 
@@ -456,7 +518,14 @@ use App\Models\SocialNetworkManager;
             
             if(!empty($listSocialNetworksForUserDelete)){
                 foreach($listSocialNetworksForUserDelete as $socialnetwork){
-                    $socialNetworkManager->deleteSocialNetwork($socialnetwork->getId());    //suppression dans la base de donnée  
+                    try
+                    {
+                        $socialNetworkManager->deleteSocialNetwork($socialnetwork->getId());    //suppression dans la base de donnée
+                    }
+                        catch (Exception $e)
+                    {
+                        setFlashMessage($e->getMessage());
+                    } 
                 }
             }
 
@@ -472,8 +541,12 @@ use App\Models\SocialNetworkManager;
 
                     if($listMediasDelete !== []){
                         foreach($listMediasDelete as $media){
-                            unlink($media->getPath());  //suppression des media sur le serveur dans le dossier media
-                            $mediaManager->deleteMedia($media->getId());    //suppression dans la base de donnée
+                            try{
+                                unlink($media->getPath());  //suppression des media sur le serveur dans le dossier media
+                                $mediaManager->deleteMedia($media->getId());    //suppression dans la base de donnée
+                            } catch (Exception $e) {
+                                setFlashMessage($e->getMessage());
+                            }  
                         }
                     }
 
@@ -482,17 +555,29 @@ use App\Models\SocialNetworkManager;
                     
                     if($listCommentsDelete !== []){
                         foreach($listCommentsDelete as $comment){
-                            $commentManager->deleteComment($comment->getId());    //suppression dans la base de donnée
+                            try{
+                                $commentManager->deleteComment($comment->getId());    //suppression dans la base de donnée
+                            } catch (Exception $e) {
+                                setFlashMessage($e->getMessage());
+                            }  
                         }
                     }
 
                     // on supprime le post
-                    $post = $postManager->deletePost($post->getId());
+                    try{
+                        $post = $postManager->deletePost($post->getId());
+                    } catch (Exception $e) {
+                        setFlashMessage($e->getMessage());
+                    }  
                 }
             }
 
             // suppression de l'user
-            $user = $userManager->deleteUser($id);
+            try{
+                $user = $userManager->deleteUser($id);
+            } catch (Exception $e) {
+                setFlashMessage($e->getMessage());
+            }
             session_destroy();
 
             require('../app/Views/frontViews/frontDeleteUserView.php');

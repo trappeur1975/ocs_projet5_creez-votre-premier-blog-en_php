@@ -7,7 +7,7 @@ use App\Models\UserManager;
 class Auth {
 
     // verifie si le status de l'user (connecter) (=> $userStatus) et bien valide (parmis different status => $statutes) pour acceder a une fonction ou partie du site
-    public static function validator(array $statutes, $userStatus){
+    private static function validator(array $statutes, $userStatus){
         $validStatus = false;
 
         foreach($statutes as $status){
@@ -63,21 +63,3 @@ class Auth {
     }
 
 }
-
-    /**
-     * check that the user is logged in and the status is 'administrateur'
-     *
-     * @return void
-     */
-    // public static function check(){       
-    //     $userManager = new UserManager();   //nouveau
-        
-    //     if(session_status() === PHP_SESSION_NONE){
-    //         session_start();
-    //     }
-
-    //     if(!isset($_SESSION['connection']) OR $userManager->getUserSatus($_SESSION['connection'])['status'] !== 'administrateur'){
-    //         // throw new Exception('vous n\'étes identifier sur le site');
-    //         header('Location: /backend/connection?badConnection=true');
-    //     }
-    // }

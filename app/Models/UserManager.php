@@ -110,7 +110,7 @@ class UserManager extends Manager
         if($result === true){
             return $db->lastInsertId();
         } else {
-            throw new Exception('impossible de creer l enregistrement du user');
+            throw new Exception('impossible d\'enregistrer le user en base de donnee');
         }
     }
 
@@ -164,7 +164,7 @@ class UserManager extends Manager
         $query = $db->prepare('DELETE FROM user WHERE id = :id');
         $result = $query->execute(['id' => $id]);
         if($result === false){
-            throw new Exception('impossible de supprimer l utilisateur :'.$id.'peut être il n\'existe pas');
+            throw new Exception('impossible de supprimer l utilisateur :'.$id);
         }
     }
 

@@ -67,6 +67,12 @@
             </ul>
         </nav>
         
+        <div > <!-- pour afficher les messages flash-->
+            <?php          
+                getFlashMessage();
+            ?>
+        </div>
+        
         <div class="container mt-4">
             <?= $content ?>
         </div>

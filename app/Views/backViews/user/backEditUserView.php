@@ -24,6 +24,13 @@ ob_start();
         <?php endif ?>
 <!-- end the labels on the state of the edition or the creation of the user   -->
 
+ <!--  handle connection error messages  -->
+ <!-- <?php  if($errorMessage != null): ?> 
+        <div class="alert alert-danger">
+            <?php echo $errorMessage; ?>
+        </div>
+    <?php endif ?> -->
+
 <!-- start main content  -->
     <h1>Backend Edit the User id: <?= $user->getId() ?></h1>
 

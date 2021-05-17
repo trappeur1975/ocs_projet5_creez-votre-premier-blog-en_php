@@ -106,6 +106,9 @@ class MediaManager extends Manager
               
                 move_uploaded_file( $from, $to);
                 return $to;
+            }else {
+                throw new Exception('impossible d\'enregistrer le media Image en base de donne et sur le serveur');
+                // $errorMessage = 'impossible de creer l enregistrement du socialNetwork';
             }
         } else {
             throw new Exception('impossible de creer l enregistrement du media Image (peut etre l extension du fichier, son poids, ...)');
@@ -117,7 +120,7 @@ class MediaManager extends Manager
     {
         //on verifier que le type du fichier uploader est bien autorisé a etre sauvegardé sur le site (base de donnee et serveur)
         $authorizedFileTypes = searchDatasFile('video');   //voir fichier globalFunctions.php
-        $validateVideo = validateWordinString($authorizedFileTypes, $mediaVideo->getPath());
+        $validateVideo = validateWordInString($authorizedFileTypes, $mediaVideo->getPath());
 
         if($validateVideo){
             $db = $this->dbConnect();
@@ -135,8 +138,11 @@ class MediaManager extends Manager
                 'post_id' => $mediaVideo->getPost_id(),
                 'user_id' => $mediaVideo->getUser_id()
                 ]);
+            if($result === false){
+                throw new Exception('impossible d\'enregistrement du media video en base de donnee');
+            }
         } else {
-            throw new Exception('impossible de creer l enregistrement du media video');
+            throw new Exception('impossible d\'enregistrement du media video');
         }
     }
 

@@ -54,21 +54,20 @@ class PostManager extends Manager
                                                   introduction = :introduction,
                                                   content = :content,
                                                   dateCreate = :dateCreate,
-                                                  dateChange = :dateChange,
+                                                --   dateChange = :dateChange,
                                                   user_id = :user_id');
         $result = $query->execute([
             'title' => $post->getTitle(),
             'introduction' => $post->getIntroduction(),
             'content' => $post->getContent(),
             'dateCreate' => $post->getDateCreate()->format('Y-m-d H:i:s'),
-            'dateChange' => $post->getDateChange(),
             'user_id' => $post->getUser_id()
             ]);
 
         if($result === true){
             return $db->lastInsertId();
         } else {
-            throw new Exception('impossible de de creer l enregistrement du nouveau post');
+            throw new Exception('impossible d\'enregistrer le post en base de donnee');
         }
     }
    

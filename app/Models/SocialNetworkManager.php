@@ -12,24 +12,36 @@ use Exception;
  */
 class SocialNetworkManager extends Manager
 {
-     // ajoute le user (en attribut de cette fonction) a la table user en bdd
-     public function addSocialNetwork(SocialNetwork $socialNetwork)
-     {
-         $db = $this->dbConnect();
-         
-         $query = $db->prepare('INSERT INTO socialnetwork SET url = :url, 
-                                                     user_id = :user_id');
-         $result = $query->execute([
-             'url' => $socialNetwork->getUrl(),
-             'user_id' => $socialNetwork->getUser_id()
-             ]);
- 
-         if($result === true){
-             return $db->lastInsertId();
-         } else {
-             throw new Exception('impossible de creer l enregistrement du socialNetwork');
-         }
-     }
+    // ajoute le user (en attribut de cette fonction) a la table user en bdd
+    public function addSocialNetwork(SocialNetwork $socialNetwork)
+    {
+        $errorMessage = null;
+        
+        //on verifier que le social network est bien autorisé a etre enregistré sur le site (base de donnee)
+        $authorizedSocialNetworks = searchDatasFile('socialnetwork');   //voir fichier globalFunctions.php
+        $validateSocialNetwork = validateWordInString($authorizedSocialNetworks, $socialNetwork->getUrl());
+
+        if($validateSocialNetwork){
+            $db = $this->dbConnect();
+            
+            $query = $db->prepare('INSERT INTO socialnetwork SET url = :url, 
+                                                    user_id = :user_id');
+            $result = $query->execute([
+                'url' => $socialNetwork->getUrl(),
+                'user_id' => $socialNetwork->getUser_id()
+                ]);
+
+            if($result === true){
+                return $db->lastInsertId();
+            } else {
+                throw new Exception('impossible de creer l enregistrement du socialNetwork en base de donne');
+                // $errorMessage = 'impossible de creer l enregistrement du socialNetwork';
+            }
+        } else {
+            throw new Exception('impossible d\'enregistrer ce socialNetwork');
+            // $errorMessage = 'impossible d\'enregistrer ce socialNetwork';
+        }
+    }
 
     /**
      * Method deleteSocialNetwork delete a socialNetwork 
@@ -44,7 +56,7 @@ class SocialNetworkManager extends Manager
         $query = $db->prepare('DELETE FROM socialnetwork WHERE id = :id');
         $result = $query->execute(['id' => $id]);
         if($result === false){
-            throw new Exception('impossible de supprimer le socialNetwork :'.$id.'peut être il n\'existe pas');
+            throw new Exception('impossible de supprimer le socialNetwork :'.$id);
         }
     }
 

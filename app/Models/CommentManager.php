@@ -90,11 +90,6 @@ class CommentManager extends Manager
         }else {
             return $comment;
         }
-        // if($result === true){
-        //     return $comment;
-        // }else {
-        //     throw new Exception('impossible de supprimer le commentaire :'.$idComment);
-        // }
     }
 
     /**

@@ -21,7 +21,6 @@ function searchDatasFile(String $typeDatasSought){
         $line = fgets($file);
         $datas = explode('|', $line);
         if($datas[0] == $typeDatasSought){
-            // dd($typeDatasSought);
             $datasFind = $datas;
             break;	//to exit the foreach loop 
         }
@@ -44,7 +43,7 @@ function validateData(array $datas, String $dataSought){
 }
 
 //cherche si un des mots se trouvant dans un tableau ($datas) existe bien dans une chaine de caractére
-function validateWordinString(array $datas, String $stringCaractere){
+function validateWordInString(array $datas, String $stringCaractere){  
     $find = false;
     foreach($datas as $data){
         if(strpos($stringCaractere, $data)){
@@ -54,3 +53,26 @@ function validateWordinString(array $datas, String $stringCaractere){
     }
     return $find;
 }
+
+//------------message flash---------------
+    // creer un essage flash
+    // $type mettre le type de bootstrap (success, warning, ou danger par exemple)
+    function setFlashMessage($message, $type='danger'){
+        $_SESSION['flash'] = array(
+            'message'=> $message,
+            'type' => $type
+        );
+            
+    }
+
+    // aficher un message flash
+    function getFlashMessage(){
+        if(isset($_SESSION['flash'])){
+            echo('<div class="alert alert-'.$_SESSION['flash']['type'].'">
+                    <!-- <a class="close">fermer</a> -->
+                    '.$_SESSION['flash']['message'].'
+                </div>
+            ');
+            // unset($_SESSION['flash']);
+        }
+    }
