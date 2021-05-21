@@ -68,8 +68,11 @@
         </nav>
         
         <div > <!-- pour afficher les messages flash-->
-            <?php          
-                getFlashMessage();
+            <?php           
+                getFalshErrors();
+                // getFlashMessage();
+                // dd($_SESSION['errors']['errors']);
+                
             ?>
         </div>
         

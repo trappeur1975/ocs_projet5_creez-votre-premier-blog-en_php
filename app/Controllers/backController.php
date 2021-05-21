@@ -102,15 +102,6 @@ use App\Models\SocialNetworkManager;
     function adminPosts()
     {
         $userLogged = Auth::check(['administrateur']);
-
-        // -----------teste lecture de fichier--------
-        // $myFile = fopen(CONFIGFILE, 'r');
-        // $datas= searchDatasFile($myFile, 'videos');
-        // dd(validateData($datas, 'vimeo'));
-
-        // dd(searchDataFile($myFile, 'videos', 'youtube'));
-        // dd(searchDataFile($myFile, 'imageStoragePath', 'imageStoragePath'));
-        // ----------fin teste lecture de fichier------------
         
         $postManager = new PostManager();
         $listPosts = $postManager->getListPosts();
@@ -154,14 +145,14 @@ use App\Models\SocialNetworkManager;
             
             //for data validation
                 $errors = [];
-            
+
                 if(empty($_POST['title'])){
-                    $errors['title'][] = 'Le champs titre ne peut être vide';
+                    $errors[] = 'Le champ titre ne peut être vide';
                 }
                 if(mb_strlen($_POST['title'])<=3){
-                    $errors['title'][] = 'Le champs titre doit contenir plus de 3 caractere';
+                    $errors[] = 'Le champ titre doit contenir plus de 3 caracteres';
                 }
-                
+
                 if(empty($errors)){
                                       
                     //ISSSUE  gestion des date en datetime dans entité post // base de donnee en string pour la create ou l edit d un post (=>voir methode setDateCreate($dateCreate) de la class Post)
@@ -182,7 +173,8 @@ use App\Models\SocialNetworkManager;
                     try{
                         $lastRecordingPost = $postManager->addPost($post);// add the post to the database and get the last id of the posts in the database via the return of the function
                     } catch (Exception $e) {
-                        setFlashMessage($e->getMessage());
+                        // setFlashMessage($e->getMessage());
+                        $errors[] = $e->getMessage();
                     } 
 
                     //media IMAGE
@@ -212,7 +204,9 @@ use App\Models\SocialNetworkManager;
                         try{
                             $mediaManager->addMediaImage($mediaUploadImage, CONFIGFILE, $file); //adding the media to the database and recovery via the id function of the last media in the database
                         } catch (Exception $e) {
-                            setFlashMessage($e->getMessage());
+                            // setFlashMessage($e->getMessage());
+                            $errors[] = $e->getMessage();
+                            
                         }
                     }
                     
@@ -230,15 +224,23 @@ use App\Models\SocialNetworkManager;
                         try{
                             $mediaManager->addMediaVideo($mediaUploadVideo);
                         } catch (Exception $e) {
-                            setFlashMessage($e->getMessage());
+                            // setFlashMessage($e->getMessage());
+                            $errors[] = $e->getMessage();
                         }
                     }
-                    // -------------fin enregistrement en bdd du media VIDEO --------------------
-           
+                    
+                    setFlashErrors($errors);    // pour gerer les erreurs en message flash (voir fichier globalFunctions.php)
+                    
                     header('Location: /backend/editPost/'.$lastRecordingPost.'?created=true');
+                    exit();
+
                 }else{
                     // ISSUE COMMENT TRANSMETTRE UN TABLEAU $errors=[]; DANS LA REDIRECTION CI DESSOUS POUR AFFICHER DANS LA VIEW LES DIFFERENTES ERREORS
+                    
+                    setFlashErrors($errors);    // pour gerer les erreurs en message flash (voir fichier globalFunctions.php)
+                    
                     header('Location: /backend/createPost?created=false');
+                    exit();
                 }
         }
 
@@ -298,10 +300,10 @@ use App\Models\SocialNetworkManager;
                 $errors = [];
 
                 if(empty($_POST['title'])){
-                    $errors['title'][] = 'Le champs titre ne peut être vide';
+                    $errors[] = 'Le champ titre ne peut être vide';
                 }
                 if(mb_strlen($_POST['title'])<=3){
-                    $errors['title'][] = 'Le champs titre doit contenir plus de 3 caractere';
+                    $errors[] = 'Le champ titre doit contenir plus de 3 caracteres';
                 }
 
                 if(empty($errors)){
@@ -328,7 +330,8 @@ use App\Models\SocialNetworkManager;
                         try{                    
                             $postManager->updatePost($post);
                         } catch (Exception $e) {
-                            setFlashMessage($e->getMessage());
+                            // setFlashMessage($e->getMessage());
+                            $errors[] = $e->getMessage();
                         }
 
                     // -------- enregistrement des modifications (via le select des medias et upload de media) des infos sur les media lié au post edité
@@ -372,7 +375,8 @@ use App\Models\SocialNetworkManager;
                                 try{
                                     $mediaManager->addMediaImage($mediaUploadImage, CONFIGFILE, $file); //adding the media to the database and recovery via the id function of the last media in the database
                                 } catch (Exception $e) {
-                                    setFlashMessage($e->getMessage());
+                                    // setFlashMessage($e->getMessage());
+                                    $errors[] = $e->getMessage();
                                 }
                             }          
                             
@@ -391,7 +395,8 @@ use App\Models\SocialNetworkManager;
                                 try{
                                     $mediaManager->addMediaVideo($mediaUploadVideo);
                                 } catch (Exception $e) {
-                                    setFlashMessage($e->getMessage());
+                                    // setFlashMessage($e->getMessage());
+                                    $errors[] = $e->getMessage();
                                 } 
                             }
                             
@@ -409,7 +414,8 @@ use App\Models\SocialNetworkManager;
                                 try{
                                     $mediaManager->updatePostIdMedia($value, $post->getId());
                                 } catch (Exception $e) {
-                                    setFlashMessage($e->getMessage());
+                                    // setFlashMessage($e->getMessage());
+                                    $errors[] = $e->getMessage();
                                 }
                             }
                         }
@@ -419,10 +425,18 @@ use App\Models\SocialNetworkManager;
                     
                     // --------------FIN enregistrement des modifications (via le select des medias) des infos sur les media lié au post 
                     
+                    
+                    setFlashErrors($errors);    // pour gerer les erreurs en message flash (voir fichier globalFunctions.php)
+
                     header('Location: /backend/editPost/'.$post->getId().'?success=true');
+                    exit();
+
                 }else{
-                    // ISSUE COMMENT TRANSMETTRE UN TABLEAU $errors=[]; DANS LA REDIRECTION CI DESSOUS POUR AFFICHER DANS LA VIEW LES DIFFERENTES ERREORS
+                    
+                    setFlashErrors($errors);    // pour gerer les erreurs en message flash (voir fichier globalFunctions.php)
+
                     header('Location: /backend/editPost/'.$post->getId().'?success=false');
+                    exit();
                 }
         }
 
@@ -436,6 +450,8 @@ use App\Models\SocialNetworkManager;
     function deletePost($id)
     {
         $userLogged = Auth::check(['administrateur']);
+
+        $errors = [];
  
         // on supprime les commentaires lier au post (si il y en a)
         $commentManager = new CommentManager();
@@ -446,7 +462,8 @@ use App\Models\SocialNetworkManager;
                 try{
                     $commentManager->deleteComment($comment->getId());    //suppression dans la base de donnée
                 } catch (Exception $e) {
-                    setFlashMessage($e->getMessage());
+                    // setFlashMessage($e->getMessage());
+                    $errors[] = $e->getMessage();
                 }
             }
         }
@@ -461,7 +478,8 @@ use App\Models\SocialNetworkManager;
                     unlink($media->getPath());  //suppression des media sur le serveur dans le dossier media
                     $mediaManager->deleteMedia($media->getId());    //suppression dans la base de donnée
                 } catch (Exception $e) {
-                    setFlashMessage($e->getMessage());
+                    // setFlashMessage($e->getMessage());
+                    $errors[] = $e->getMessage();
                 } 
             }
         }
@@ -471,8 +489,11 @@ use App\Models\SocialNetworkManager;
         try{
             $post = $postManager->deletePost($id);
         } catch (Exception $e) {
-            setFlashMessage($e->getMessage());
+            // setFlashMessage($e->getMessage());
+            $errors[] = $e->getMessage();
         } 
+
+        setFlashErrors($errors);
 
         require('../app/Views/backViews/post/backDeletePostView.php');
     }
@@ -513,6 +534,8 @@ use App\Models\SocialNetworkManager;
     {
         $userLogged = Auth::check(['administrateur']);
  
+        // mail('destinataireEmail@societe.fr', 'titre du email', 'message du email', 'From: adminNico@blogNico.com');
+
         // user
         $user = new User();
         
@@ -548,12 +571,12 @@ use App\Models\SocialNetworkManager;
             //for data validation
                 $errors = [];
             
-                // if(empty($_POST['title'])){
-                //     $errors['title'][] = 'Le champs titre ne peut être vide';
-                // }
-                // if(mb_strlen($_POST['title'])<=3){
-                //     $errors['title'][] = 'Le champs titre doit contenir plus de 3 caractere';
-                // }
+                if(empty($_POST['firstName'])){
+                    $errors[] = 'Le champ firstName ne peut être vide';
+                }
+                if(mb_strlen($_POST['lastName'])<=3){
+                    $errors[] = 'Le champ lastName doit contenir plus de 3 caracteres';
+                }
                 
                 if(empty($errors)){
 
@@ -574,7 +597,8 @@ use App\Models\SocialNetworkManager;
                     try{
                         $lastRecordingUser = $userManager->addUser($user);// add the user to the database and get the last id of the users in the database via the return of the function
                     } catch (Exception $e) {
-                        setFlashMessage($e->getMessage());
+                        // setFlashMessage($e->getMessage());
+                        $errors[] = $e->getMessage();
                     }
                     // enregistrement en bdd du media logo et du fichier uploader sur le server dans le dossier media
                     if(isset($_FILES['mediaUploadLogo']) AND $_FILES['mediaUploadLogo']['error']== 0){
@@ -602,7 +626,8 @@ use App\Models\SocialNetworkManager;
                         try{
                             $mediaManager->addMediaImage($mediaUploadLogo, CONFIGFILE, $file); //adding the media to the database and recovery via the id function of the last media in the database
                         } catch (Exception $e) {
-                            setFlashMessage($e->getMessage());
+                            // setFlashMessage($e->getMessage());
+                            $errors[] = $e->getMessage();
                         }
                     }
                     
@@ -619,15 +644,24 @@ use App\Models\SocialNetworkManager;
                         }
                         catch (Exception $e)
                         {
-                            setFlashMessage($e->getMessage());
+                            // setFlashMessage($e->getMessage());
+                            $errors[] = $e->getMessage();
                             // setFlashMessage($e->getMessage(), 'warning');
                         }
                     }
 
-                   header('Location: /backend/editUser/'.$lastRecordingUser.'?created=true');
+                    setFlashErrors($errors);    // pour gerer les erreurs en message flash (voir fichier globalFunctions.php)
+
+                    header('Location: /backend/editUser/'.$lastRecordingUser.'?created=true');
+                    exit();
+
                 }else{
-                    // ISSUE COMMENT TRANSMETTRE UN TABLEAU $errors=[]; DANS LA REDIRECTION CI DESSOUS POUR AFFICHER DANS LA VIEW LES DIFFERENTES ERREORS
+                    
+                    setFlashErrors($errors);    // pour gerer les erreurs en message flash (voir fichier globalFunctions.php)
+                    
                     header('Location: /backend/createUser?created=false');
+                    exit();
+
                 }
         }
         
@@ -693,23 +727,15 @@ use App\Models\SocialNetworkManager;
             //for data validation
                 $errors = [];
 
-                // if(empty($_POST['title'])){
-                //     $errors['title'][] = 'Le champs titre ne peut être vide';
-                // }
-                // if(mb_strlen($_POST['title'])<=3){
-                //     $errors['title'][] = 'Le champs titre doit contenir plus de 3 caractere';
-                // }
+                if(empty($_POST['firstName'])){
+                    $errors[] = 'Le champ firstName ne peut être vide';
+                }
+                if(mb_strlen($_POST['lastName'])<=3){
+                    $errors[] = 'Le champ lastName doit contenir plus de 3 caracteres';
+                }
 
                 if(empty($errors)){
                 
-                    //ISSSUE  gestion des date en datetime dans entité post // base de donnee en string pour la create ou l edit d un post (=>voir methode setDateCreate($dateCreate) de la class Post)
-                    //modification pour gerer l enregistrement dans la base de donnee via le Usermanager
-                    // $dateValidate = DateTime::createFromFormat('Y-m-d H:i:s', $_POST['validate']); // pour que la date String soit en Datetime
-
-                    // if($_POST['validate'] === ''){
-                    //     $validate=NULL;
-                    // }
-
                     // enregistrement en bdd du user
                     $user
                         ->setFirstName($_POST['firstName'])
@@ -723,7 +749,7 @@ use App\Models\SocialNetworkManager;
                     try{
                         $userManager->updateUser($user);
                     } catch (Exception $e) {
-                        setFlashMessage($e->getMessage());
+                        $errors[] = $e->getMessage();
                     }
 
                     // enregistrement en bdd du media logo et du fichier uploader sur le server dans le dossier media
@@ -750,7 +776,7 @@ use App\Models\SocialNetworkManager;
                                     unlink($logo->getPath());  //suppression des media sur le serveur dans le dossier media
                                     $mediaManager->deleteMedia($logo->getId());    //suppression dans la base de donnée
                                 } catch (Exception $e) {
-                                    setFlashMessage($e->getMessage());
+                                    $errors[] = $e->getMessage();
                                 }    
                             }
                         }
@@ -767,7 +793,7 @@ use App\Models\SocialNetworkManager;
                         try{
                             $mediaManager->addMediaImage($mediaUploadLogo, CONFIGFILE, $file); //adding the media to the database and recovery via the id function of the last media in the database
                         } catch (Exception $e) {
-                            setFlashMessage($e->getMessage());
+                            $errors[] = $e->getMessage();
                         } 
                     }
 
@@ -781,7 +807,7 @@ use App\Models\SocialNetworkManager;
                                 }
                                 catch (Exception $e)
                                 {
-                                    setFlashMessage($e->getMessage());
+                                    $errors[] = $e->getMessage();
                                 }
                             }
                         }
@@ -798,14 +824,21 @@ use App\Models\SocialNetworkManager;
                             }
                             catch (Exception $e)
                             {
-                                setFlashMessage($e->getMessage());
+                                $errors[] = $e->getMessage();
                             }    
                         }
+                    
+                    setFlashErrors($errors);    // pour gerer les erreurs en message flash (voir fichier globalFunctions.php)
 
                     header('Location: /backend/editUser/'.$user->getId().'?success=true');
+                    exit();
+
                 }else{
-                    // ISSUE COMMENT TRANSMETTRE UN TABLEAU $errors=[]; DANS LA REDIRECTION CI DESSOUS POUR AFFICHER DANS LA VIEW LES DIFFERENTES ERREORS
+                    
+                    setFlashErrors($errors);    // pour gerer les erreurs en message flash (voir fichier globalFunctions.php)
+
                     header('Location: /backend/editUser/'.$user->getId().'?success=false');
+                    exit();
                 }
         }
 
@@ -818,7 +851,10 @@ use App\Models\SocialNetworkManager;
      */
     function deleteUser($id)
     {
+        
         $userLogged = Auth::check(['administrateur']);
+
+        $errors = [];
   
         // suppression de la base de donnee de tout les commentaires de l'user    
         $commentManager = new CommentManager();
@@ -829,7 +865,8 @@ use App\Models\SocialNetworkManager;
                 try{
                     $commentManager->deleteComment($comment->getId());  //suppression dans la base de donnée
                 } catch (Exception $e) {
-                    setFlashMessage($e->getMessage());
+                    // setFlashMessage($e->getMessage());
+                    $errors[] = $e->getMessage();
                 }
             }
         }
@@ -844,7 +881,8 @@ use App\Models\SocialNetworkManager;
                     unlink($media->getPath());  //suppression des media sur le serveur dans le dossier media
                     $mediaManager->deleteMedia($media->getId());    //suppression dans la base de donnée
                 } catch (Exception $e) {
-                    setFlashMessage($e->getMessage());
+                    // setFlashMessage($e->getMessage());
+                    $errors[] = $e->getMessage();
                 }   
             }
         }
@@ -861,7 +899,8 @@ use App\Models\SocialNetworkManager;
                 }
                 catch (Exception $e)
                 {
-                    setFlashMessage($e->getMessage());
+                    // setFlashMessage($e->getMessage());
+                    $errors[] = $e->getMessage();
                 } 
             }
         }
@@ -882,7 +921,8 @@ use App\Models\SocialNetworkManager;
                             unlink($media->getPath());  //suppression des media sur le serveur dans le dossier media
                             $mediaManager->deleteMedia($media->getId());    //suppression dans la base de donnée
                         } catch (Exception $e) {
-                            setFlashMessage($e->getMessage());
+                            // setFlashMessage($e->getMessage());
+                            $errors[] = $e->getMessage();
                         } 
                     }
                 }
@@ -895,7 +935,8 @@ use App\Models\SocialNetworkManager;
                         try{
                             $commentManager->deleteComment($comment->getId());    //suppression dans la base de donnée
                         } catch (Exception $e) {
-                            setFlashMessage($e->getMessage());
+                            // setFlashMessage($e->getMessage());
+                            $errors[] = $e->getMessage();
                         } 
                     }
                 }
@@ -904,7 +945,8 @@ use App\Models\SocialNetworkManager;
                 try{
                     $post = $postManager->deletePost($post->getId());
                 } catch (Exception $e) {
-                    setFlashMessage($e->getMessage());
+                    // setFlashMessage($e->getMessage());
+                    $errors[] = $e->getMessage();
                 } 
             }
         }
@@ -915,8 +957,12 @@ use App\Models\SocialNetworkManager;
         try{
             $user = $userManager->deleteUser($id);
         } catch (Exception $e) {
-            setFlashMessage($e->getMessage());
+            // setFlashMessage($e->getMessage());
+            $errors[] = $e->getMessage();
+
         }
+
+        setFlashErrors($errors);    // pour gerer les erreurs en message flash (voir fichier globalFunctions.php)
 
         require('../app/Views/backViews/user/backDeleteUserView.php');
     }
@@ -973,14 +1019,20 @@ use App\Models\SocialNetworkManager;
     function deleteComment($id)
     {
         $userLogged = Auth::check(['administrateur']);
+
+        $errors = [];
     
         // on supprime le commentaire
         $commentManager = new CommentManager();
         try{
             $comment = $commentManager->deleteComment($id);
         } catch (Exception $e) {
-            setFlashMessage($e->getMessage());
-        } 
+            // setFlashMessage($e->getMessage());
+            $errors[] = $e->getMessage();
+            
+        }
+
+        setFlashErrors($errors);
 
         require('../app/Views/backViews/comment/backDeleteCommentView.php');
     }
@@ -992,14 +1044,19 @@ use App\Models\SocialNetworkManager;
     function validateComment($id)
     {
         $userLogged = Auth::check(['administrateur']);
+
+        $errors = [];
     
         // on valide le commentaire
         $commentManager = new CommentManager();
         try{
             $comment = $commentManager->validateComment;
         } catch (Exception $e) {
-            setFlashMessage($e->getMessage());
+            // setFlashMessage($e->getMessage());
+            $errors[] = $e->getMessage();
         }  
+
+        setFlashErrors($errors);
 
         require('../app/Views/backViews/comment/backValidateCommentView.php');
     }

@@ -139,10 +139,10 @@ class MediaManager extends Manager
                 'user_id' => $mediaVideo->getUser_id()
                 ]);
             if($result === false){
-                throw new Exception('impossible d\'enregistrement du media video en base de donnee');
+                throw new Exception('impossible d\'enregistrer le media video en base de donnee');
             }
         } else {
-            throw new Exception('impossible d\'enregistrement du media video');
+            throw new Exception('impossible d\'enregistrer le media video');
         }
     }
 

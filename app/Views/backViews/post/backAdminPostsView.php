@@ -3,7 +3,6 @@ $title = 'Backend Post administration';
 ob_start(); 
 ?>
         
-
 <!-- label if the post was successfully deleted  -->
     <?php  if(isset($_GET['delete'])): ?>
         <div class="alert alert-success">
