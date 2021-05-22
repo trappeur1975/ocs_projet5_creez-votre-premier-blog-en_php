@@ -42,11 +42,11 @@ use App\Models\SocialNetworkManager;
 
                         if($userManager->getUserSatus($_SESSION['connection'])['status'] === 'administrateur'){
                             header('Location: /backend/adminPosts');    //si user est administrateur il va sur le bachend admin
-                            exit();
+                            return http_response_code(302);
                         }else if($userManager->getUserSatus($_SESSION['connection'])['status'] === 'abonner' and !is_null($userRegister->getValidate())){  //si le user qui se connect est de type "abonner" et que sont compte a était valider par l administrateur du site (=> validate ! null)
                             header('Location: /userFrontDashboard/'.$userRegister->getId());    //si user est abonner il va sur son dashboard
                             // header('Location: /');    //si user est abonner il va sur le front page home
-                            exit();
+                            return http_response_code(302);
                         }else {
                             // $error = 'votre status ne vous autorise pas a acceder au contenu du site reserver a un certain statut ';
                             header('Location: /?unauthorizedAccess=true');
@@ -77,7 +77,7 @@ use App\Models\SocialNetworkManager;
         session_start();
         session_destroy();
         header('Location: /backend/connection');
-        exit();
+        return http_response_code(302);
     }
 
 // AUTRE
@@ -232,7 +232,7 @@ use App\Models\SocialNetworkManager;
                     setFlashErrors($errors);    // pour gerer les erreurs en message flash (voir fichier globalFunctions.php)
                     
                     header('Location: /backend/editPost/'.$lastRecordingPost.'?created=true');
-                    exit();
+                    return http_response_code(302);
 
                 }else{
                     // ISSUE COMMENT TRANSMETTRE UN TABLEAU $errors=[]; DANS LA REDIRECTION CI DESSOUS POUR AFFICHER DANS LA VIEW LES DIFFERENTES ERREORS
@@ -240,7 +240,7 @@ use App\Models\SocialNetworkManager;
                     setFlashErrors($errors);    // pour gerer les erreurs en message flash (voir fichier globalFunctions.php)
                     
                     header('Location: /backend/createPost?created=false');
-                    exit();
+                    return http_response_code(302);
                 }
         }
 
@@ -429,14 +429,14 @@ use App\Models\SocialNetworkManager;
                     setFlashErrors($errors);    // pour gerer les erreurs en message flash (voir fichier globalFunctions.php)
 
                     header('Location: /backend/editPost/'.$post->getId().'?success=true');
-                    exit();
+                    return http_response_code(302);
 
                 }else{
                     
                     setFlashErrors($errors);    // pour gerer les erreurs en message flash (voir fichier globalFunctions.php)
 
                     header('Location: /backend/editPost/'.$post->getId().'?success=false');
-                    exit();
+                    return http_response_code(302);
                 }
         }
 
@@ -653,14 +653,14 @@ use App\Models\SocialNetworkManager;
                     setFlashErrors($errors);    // pour gerer les erreurs en message flash (voir fichier globalFunctions.php)
 
                     header('Location: /backend/editUser/'.$lastRecordingUser.'?created=true');
-                    exit();
+                    return http_response_code(302);
 
                 }else{
                     
                     setFlashErrors($errors);    // pour gerer les erreurs en message flash (voir fichier globalFunctions.php)
                     
                     header('Location: /backend/createUser?created=false');
-                    exit();
+                    return http_response_code(302);
 
                 }
         }
@@ -831,14 +831,14 @@ use App\Models\SocialNetworkManager;
                     setFlashErrors($errors);    // pour gerer les erreurs en message flash (voir fichier globalFunctions.php)
 
                     header('Location: /backend/editUser/'.$user->getId().'?success=true');
-                    exit();
+                    return http_response_code(302);
 
                 }else{
                     
                     setFlashErrors($errors);    // pour gerer les erreurs en message flash (voir fichier globalFunctions.php)
 
                     header('Location: /backend/editUser/'.$user->getId().'?success=false');
-                    exit();
+                    return http_response_code(302);
                 }
         }
 
@@ -974,11 +974,19 @@ use App\Models\SocialNetworkManager;
     function validateUser($id)
     {
         $userLogged = Auth::check(['administrateur']);
-    
+
+        $errors = [];
+
         // on valide le commentaire
         $usertManager = new userManager();
-        $usertManager->validateUser($id);
-
+        try{
+            $usertManager->validateUser($id);
+        } catch (Exception $e) {
+            $errors[] = $e->getMessage();
+        }  
+        
+        setFlashErrors($errors);
+        
         require('../app/Views/backViews/user/backValidateUserView.php');
     }
 
@@ -1050,7 +1058,7 @@ use App\Models\SocialNetworkManager;
         // on valide le commentaire
         $commentManager = new CommentManager();
         try{
-            $comment = $commentManager->validateComment;
+            $comment = $commentManager->validateComment($id);
         } catch (Exception $e) {
             // setFlashMessage($e->getMessage());
             $errors[] = $e->getMessage();
@@ -1058,5 +1066,10 @@ use App\Models\SocialNetworkManager;
 
         setFlashErrors($errors);
 
-        require('../app/Views/backViews/comment/backValidateCommentView.php');
+        if (!isset($_SESSION['flash'])){
+            require('../app/Views/backViews/comment/backValidateCommentView.php');
+        } else {
+            adminPosts();
+        }
+        
     }

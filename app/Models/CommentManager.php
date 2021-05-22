@@ -131,9 +131,9 @@ class CommentManager extends Manager
      * 
      */
     public function validateComment(int $idComment)
-    {
+    {  
         $comment = $this->getComment($idComment);
-        
+
         $dateTime = new Datetime();
         $validate = $dateTime->format('Y-m-d H:i:s');
   

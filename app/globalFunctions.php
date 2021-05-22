@@ -57,7 +57,7 @@ function formatHtml(string $content) {
 
 //------------message flash---------------
     function setFlashErrors(array $errors, $type='danger'){
-        $_SESSION['errors'] = array(
+        $_SESSION['flash'] = array(
             'errors'=> $errors,
             'type' => $type
         );
@@ -65,14 +65,14 @@ function formatHtml(string $content) {
     }
 
     function getFalshErrors(){
-        if(isset($_SESSION['errors'])){
-            foreach($_SESSION['errors']['errors'] as $error){
-                echo('<div class="alert alert-'.$_SESSION['errors']['type'].'">
+        if(isset($_SESSION['flash'])){
+            foreach($_SESSION['flash']['errors'] as $error){
+                echo('<div class="alert alert-'.$_SESSION['flash']['type'].'">
                     '.$error.'
                     </div>
                 ');     
             }
-            unset($_SESSION['errors']);
+            unset($_SESSION['flash']);
         }
     }
 

@@ -73,10 +73,6 @@ use App\Models\SocialNetworkManager;
         if ($_SERVER['REQUEST_METHOD'] === 'POST') { // if a submission of the form (=> a creation of a post) has been made
             
             $errors = [];
-            //modification pour gerer l enregistrement dans la base de donnee via le Postmanager
-            
-            // $dateCreate = DateTime::createFromFormat('Y-m-d H:i:s',new Datetime()); // pour que la date String soit en Datetime
-            // $dateCreate = new Datetime();
             
             if(empty($errors)){
                 Auth::check(['administrateur','abonner']);    
@@ -100,14 +96,19 @@ use App\Models\SocialNetworkManager;
                 try{
                     $commentManager->addComment($comment);// add the comment to the database and get the last id of the comments in the database via the return of the function
                 } catch (Exception $e) {
-                    setFlashMessage($e->getMessage());
+                    $errors[] = $e->getMessage();
                 }
 
+                setFlashErrors($errors);    // pour gerer les erreurs en message flash (voir fichier globalFunctions.php)
+
                 header('Location: /post/'.$id.'?createdComment=true');
+                return http_response_code(302);
  
             }else{
-                // ISSUE COMMENT TRANSMETTRE UN TABLEAU $errors=[]; DANS LA REDIRECTION CI DESSOUS POUR AFFICHER DANS LA VIEW LES DIFFERENTES ERREORS
+                
+                setFlashErrors($errors);    // pour gerer les erreurs en message flash (voir fichier globalFunctions.php)
                 header('Location: /post/'.$id.'?createdComment=false');
+                return http_response_code(302);
             }
         }
         require('../app/Views/frontViews/frontPostView.php');
@@ -126,20 +127,21 @@ use App\Models\SocialNetworkManager;
         $commentManager = new CommentManager();
         $comment = $commentManager->getComment($id);
 
+        $errors = [];
+
         if($comment->getUser_id() === $_SESSION['connection']){ //on verifier que le commentaire que le user souhaite modifier lui appartient bien
 
             $formComment = new Form($comment, true);
 
             if($_SERVER['REQUEST_METHOD'] === 'POST') { // if a submission of the form (=> a modification of a comment) has been made
                 //for data validation
-                    $errors = [];
 
-                    // if(empty($_POST['title'])){
-                    //     $errors['title'][] = 'Le champs titre ne peut être vide';
-                    // }
-                    // if(mb_strlen($_POST['title'])<=3){
-                    //     $errors['title'][] = 'Le champs titre doit contenir plus de 3 caractere';
-                    // }
+                    if(empty($_POST['comment'])){
+                        $errors[] = 'Le champs commentaire ne peut être vide';
+                    }
+                    if(mb_strlen($_POST['comment'])<=3){
+                        $errors[] = 'Le champs commentaire doit contenir plus de 3 caractere';
+                    }
 
                     if(empty($errors)){
                         // enregistrement des modifications du commentaire
@@ -149,19 +151,30 @@ use App\Models\SocialNetworkManager;
                             try{
                                 $commentManager->updateComment($comment);
                             } catch (Exception $e) {
-                                setFlashMessage($e->getMessage());
+                                $errors[] = $e->getMessage();
                             } 
                         }
-                            
+                        
+                        setFlashErrors($errors);
+
                         header('Location: /post/'.$comment->getPost_id().'?successUploadComment=true');
+                        return http_response_code(302);
+
                     }else{
-                        // ISSUE COMMENT TRANSMETTRE UN TABLEAU $errors=[]; DANS LA REDIRECTION CI DESSOUS POUR AFFICHER DANS LA VIEW LES DIFFERENTES ERREORS
+                        setFlashErrors($errors);
+
                         header('Location: /post/'.$comment->getPost_id().'?successUploadComment=false');
+                        return http_response_code(302);
                     }
             }
             require('../app/Views/frontViews/frontEditCommentPostView.php');
         }else {
-            throw new Exception('impossible de modifier le commentaire :'.$comment->getId().'par le user :'.$_SESSION['connection']);
+            // throw new Exception('impossible de modifier le commentaire :'.$comment->getId().'par le user :'.$_SESSION['connection']);
+            $errors[] = 'impossible de modifier le commentaire :'.$comment->getId().'par le user :'.$_SESSION['connection'];
+            setFlashErrors($errors);
+
+            header('Location: /listposts');
+            return http_response_code(302);
         }
 
     }
@@ -173,6 +186,8 @@ use App\Models\SocialNetworkManager;
     function deleteCommentPostFront($id)
     {
         $userLogged = Auth::check(['administrateur','abonner']);
+
+        $errors = [];
     
         // on supprime le commentaire
         $commentManager = new CommentManager();
@@ -182,12 +197,17 @@ use App\Models\SocialNetworkManager;
             try{
                 $comment = $commentManager->deleteComment($id);
             } catch (Exception $e) {
-                setFlashMessage($e->getMessage());
+                $errors[] = $e->getMessage();
             }  
 
             require('../app/Views/frontViews/frontDeleteCommentPostView.php');
         }else {
-            throw new Exception('impossible de supprimmer le commentaire :'.$comment->getId().'par le user :'.$_SESSION['connection']);
+            // throw new Exception('impossible de supprimmer le commentaire :'.$comment->getId().'par le user :'.$_SESSION['connection']);
+            $errors[] = 'impossible de supprimer le commentaire :'.$comment->getId().' par le user :'.$_SESSION['connection'];
+            setFlashErrors($errors);
+
+            header('Location: /listposts');
+            return http_response_code(302);
         }
     }
 
@@ -264,7 +284,7 @@ use App\Models\SocialNetworkManager;
                         try{
                             $userManager->updateUser($user);
                         } catch (Exception $e) {
-                            setFlashMessage($e->getMessage());
+                            $errors[] = $e->getMessage();
                         }
 
                         // enregistrement en bdd du media logo et du fichier uploader sur le server dans le dossier media
@@ -291,7 +311,7 @@ use App\Models\SocialNetworkManager;
                                         unlink($logo->getPath());  //suppression des media sur le serveur dans le dossier media
                                         $mediaManager->deleteMedia($logo->getId());    //suppression dans la base de donnée
                                     } catch (Exception $e) {
-                                        setFlashMessage($e->getMessage());
+                                        $errors[] = $e->getMessage();
                                     }   
                                 }
                             }
@@ -309,7 +329,7 @@ use App\Models\SocialNetworkManager;
                             try{
                                 $mediaManager->addMediaImage($mediaUploadLogo, CONFIGFILE, $file); //adding the media to the database and recovery via the id function of the last media in the database
                             } catch (Exception $e) {
-                                setFlashMessage($e->getMessage());
+                                $errors[] = $e->getMessage();
                             } 
                         }
 
@@ -323,7 +343,7 @@ use App\Models\SocialNetworkManager;
                                     }
                                     catch (Exception $e)
                                     {
-                                        setFlashMessage($e->getMessage());
+                                        $errors[] = $e->getMessage();
                                     } 
                                 }
                             }
@@ -341,14 +361,20 @@ use App\Models\SocialNetworkManager;
                                 }
                                 catch (Exception $e)
                                 {
-                                    setFlashMessage($e->getMessage());
+                                    $errors[] = $e->getMessage();
                                 }
                             }
+                       
+                        setFlashErrors($errors);    // pour gerer les erreurs en message flash (voir fichier globalFunctions.php)
 
                         header('Location: /userFrontDashboard/'.$id.'?successEditUser=true');
+                        return http_response_code(302);
+
                     }else{
-                        // ISSUE COMMENT TRANSMETTRE UN TABLEAU $errors=[]; DANS LA REDIRECTION CI DESSOUS POUR AFFICHER DANS LA VIEW LES DIFFERENTES ERREORS
+                        setFlashErrors($errors);    // pour gerer les erreurs en message flash (voir fichier globalFunctions.php)
+                        
                         header('Location: /userFrontDashboard/'.$id().'?successEditUser=false');
+                        return http_response_code(302);
                     }
             }
             
@@ -364,6 +390,11 @@ use App\Models\SocialNetworkManager;
      */
     function createUserFront()
     {
+        // creation d une session pour pouvoir notamment afficher les message flash
+        if(session_status() === PHP_SESSION_NONE){
+            session_start();
+        }
+        
         // user
         $user = new User();
         $formUser = new Form($user);
@@ -380,16 +411,16 @@ use App\Models\SocialNetworkManager;
 
         // traitement server et affichage des retours d'infos 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') { // if a submission of the form (=> a creation of a user) has been made
-                
+            
             //for data validation
                 $errors = [];
             
-                // if(empty($_POST['title'])){
-                //     $errors['title'][] = 'Le champs titre ne peut être vide';
-                // }
-                // if(mb_strlen($_POST['title'])<=3){
-                //     $errors['title'][] = 'Le champs titre doit contenir plus de 3 caractere';
-                // }
+                if(empty($_POST['firstName'])){
+                    $errors[] = 'Le champ firstName ne peut être vide';
+                }
+                if(mb_strlen($_POST['lastName'])<=3){
+                    $errors[] = 'Le champ lastName doit contenir plus de 3 caracteres';
+                }
                 
                 if(empty($errors)){
                     
@@ -408,7 +439,7 @@ use App\Models\SocialNetworkManager;
                     try{
                         $lastRecordingUser = $userManager->addUser($user);// add the user to the database and get the last id of the users in the database via the return of the function
                     } catch (Exception $e) {
-                        setFlashMessage($e->getMessage());
+                        $errors[] = $e->getMessage();
                     }
 
                     // enregistrement en bdd du media logo et du fichier uploader sur le server dans le dossier media
@@ -437,7 +468,7 @@ use App\Models\SocialNetworkManager;
                         try{
                             $mediaManager->addMediaImage($mediaUploadLogo, CONFIGFILE, $file); //adding the media to the database and recovery via the id function of the last media in the database
                         } catch (Exception $e) {
-                            setFlashMessage($e->getMessage());
+                            $errors[] = $e->getMessage();
                         } 
                     }
                     
@@ -455,14 +486,19 @@ use App\Models\SocialNetworkManager;
                         }
                         catch (Exception $e)
                         {
-                            setFlashMessage($e->getMessage());
+                            $errors[] = $e->getMessage();
                         }
                     }
-
+                    setFlashErrors($errors);    // pour gerer les erreurs en message flash (voir fichier globalFunctions.php)
+                    
                     header('Location: /createUserFront?createdUser=true');
-                }else{
-                    // ISSUE COMMENT TRANSMETTRE UN TABLEAU $errors=[]; DANS LA REDIRECTION CI DESSOUS POUR AFFICHER DANS LA VIEW LES DIFFERENTES ERREORS
+                    return http_response_code(302);
+
+                }else{  
+                    setFlashErrors($errors);    // pour gerer les erreurs en message flash (voir fichier globalFunctions.php)
+                    
                     header('Location: /createUserFront?createdUser=false');
+                    return http_response_code(302);
                 }
         }
         
@@ -476,6 +512,8 @@ use App\Models\SocialNetworkManager;
     function deleteUserFront($id){
 
         $userLogged = Auth::check(['abonner']);
+
+        $errors = [];
 
         // users
         $userManager = new UserManager();
@@ -492,7 +530,7 @@ use App\Models\SocialNetworkManager;
                     try{
                         $commentManager->deleteComment($comment->getId());    //suppression dans la base de donnée
                     } catch (Exception $e) {
-                        setFlashMessage($e->getMessage());
+                        $errors[] = $e->getMessage();
                     }  
                 }
             }
@@ -507,7 +545,7 @@ use App\Models\SocialNetworkManager;
                         unlink($media->getPath());  //suppression des media sur le serveur dans le dossier media
                         $mediaManager->deleteMedia($media->getId());    //suppression dans la base de donnée
                     } catch (Exception $e) {
-                        setFlashMessage($e->getMessage());
+                        $errors[] = $e->getMessage();
                     }   
                 }
             }
@@ -524,7 +562,7 @@ use App\Models\SocialNetworkManager;
                     }
                         catch (Exception $e)
                     {
-                        setFlashMessage($e->getMessage());
+                        $errors[] = $e->getMessage();
                     } 
                 }
             }
@@ -545,7 +583,7 @@ use App\Models\SocialNetworkManager;
                                 unlink($media->getPath());  //suppression des media sur le serveur dans le dossier media
                                 $mediaManager->deleteMedia($media->getId());    //suppression dans la base de donnée
                             } catch (Exception $e) {
-                                setFlashMessage($e->getMessage());
+                                $errors[] = $e->getMessage();
                             }  
                         }
                     }
@@ -558,7 +596,7 @@ use App\Models\SocialNetworkManager;
                             try{
                                 $commentManager->deleteComment($comment->getId());    //suppression dans la base de donnée
                             } catch (Exception $e) {
-                                setFlashMessage($e->getMessage());
+                                $errors[] = $e->getMessage();
                             }  
                         }
                     }
@@ -567,7 +605,7 @@ use App\Models\SocialNetworkManager;
                     try{
                         $post = $postManager->deletePost($post->getId());
                     } catch (Exception $e) {
-                        setFlashMessage($e->getMessage());
+                        $errors[] = $e->getMessage();
                     }  
                 }
             }
@@ -576,9 +614,12 @@ use App\Models\SocialNetworkManager;
             try{
                 $user = $userManager->deleteUser($id);
             } catch (Exception $e) {
-                setFlashMessage($e->getMessage());
+                $errors[] = $e->getMessage();
             }
-            session_destroy();
+            // session_destroy();
+            unset($_SESSION['connection']);
+           
+            setFlashErrors($errors);    // pour gerer les erreurs en message flash (voir fichier globalFunctions.php)
 
             require('../app/Views/frontViews/frontDeleteUserView.php');
         }else {
