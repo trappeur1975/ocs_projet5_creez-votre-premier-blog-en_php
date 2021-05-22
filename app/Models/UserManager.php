@@ -160,12 +160,16 @@ class UserManager extends Manager
      */
     public function deleteUser(int $id) : void
     {
+        $user = $this->getUser($id);
+        $emailUser= $user->getEmail();
+        
         $db = $this->dbConnect();
         $query = $db->prepare('DELETE FROM user WHERE id = :id');
         $result = $query->execute(['id' => $id]);
         if($result === false){
             throw new Exception('impossible de supprimer l utilisateur :'.$id);
         }
+        sendEmail($emailUser, 'Supression de votre compte sur BlogNico', 'Votre compte user sur le BlogNico a ete SUPPRIMER');
     }
 
     /**
@@ -191,6 +195,8 @@ class UserManager extends Manager
         if($result === false){
             throw new Exception('impossible de valider le user :'.$idUser);
         }
+
+        sendEmail($user->getEmail(), 'Votre compte sur BlogNico VALIDER', 'Votre compte user  sur le BlogNico a ete VALIDER part de l\'administrateur du site');
     }
 
     /**

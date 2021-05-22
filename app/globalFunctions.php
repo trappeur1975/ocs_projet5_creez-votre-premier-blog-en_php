@@ -13,6 +13,12 @@ function formatHtml(string $content) {
     return nl2br(htmlentities($content));
 }
 
+// envoyer un email
+function sendEmail(String $recipientEmail, String $title, String $message){
+    $senderEmail = 'From: '.searchDatasFile('email')[1]; //chemin de stockage du fichier uploader (voir fichier globalFunctions.php)
+    mail($recipientEmail, $title, $message, $senderEmail);
+}
+
 // gestion de fichier
     // cherche a recuperer (sous forme d un tableau) les données d une ligne dans un fichier si elle existe
     function searchDatasFile(String $typeDatasSought){
@@ -74,29 +80,4 @@ function formatHtml(string $content) {
             }
             unset($_SESSION['flash']);
         }
-    }
-
-
-    // creer un message flash
-    // $type mettre le type de bootstrap (success, warning, ou danger par exemple)
-    // function setFlashMessage($message, $type='danger'){
-    //     $_SESSION['flash'] = array(
-    //         'message'=> $message,
-    //         'type' => $type
-    //     );
-            
-    // }
-
-    // afficher un message flash
-    // function getFlashMessage(){
-    //     if(isset($_SESSION['flash'])){
-    //         echo('<div class="alert alert-'.$_SESSION['flash']['type'].'">
-    //                 <!-- <a class="close">fermer</a> -->
-    //                 '.$_SESSION['flash']['message'].'
-    //             </div>
-    //         ');
-    //         unset($_SESSION['flash']);
-    //     }
-    // }
-
-    
+    }  

@@ -184,11 +184,11 @@ use App\Models\SocialNetworkManager;
                         $idMediaType = 1;   //image
                         
                         $file = $_FILES['mediaUploadImage']; //fichier uploader
-                        $storagePath = searchDatasFile('imageStoragePath')[1]; //chemin de stockage du fichier uploader (voir fichier globalFunctions.php)         
+                        $storagePath = searchDatasFile('imageStoragePath')[1]; //chemin de stockage du fichier uploader (voir fichier globalFunctions.php)
                         $name = 'mediaImage-'.pathinfo($file['name'])['filename'].'-'; 
                         $newNameUploaderFile = uniqid($name , true);    // concatenation "media-" + nom du fichier uploader(sans son extension + identifiant unique (via uniqid) pour avoir un identifiant unique
                         
-                        $extension_upload = pathinfo($file['name'])['extension']; //pour recuperer l'extension du fichier uploader   
+                        $extension_upload = pathinfo($file['name'])['extension']; //pour recuperer l'extension du fichier uploader
                         $pathFile =  $storagePath.basename($newNameUploaderFile.'.'.$extension_upload); //chemin de stockage  avec nouveau nom du media uploader
 
                         // enregistrement en bdd du media IMAGE et du fichier uploader sur le server dans le dossier media
@@ -534,8 +534,6 @@ use App\Models\SocialNetworkManager;
     {
         $userLogged = Auth::check(['administrateur']);
  
-        // mail('destinataireEmail@societe.fr', 'titre du email', 'message du email', 'From: adminNico@blogNico.com');
-
         // user
         $user = new User();
         

@@ -491,6 +491,9 @@ use App\Models\SocialNetworkManager;
                     }
                     setFlashErrors($errors);    // pour gerer les erreurs en message flash (voir fichier globalFunctions.php)
                     
+                    sendEmail('adminComptePerso@hotmail.com', 'nouveau compte user creer', 'un nouveau compte user a ete enregiste sur votre blog et est en attente de validation de votre part');
+                    sendEmail($user->getEmail(), 'Votre compte sur BlogNico', 'Votre compte user a bien ete enregistre sur le BlogNico et est en attente de validation de la part de l\'administrateur du site');
+
                     header('Location: /createUserFront?createdUser=true');
                     return http_response_code(302);
 

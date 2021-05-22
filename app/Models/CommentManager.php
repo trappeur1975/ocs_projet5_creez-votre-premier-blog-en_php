@@ -8,6 +8,8 @@ use \DateTime;
 
 class CommentManager extends Manager
 {
+    const ADMINISTRATEUR = 2;
+    
     /**
      * Method getListCommentForPost method that returns the list of comment linked to a post 
      *
@@ -51,6 +53,10 @@ class CommentManager extends Manager
     // ajoute le comment (en attribut de cette fonction) a la table comment en bdd
     public function addComment(Comment $comment)
     {   
+        $UserIdComment = $comment->getUser_id();
+        $usermanager = new userManager();
+        $userComment = $usermanager->getUser($UserIdComment);
+        
         $db = $this->dbConnect();
         $query = $db->prepare('INSERT INTO comment SET comment = :comment, 
                                                     dateCompletion = :dateCompletion,
@@ -67,7 +73,12 @@ class CommentManager extends Manager
         
         if($result === false){
             throw new Exception('impossible de creer l enregistrement du nouveau commentaire');
-        }      
+        }  
+
+        if($userComment->getUserType_id() != self::ADMINISTRATEUR){
+            sendEmail($userComment->getEmail(), 'commentaire sur BlogNico en attente', 'Votre commentaire sur le BlogNico a bien ete enregistre et est en attente de validation de la part de l\'administrateur du site');
+        }
+       
     }
 
     /**
@@ -81,6 +92,10 @@ class CommentManager extends Manager
     {   
         $comment = $this->getComment($idComment);
 
+        $UserIdComment = $comment->getUser_id();
+        $usermanager = new userManager();
+        $userComment = $usermanager->getUser($UserIdComment);
+
         $db = $this->dbConnect();
         $query = $db->prepare('DELETE FROM comment WHERE id = :idComment');
         $result = $query->execute(['idComment' => $idComment]);
@@ -88,6 +103,10 @@ class CommentManager extends Manager
         if($result === false){
             throw new Exception('impossible de supprimer le commentaire :'.$idComment);
         }else {
+            if($userComment->getUserType_id() != self::ADMINISTRATEUR){
+                sendEmail($userComment->getEmail(), 'commentaire #'.$idComment.' sur BlogNico SUPPRIMER', 'Votre commentaire #'.$idComment.' sur le BlogNico a ete supprime');
+            }
+            
             return $comment;
         }
     }
@@ -133,6 +152,10 @@ class CommentManager extends Manager
     public function validateComment(int $idComment)
     {  
         $comment = $this->getComment($idComment);
+       
+        $UserIdComment = $comment->getUser_id();
+        $usermanager = new userManager();
+        $userComment = $usermanager->getUser($UserIdComment);
 
         $dateTime = new Datetime();
         $validate = $dateTime->format('Y-m-d H:i:s');
@@ -145,6 +168,9 @@ class CommentManager extends Manager
             ]);
       
         if($result === true){
+            if($userComment->getUserType_id() != self::ADMINISTRATEUR){
+                sendEmail($userComment->getEmail(), 'votre commentaire #'.$idComment.' sur BlogNico VALIDER', 'Votre commentaire # '.$idComment.' sur le BlogNico a ete VALIDER part de l\'administrateur du site'); 
+            }
             return $comment;
         }else {
             throw new Exception('impossible de valider le commentaire :'.$idComment);

@@ -73,11 +73,11 @@ pour tester l'envoi des email un serveur de email ("MailDev) en local a été ut
 
 4) pour tester le service on peut envoyer un email depuis un fichier php
 
-        mail('destinataireEmail@societe.fr', 'titre du email', 'message du email', 'From: emailEmetteur@societe.com');
+        mail('destinataireEmail@societe.fr', 'titre du email', 'message du email', 'From: emailExpediteur@societe.com');
 
 ----------------- infos site ----------------
 pour lancer le serveur php via la console avec pour dossier racine "public" executer la commande suivante:
 
     php -S localhost:8000 -t public
 
-dernier modif 22/05/2021 version1
+dernier modif 22/05/2021 version2
