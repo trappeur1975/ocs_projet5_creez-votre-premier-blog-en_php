@@ -33,7 +33,11 @@ use App\Models\SocialNetworkManager;
                 try {
                     $userRegister = $userManager->findByUserLogin($_POST['login']);
 
-                    if($userRegister->getPassword() ===  $_POST['password']){
+                    // on hache le mot de passe
+                    $hashPsswords = hash('md5', $_POST['password']);
+
+                    if($userRegister->getPassword() === $hashPsswords){
+
                         session_start();
                        
                         $_SESSION['connection'] = $userRegister->getId(); //creation de la session qui enregistre le id de user qi vient de se connecter
@@ -594,6 +598,9 @@ use App\Models\SocialNetworkManager;
                 
                 if(empty($errors)){
 
+                    // on hache le mot de passe
+                    $hashPsswords = hash('md5', $_POST['password']);
+
                     // enregistrement en bdd du user
                     $user
                         ->setFirstName($_POST['firstName'])
@@ -601,7 +608,8 @@ use App\Models\SocialNetworkManager;
                         ->setEmail($_POST['email'])
                         ->setSlogan($_POST['slogan'])
                         ->setLogin($_POST['login'])
-                        ->setPassword($_POST['password'])
+                        ->setPassword($hashPsswords)
+                        // ->setPassword($_POST['password'])
                         ->setUserType_id($_POST['userType_id'][0]); //car on cette donnee est issu d'un select multiple
                         // ->setValidate(new Datetime()); //to assign today's date (in datetime) by default to the user we create
                         // ->setValidate(DateTime::createFromFormat('Y-m-d H:i:s',new Datetime())); //to assign today's date (in datetime) by default to the user we create 
@@ -777,6 +785,9 @@ use App\Models\SocialNetworkManager;
 
             if(empty($errors)){
             
+                // on hache le mot de passe
+                $hashPsswords = hash('md5', $_POST['password']);
+                
                 // enregistrement en bdd du user
                 $user
                     ->setFirstName($_POST['firstName'])
@@ -784,7 +795,8 @@ use App\Models\SocialNetworkManager;
                     ->setEmail($_POST['email'])
                     ->setSlogan($_POST['slogan'])
                     ->setLogin($_POST['login'])
-                    ->setPassword($_POST['password'])
+                    ->setPassword($hashPsswords)
+                    // ->setPassword($_POST['password'])
                     ->setUserType_id($_POST['userType_id'][0]); //car cette donnee est issu d'un select multiple
                 
                 try{

@@ -128,114 +128,6 @@ use App\Models\SocialNetworkManager;
         require('../app/Views/frontViews/frontPostView.php');
     }
 
-//COMMENT
-    /**
-     * function use for road http://localhost:8000/editCommentPostFront/1 ou http://localhost:8000/editCommentPostFront/2 ou ....
-     * 
-     */
-    function editCommentPostFront($id)
-    {
-        $userLogged = Auth::check(['administrateur','abonner']);
-
-        $errors = [];
-   
-        // on edit le commentaire (a travers son formulaire)
-        $commentManager = new CommentManager();
-        try{
-            $comment = $commentManager->getComment($id);
-        } catch (Exception $e) {    //dans le cas ou l'on demande une ressource qui n'existe pas (ici un id de comment qui n'existe pas)
-            $errors[] = $e->getMessage();
-            setFlashErrors($errors);    // pour gerer les erreurs en message flash (voir fichier globalFunctions.php)
-            require_once('../app/Views/errors.php');
-            return http_response_code(302);
-        }
-
-        if($comment->getUser_id() === $_SESSION['connection']){ //on verifier que le commentaire que le user souhaite modifier lui appartient bien
-
-            $formComment = new Form($comment, true);
-
-            if($_SERVER['REQUEST_METHOD'] === 'POST') { // if a submission of the form (=> a modification of a comment) has been made
-                
-                //test de validation des champs du formulaire
-                if(empty($_POST['comment']) OR mb_strlen($_POST['comment'])<=3){
-                    $errors[] = 'Le champ commentaire ne peut être vide et doit contenir plus de 3 caracteres';
-                }
-
-                // enregistrement des infos
-                if(empty($errors)){
-                    // enregistrement des modifications du commentaire
-                    if (!empty($_POST['comment'])){
-                        $comment->setComment($_POST['comment']);
-                        
-                        try{
-                            $commentManager->updateComment($comment);
-                        } catch (Exception $e) {
-                            $errors[] = $e->getMessage();
-                        } 
-                    }
-                    
-                    setFlashErrors($errors);
-
-                    header('Location: /post/'.$comment->getPost_id().'?successUploadComment=true');
-                    return http_response_code(302);
-
-                }else{
-                    setFlashErrors($errors);
-
-                    header('Location: /post/'.$comment->getPost_id().'?successUploadComment=false');
-                    return http_response_code(302);
-                }
-            }
-            require('../app/Views/frontViews/frontEditCommentPostView.php');
-        }else {
-            $errors[] = 'impossible de modifier le commentaire :'.$comment->getId().'par le user :'.$_SESSION['connection'];
-            setFlashErrors($errors);
-
-            header('Location: /listposts');
-            return http_response_code(302);
-        }
-
-    }
-
-    /**
-     * function use for road http://localhost:8000/deleteCommentPostFront/1 ou http://localhost:8000/deleteCommentPostFront/2 ou ....
-     * 
-     */
-    function deleteCommentPostFront($id)
-    {
-        $userLogged = Auth::check(['administrateur','abonner']);
-
-        $errors = [];
-    
-        // on supprime le commentaire
-        $commentManager = new CommentManager();
-        try{
-            $comment = $commentManager->getComment($id);
-        } catch (Exception $e) {    //dans le cas ou l'on demande une ressource qui n'existe pas (ici un id de comment qui n'existe pas)
-            $errors[] = $e->getMessage();
-            setFlashErrors($errors);    // pour gerer les erreurs en message flash (voir fichier globalFunctions.php)
-            require_once('../app/Views/errors.php');
-            return http_response_code(302);
-        }
-        
-        if($comment->getUser_id() === $_SESSION['connection']){ //on verifier que le commentaire que le user souhaite modifier lui appartient bien
-            try{
-                $comment = $commentManager->deleteComment($id);
-            } catch (Exception $e) {
-                $errors[] = $e->getMessage();
-            }  
-
-            require('../app/Views/frontViews/frontDeleteCommentPostView.php');
-        }else {
-            // throw new Exception('impossible de supprimmer le commentaire :'.$comment->getId().'par le user :'.$_SESSION['connection']);
-            $errors[] = 'impossible de supprimer le commentaire :'.$comment->getId().' par le user :'.$_SESSION['connection'];
-            setFlashErrors($errors);
-
-            header('Location: /listposts');
-            return http_response_code(302);
-        }
-    }
-
 // USER
     /**
      * function use for road  http://localhost:8000/userFrontDashboard/1 ou http://localhost:8000/userFrontDashboard/2 ou ....
@@ -333,6 +225,9 @@ use App\Models\SocialNetworkManager;
                 // enregistrement des infos
                 if(empty($errors)){
                 
+                    // on hache le mot de passe
+                    $hashPsswords = hash('md5', $_POST['password']);
+
                     // enregistrement en bdd du user
                     $user
                         ->setFirstName($_POST['firstName'])
@@ -340,7 +235,8 @@ use App\Models\SocialNetworkManager;
                         ->setEmail($_POST['email'])
                         ->setSlogan($_POST['slogan'])
                         ->setLogin($_POST['login'])
-                        ->setPassword($_POST['password']);
+                        ->setPassword($hashPsswords);
+                        // ->setPassword($_POST['password']);
                     
                     try{
                         $userManager->updateUser($user);
@@ -457,7 +353,7 @@ use App\Models\SocialNetworkManager;
         if(session_status() === PHP_SESSION_NONE){
             session_start();
         }
-        
+
         // user
         $user = new User();
         $formUser = new Form($user);
@@ -511,6 +407,9 @@ use App\Models\SocialNetworkManager;
             
             if(empty($errors)){
                 
+                // on hache le mot de passe
+                $hashPsswords = hash('md5', $_POST['password']);
+
                 // enregistrement en bdd du user
                 $user
                     ->setFirstName($_POST['firstName'])
@@ -518,7 +417,8 @@ use App\Models\SocialNetworkManager;
                     ->setEmail($_POST['email'])
                     ->setSlogan($_POST['slogan'])
                     ->setLogin($_POST['login'])
-                    ->setPassword($_POST['password']) 
+                    ->setPassword($hashPsswords)
+                    // ->setPassword($_POST['password']) 
                     ->setUserType_id(1); //par défaut c est un user de type "abonner"
                 
                 try{
@@ -724,4 +624,112 @@ use App\Models\SocialNetworkManager;
             return http_response_code(302);
         }
 
+    }
+
+//COMMENT
+    /**
+     * function use for road http://localhost:8000/editCommentPostFront/1 ou http://localhost:8000/editCommentPostFront/2 ou ....
+     * 
+     */
+    function editCommentPostFront($id)
+    {
+        $userLogged = Auth::check(['administrateur','abonner']);
+
+        $errors = [];
+
+        // on edit le commentaire (a travers son formulaire)
+        $commentManager = new CommentManager();
+        try{
+            $comment = $commentManager->getComment($id);
+        } catch (Exception $e) {    //dans le cas ou l'on demande une ressource qui n'existe pas (ici un id de comment qui n'existe pas)
+            $errors[] = $e->getMessage();
+            setFlashErrors($errors);    // pour gerer les erreurs en message flash (voir fichier globalFunctions.php)
+            require_once('../app/Views/errors.php');
+            return http_response_code(302);
+        }
+
+        if($comment->getUser_id() === $_SESSION['connection']){ //on verifier que le commentaire que le user souhaite modifier lui appartient bien
+
+            $formComment = new Form($comment, true);
+
+            if($_SERVER['REQUEST_METHOD'] === 'POST') { // if a submission of the form (=> a modification of a comment) has been made
+                
+                //test de validation des champs du formulaire
+                if(empty($_POST['comment']) OR mb_strlen($_POST['comment'])<=3){
+                    $errors[] = 'Le champ commentaire ne peut être vide et doit contenir plus de 3 caracteres';
+                }
+
+                // enregistrement des infos
+                if(empty($errors)){
+                    // enregistrement des modifications du commentaire
+                    if (!empty($_POST['comment'])){
+                        $comment->setComment($_POST['comment']);
+                        
+                        try{
+                            $commentManager->updateComment($comment);
+                        } catch (Exception $e) {
+                            $errors[] = $e->getMessage();
+                        } 
+                    }
+                    
+                    setFlashErrors($errors);
+
+                    header('Location: /post/'.$comment->getPost_id().'?successUploadComment=true');
+                    return http_response_code(302);
+
+                }else{
+                    setFlashErrors($errors);
+
+                    header('Location: /post/'.$comment->getPost_id().'?successUploadComment=false');
+                    return http_response_code(302);
+                }
+            }
+            require('../app/Views/frontViews/frontEditCommentPostView.php');
+        }else {
+            $errors[] = 'impossible de modifier le commentaire :'.$comment->getId().'par le user :'.$_SESSION['connection'];
+            setFlashErrors($errors);
+
+            header('Location: /listposts');
+            return http_response_code(302);
+        }
+
+    }
+
+    /**
+     * function use for road http://localhost:8000/deleteCommentPostFront/1 ou http://localhost:8000/deleteCommentPostFront/2 ou ....
+     * 
+     */
+    function deleteCommentPostFront($id)
+    {
+        $userLogged = Auth::check(['administrateur','abonner']);
+
+        $errors = [];
+
+        // on supprime le commentaire
+        $commentManager = new CommentManager();
+        try{
+            $comment = $commentManager->getComment($id);
+        } catch (Exception $e) {    //dans le cas ou l'on demande une ressource qui n'existe pas (ici un id de comment qui n'existe pas)
+            $errors[] = $e->getMessage();
+            setFlashErrors($errors);    // pour gerer les erreurs en message flash (voir fichier globalFunctions.php)
+            require_once('../app/Views/errors.php');
+            return http_response_code(302);
+        }
+        
+        if($comment->getUser_id() === $_SESSION['connection']){ //on verifier que le commentaire que le user souhaite modifier lui appartient bien
+            try{
+                $comment = $commentManager->deleteComment($id);
+            } catch (Exception $e) {
+                $errors[] = $e->getMessage();
+            }  
+
+            require('../app/Views/frontViews/frontDeleteCommentPostView.php');
+        }else {
+            // throw new Exception('impossible de supprimmer le commentaire :'.$comment->getId().'par le user :'.$_SESSION['connection']);
+            $errors[] = 'impossible de supprimer le commentaire :'.$comment->getId().' par le user :'.$_SESSION['connection'];
+            setFlashErrors($errors);
+
+            header('Location: /listposts');
+            return http_response_code(302);
+        }
     }
