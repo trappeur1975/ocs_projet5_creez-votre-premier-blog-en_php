@@ -29,9 +29,9 @@
                     }
                 ?>
                 
-                <!-- affichage de ceratin menu selon si user est connecter ou non au site -->
+                <!-- affichage de certain menu selon si user est connecter ou non au site -->
                 <?php
-                    if(!isset($_SESSION['connection'])){
+                    if(!isset($_SESSION['connection']) OR is_null($userLogged->getValidate())){
                 ?>
                     <li class="nav-item">
                         <form action="/backend/connection" method="post"> <!-- for security to prevent me being forcibly connected by sending me this link -->
@@ -54,7 +54,7 @@
                 ?>
 
                 <?php
-                    if(isset($_SESSION['connection']) AND $userLogged->getUserType_id() == 1){ //si on en logger et que l on est un user de status "abonner"
+                    if(isset($_SESSION['connection']) AND $userLogged->getUserType_id() == 1 AND !is_null($userLogged->getValidate())){ //si on en logger et que l on est un user de status "abonner"
 
                 ?>
                     <li class="nav-item">

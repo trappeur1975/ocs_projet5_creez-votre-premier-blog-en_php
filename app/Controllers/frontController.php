@@ -72,7 +72,13 @@ use App\Models\SocialNetworkManager;
         // traitement server et affichage des retours d'infos 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') { // if a submission of the form (=> a creation of a post) has been made
             
+            //for data validation
             $errors = [];
+
+            //test de validation des champs du formulaire
+                if(empty($_POST['comment']) OR mb_strlen($_POST['comment'])<=3){
+                    $errors[] = 'Le champ commentaire ne peut être vide et doit contenir plus de 3 caracteres';
+                }
             
             if(empty($errors)){
                 Auth::check(['administrateur','abonner']);    
@@ -134,38 +140,37 @@ use App\Models\SocialNetworkManager;
             $formComment = new Form($comment, true);
 
             if($_SERVER['REQUEST_METHOD'] === 'POST') { // if a submission of the form (=> a modification of a comment) has been made
-                //for data validation
-
-                    if(empty($_POST['comment'])){
-                        $errors[] = 'Le champs commentaire ne peut être vide';
+                
+            //for data validation
+                
+                //test de validation des champs du formulaire
+                    if(empty($_POST['comment']) OR mb_strlen($_POST['comment'])<=3){
+                        $errors[] = 'Le champ commentaire ne peut être vide et doit contenir plus de 3 caracteres';
                     }
-                    if(mb_strlen($_POST['comment'])<=3){
-                        $errors[] = 'Le champs commentaire doit contenir plus de 3 caractere';
-                    }
 
-                    if(empty($errors)){
-                        // enregistrement des modifications du commentaire
-                        if (!empty($_POST['comment'])){
-                            $comment->setComment($_POST['comment']);
-                            
-                            try{
-                                $commentManager->updateComment($comment);
-                            } catch (Exception $e) {
-                                $errors[] = $e->getMessage();
-                            } 
-                        }
+                if(empty($errors)){
+                    // enregistrement des modifications du commentaire
+                    if (!empty($_POST['comment'])){
+                        $comment->setComment($_POST['comment']);
                         
-                        setFlashErrors($errors);
-
-                        header('Location: /post/'.$comment->getPost_id().'?successUploadComment=true');
-                        return http_response_code(302);
-
-                    }else{
-                        setFlashErrors($errors);
-
-                        header('Location: /post/'.$comment->getPost_id().'?successUploadComment=false');
-                        return http_response_code(302);
+                        try{
+                            $commentManager->updateComment($comment);
+                        } catch (Exception $e) {
+                            $errors[] = $e->getMessage();
+                        } 
                     }
+                    
+                    setFlashErrors($errors);
+
+                    header('Location: /post/'.$comment->getPost_id().'?successUploadComment=true');
+                    return http_response_code(302);
+
+                }else{
+                    setFlashErrors($errors);
+
+                    header('Location: /post/'.$comment->getPost_id().'?successUploadComment=false');
+                    return http_response_code(302);
+                }
             }
             require('../app/Views/frontViews/frontEditCommentPostView.php');
         }else {
@@ -260,124 +265,152 @@ use App\Models\SocialNetworkManager;
                 }
             
             // LES COMMENTAIRES DU USER
-            $commentManager = new CommentManager();
-            $listCommentsForUser = $commentManager->listCommentsForUser($id);
+                $commentManager = new CommentManager();
+                $listCommentsForUser = $commentManager->listCommentsForUser($id);
 
 
             // traitement server et affichage des retours d'infos 
             if ($_SERVER['REQUEST_METHOD'] === 'POST') { // if a submission of the form (=> a modification of a user) has been made
 
                 //for data validation
-                    $errors = [];
+                $errors = [];
 
-                    if(empty($errors)){
+                //test de validation des champs du formulaire
+                    if(empty($_POST['firstName']) OR mb_strlen($_POST['firstName'])<=3){
+                        $errors[] = 'Le champ firstName ne peut être vide et doit contenir plus de 3 caracteres';
+                    }
+                    if(empty($_POST['lastName']) OR mb_strlen($_POST['lastName'])<=3){
+                        $errors[] = 'Le champ lastName ne peut être vide et doit contenir plus de 3 caracteres';
+                    }
+    
+                    if(empty($_POST['email']) OR strpos($_POST['email'], '@') === false){
+                        $errors[] = 'Le champ email ne peut être vide ou l\'ecriture de votre adresse email est incorrect';
+                    }
+                    $idUserIidenticalData1 = $userManager->identicalDataSearch('email', $_POST['email']);
+                    if(!is_null($idUserIidenticalData1) AND $idUserIidenticalData1 != $id) {
+                        $errors[] = 'Votre email a été déjà utilisé, vous devez en indiquer un autre';
+                    }
+                
+                    if(empty($_POST['login']) OR mb_strlen($_POST['login'])<=3){
+                        $errors[] = 'Le champ login ne peut être vide et doit contenir plus de 3 caracteres';
+                    }
                     
-                        // enregistrement en bdd du user
-                        $user
-                            ->setFirstName($_POST['firstName'])
-                            ->setLastName($_POST['lastName'])
-                            ->setEmail($_POST['email'])
-                            ->setSlogan($_POST['slogan'])
-                            ->setLogin($_POST['login'])
-                            ->setPassword($_POST['password']);
+                    $idUserIidenticalData2 = $userManager->identicalDataSearch('login', $_POST['login']);
+                    if(!is_null($idUserIidenticalData2) AND $idUserIidenticalData2 != $id) {
+                        $errors[] = 'Votre login a été déjà utilisé, vous devez en indiquer un autre';
+                    }
+    
+                    if(empty($_POST['password']) OR mb_strlen($_POST['password'])<=3){
+                        $errors[] = 'Le champ password ne peut être vide et doit contenir plus de 3 caracteres';
+                    }
+                
+                if(empty($errors)){
+                
+                    // enregistrement en bdd du user
+                    $user
+                        ->setFirstName($_POST['firstName'])
+                        ->setLastName($_POST['lastName'])
+                        ->setEmail($_POST['email'])
+                        ->setSlogan($_POST['slogan'])
+                        ->setLogin($_POST['login'])
+                        ->setPassword($_POST['password']);
+                    
+                    try{
+                        $userManager->updateUser($user);
+                    } catch (Exception $e) {
+                        $errors[] = $e->getMessage();
+                    }
+
+                    // enregistrement en bdd du media logo et du fichier uploader sur le server dans le dossier media
+                    if(isset($_FILES['mediaUploadLogo']) AND $_FILES['mediaUploadLogo']['error']== 0){
+                        
+                        // variables infos
+                        $idMediaType = 2;   //logo
+
+                        $file = $_FILES['mediaUploadLogo']; //fichier uploader
+                        $storagePath = searchDatasFile('imageStoragePath')[1]; //chemin de stockage du fichier uploader (voir fichier globalFunctions.php)         
+                        $name = 'mediaLogo-'.pathinfo($file['name'])['filename'].'-'; 
+                        $newNameUploaderFile = uniqid($name , true);    // concatenation "media-" + nom du fichier uploader(sans son extension + identifiant unique (via uniqid) pour avoir un identifiant unique
+
+                        $extension_upload = pathinfo($file['name'])['extension']; //pour recuperer l'extension du fichier uploader   
+                        $pathFile =  $storagePath.basename($newNameUploaderFile.'.'.$extension_upload); //chemin de stockage  avec nouveau nom du media uploader
+                    
+                        // on supprime en base de donnée ainsi que sur le server dans le dossier media l'ancien logo de l'user    
+                        $listMediasForUser = $mediaManager->getListMediasForUser($id);
+                        $listLogosDelete = $mediaManager->getListMediasForUserForType($listMediasForUser, $listIdsMediaType);   // on recuperer la liste des logos du user
+                    
+                        if(!empty($listLogosDelete)){
+                            foreach($listLogosDelete as $logo){
+                                try{
+                                    unlink($logo->getPath());  //suppression des media sur le serveur dans le dossier media
+                                    $mediaManager->deleteMedia($logo->getId());    //suppression dans la base de donnée
+                                } catch (Exception $e) {
+                                    $errors[] = $e->getMessage();
+                                }   
+                            }
+                        }
+
+                        // enregistrement en bdd du nouveau LOGO et et de son fichier uploader sur le server dans le dossier media
+                        $mediaUploadLogo
+                            ->setPath($pathFile)    // ->setPath('./media/media-19.jpg')
+                            ->setAlt($_POST['altFileMediaLogo'])
+                            ->setStatutActif(1)
+                            ->setMediaType_id($idMediaType)
+                            ->setUser_id($id)
+                            // ->setUser_id($user->getId())
+                            ;
                         
                         try{
-                            $userManager->updateUser($user);
+                            $mediaManager->addMediaImage($mediaUploadLogo, CONFIGFILE, $file); //adding the media to the database and recovery via the id function of the last media in the database
                         } catch (Exception $e) {
                             $errors[] = $e->getMessage();
-                        }
+                        } 
+                    }
 
-                        // enregistrement en bdd du media logo et du fichier uploader sur le server dans le dossier media
-                        if(isset($_FILES['mediaUploadLogo']) AND $_FILES['mediaUploadLogo']['error']== 0){
-                            
-                            // variables infos
-                            $idMediaType = 2;   //logo
-
-                            $file = $_FILES['mediaUploadLogo']; //fichier uploader
-                            $storagePath = searchDatasFile('imageStoragePath')[1]; //chemin de stockage du fichier uploader (voir fichier globalFunctions.php)         
-                            $name = 'mediaLogo-'.pathinfo($file['name'])['filename'].'-'; 
-                            $newNameUploaderFile = uniqid($name , true);    // concatenation "media-" + nom du fichier uploader(sans son extension + identifiant unique (via uniqid) pour avoir un identifiant unique
-    
-                            $extension_upload = pathinfo($file['name'])['extension']; //pour recuperer l'extension du fichier uploader   
-                            $pathFile =  $storagePath.basename($newNameUploaderFile.'.'.$extension_upload); //chemin de stockage  avec nouveau nom du media uploader
-                        
-                            // on supprime en base de donnée ainsi que sur le server dans le dossier media l'ancien logo de l'user    
-                            $listMediasForUser = $mediaManager->getListMediasForUser($id);
-                            $listLogosDelete = $mediaManager->getListMediasForUserForType($listMediasForUser, $listIdsMediaType);   // on recuperer la liste des logos du user
-                        
-                            if(!empty($listLogosDelete)){
-                                foreach($listLogosDelete as $logo){
-                                    try{
-                                        unlink($logo->getPath());  //suppression des media sur le serveur dans le dossier media
-                                        $mediaManager->deleteMedia($logo->getId());    //suppression dans la base de donnée
-                                    } catch (Exception $e) {
-                                        $errors[] = $e->getMessage();
-                                    }   
-                                }
-                            }
-
-                            // enregistrement en bdd du nouveau LOGO et et de son fichier uploader sur le server dans le dossier media
-                            $mediaUploadLogo
-                                ->setPath($pathFile)    // ->setPath('./media/media-19.jpg')
-                                ->setAlt($_POST['altFileMediaLogo'])
-                                ->setStatutActif(1)
-                                ->setMediaType_id($idMediaType)
-                                ->setUser_id($id)
-                                // ->setUser_id($user->getId())
-                                ;
-                            
-                            try{
-                                $mediaManager->addMediaImage($mediaUploadLogo, CONFIGFILE, $file); //adding the media to the database and recovery via the id function of the last media in the database
-                            } catch (Exception $e) {
-                                $errors[] = $e->getMessage();
-                            } 
-                        }
-
-                        // enregistrement en bdd socialNetwork des modifications qui ont etait apporté dans l'editUser()   
-                            // supression du ou des socialNetwork de l'user
-                            if(!empty($_POST['socialNetworksUser'])){ 
-                                foreach($_POST['socialNetworksUser'] as $idSsocialNetwork){
-                                    try
-                                    {
-                                        $socialNetworkManager->deleteSocialNetwork($idSsocialNetwork);
-                                    }
-                                    catch (Exception $e)
-                                    {
-                                        $errors[] = $e->getMessage();
-                                    } 
-                                }
-                            }
-                            
-                            // ajout d'un socialNetwork a l'user
-                            if(!empty($_POST['socialNetwork'])){
-                                $socialNetwork
-                                    ->setUrl($_POST['socialNetwork'])
-                                    ->setUser_id($id)
-                                    ;
-                                
+                    // enregistrement en bdd socialNetwork des modifications qui ont etait apporté dans l'editUser()   
+                        // supression du ou des socialNetwork de l'user
+                        if(!empty($_POST['socialNetworksUser'])){ 
+                            foreach($_POST['socialNetworksUser'] as $idSsocialNetwork){
                                 try
                                 {
-                                    $socialNetworkManager->addSocialNetwork($socialNetwork);
+                                    $socialNetworkManager->deleteSocialNetwork($idSsocialNetwork);
                                 }
                                 catch (Exception $e)
                                 {
                                     $errors[] = $e->getMessage();
-                                }
+                                } 
                             }
-                       
-                        setFlashErrors($errors);    // pour gerer les erreurs en message flash (voir fichier globalFunctions.php)
-
-                        header('Location: /userFrontDashboard/'.$id.'?successEditUser=true');
-                        return http_response_code(302);
-
-                    }else{
-                        setFlashErrors($errors);    // pour gerer les erreurs en message flash (voir fichier globalFunctions.php)
+                        }
                         
-                        header('Location: /userFrontDashboard/'.$id().'?successEditUser=false');
-                        return http_response_code(302);
-                    }
-            }
-            
+                        // ajout d'un socialNetwork a l'user
+                        if(!empty($_POST['socialNetwork'])){
+                            $socialNetwork
+                                ->setUrl($_POST['socialNetwork'])
+                                ->setUser_id($id)
+                                ;
+                            
+                            try
+                            {
+                                $socialNetworkManager->addSocialNetwork($socialNetwork);
+                            }
+                            catch (Exception $e)
+                            {
+                                $errors[] = $e->getMessage();
+                            }
+                        }
+                    
+                    setFlashErrors($errors);    // pour gerer les erreurs en message flash (voir fichier globalFunctions.php)
+
+                    header('Location: /userFrontDashboard/'.$id.'?successEditUser=true');
+                    return http_response_code(302);
+
+                }else{
+                    setFlashErrors($errors);    // pour gerer les erreurs en message flash (voir fichier globalFunctions.php)
+                    
+                    header('Location: /userFrontDashboard/'.$id.'?successEditUser=false');
+                    return http_response_code(302);
+                }
+            } 
             require('../app/Views/frontViews/frontUserFrontDashboardView.php');
         }else {
             throw new Exception('impossible d\'afficher ce dashboard, il ne vous appartient pas');
@@ -399,6 +432,8 @@ use App\Models\SocialNetworkManager;
         $user = new User();
         $formUser = new Form($user);
 
+        $userManager = new UserManager();
+     
         // media (logo)
         $mediaManager = new MediaManager();
         $mediaUploadLogo = new Media(); //pour avoir dans le champ input pour uploader un logo (par defaut toute les variables de cette entité Media sont a "null" )
@@ -413,96 +448,116 @@ use App\Models\SocialNetworkManager;
         if ($_SERVER['REQUEST_METHOD'] === 'POST') { // if a submission of the form (=> a creation of a user) has been made
             
             //for data validation
-                $errors = [];
+            $errors = [];
             
-                if(empty($_POST['firstName'])){
-                    $errors[] = 'Le champ firstName ne peut être vide';
+            //test de validation des champs du formulaire
+                if(empty($_POST['firstName']) OR mb_strlen($_POST['firstName'])<=3){
+                    $errors[] = 'Le champ firstName ne peut être vide et doit contenir plus de 3 caracteres';
                 }
-                if(mb_strlen($_POST['lastName'])<=3){
-                    $errors[] = 'Le champ lastName doit contenir plus de 3 caracteres';
+                if(empty($_POST['lastName']) OR mb_strlen($_POST['lastName'])<=3){
+                    $errors[] = 'Le champ lastName ne peut être vide et doit contenir plus de 3 caracteres';
+                }
+
+                if(empty($_POST['email']) OR strpos($_POST['email'], '@') === false){
+                    $errors[] = 'Le champ email ne peut être vide ou l\'ecriture de votre adresse email est incorrect';
+                }
+                $idUserIidenticalData1 = $userManager->identicalDataSearch('email', $_POST['email']);
+                if(!is_null($idUserIidenticalData1)) {
+                    $errors[] = 'Votre email a été déjà utilisé, vous devez en indiquer un autre';
+                }
+            
+                if(empty($_POST['login']) OR mb_strlen($_POST['login'])<=3){
+                    $errors[] = 'Le champ login ne peut être vide et doit contenir plus de 3 caracteres';
                 }
                 
-                if(empty($errors)){
-                    
-                    // enregistrement en bdd du user
-                    $user
-                        ->setFirstName($_POST['firstName'])
-                        ->setLastName($_POST['lastName'])
-                        ->setEmail($_POST['email'])
-                        ->setSlogan($_POST['slogan'])
-                        ->setLogin($_POST['login'])
-                        ->setPassword($_POST['password']) 
-                        ->setUserType_id(1); //par défaut c est un user de type "abonner"
+                $idUserIidenticalData2 = $userManager->identicalDataSearch('login', $_POST['login']);
+                if(!is_null($idUserIidenticalData2)) {
+                    $errors[] = 'Votre login a été déjà utilisé, vous devez en indiquer un autre';
+                }
 
-                    $userManager = new UserManager();
+                if(empty($_POST['password']) OR mb_strlen($_POST['password'])<=3){
+                    $errors[] = 'Le champ password ne peut être vide et doit contenir plus de 3 caracteres';
+                }
+            
+            if(empty($errors)){
+                
+                // enregistrement en bdd du user
+                $user
+                    ->setFirstName($_POST['firstName'])
+                    ->setLastName($_POST['lastName'])
+                    ->setEmail($_POST['email'])
+                    ->setSlogan($_POST['slogan'])
+                    ->setLogin($_POST['login'])
+                    ->setPassword($_POST['password']) 
+                    ->setUserType_id(1); //par défaut c est un user de type "abonner"
+                
+                try{
+                    $lastRecordingUser = $userManager->addUser($user);// add the user to the database and get the last id of the users in the database via the return of the function
+                } catch (Exception $e) {
+                    $errors[] = $e->getMessage();
+                }
+
+                // enregistrement en bdd du media logo et du fichier uploader sur le server dans le dossier media
+                if(isset($_FILES['mediaUploadLogo']) AND $_FILES['mediaUploadLogo']['error']== 0){
                     
+                    // variables infos
+                    $idMediaType = 2;   //logo
+
+                    $file = $_FILES['mediaUploadLogo']; //fichier uploader
+                    $storagePath = searchDatasFile('imageStoragePath')[1]; //chemin de stockage du fichier uploader (voir fichier globalFunctions.php)         
+                    $name = 'mediaLogo-'.pathinfo($file['name'])['filename'].'-'; 
+                    $newNameUploaderFile = uniqid($name , true);    // concatenation "media-" + nom du fichier uploader(sans son extension + identifiant unique (via uniqid) pour avoir un identifiant unique
+
+                    $extension_upload = pathinfo($file['name'])['extension']; //pour recuperer l'extension du fichier uploader   
+                    $pathFile =  $storagePath.basename($newNameUploaderFile.'.'.$extension_upload); //chemin de stockage  avec nouveau nom du media uploader
+
+                    // enregistrement en bdd du media LOGO
+                    $mediaUploadLogo
+                        ->setPath($pathFile)    // ->setPath('./media/media-19.jpg')
+                        ->setAlt($_POST['altFileMediaLogo'])
+                        ->setStatutActif(1)
+                        ->setMediaType_id($idMediaType)
+                        ->setUser_id($lastRecordingUser)
+                        ;
+                        
                     try{
-                        $lastRecordingUser = $userManager->addUser($user);// add the user to the database and get the last id of the users in the database via the return of the function
+                        $mediaManager->addMediaImage($mediaUploadLogo, CONFIGFILE, $file); //adding the media to the database and recovery via the id function of the last media in the database
                     } catch (Exception $e) {
                         $errors[] = $e->getMessage();
-                    }
-
-                    // enregistrement en bdd du media logo et du fichier uploader sur le server dans le dossier media
-                    if(isset($_FILES['mediaUploadLogo']) AND $_FILES['mediaUploadLogo']['error']== 0){
-                        
-                        // variables infos
-                        $idMediaType = 2;   //logo
-
-                        $file = $_FILES['mediaUploadLogo']; //fichier uploader
-                        $storagePath = searchDatasFile('imageStoragePath')[1]; //chemin de stockage du fichier uploader (voir fichier globalFunctions.php)         
-                        $name = 'mediaLogo-'.pathinfo($file['name'])['filename'].'-'; 
-                        $newNameUploaderFile = uniqid($name , true);    // concatenation "media-" + nom du fichier uploader(sans son extension + identifiant unique (via uniqid) pour avoir un identifiant unique
-
-                        $extension_upload = pathinfo($file['name'])['extension']; //pour recuperer l'extension du fichier uploader   
-                        $pathFile =  $storagePath.basename($newNameUploaderFile.'.'.$extension_upload); //chemin de stockage  avec nouveau nom du media uploader
-
-                        // enregistrement en bdd du media LOGO
-                        $mediaUploadLogo
-                            ->setPath($pathFile)    // ->setPath('./media/media-19.jpg')
-                            ->setAlt($_POST['altFileMediaLogo'])
-                            ->setStatutActif(1)
-                            ->setMediaType_id($idMediaType)
-                            ->setUser_id($lastRecordingUser)
-                            ;
-                            
-                        try{
-                            $mediaManager->addMediaImage($mediaUploadLogo, CONFIGFILE, $file); //adding the media to the database and recovery via the id function of the last media in the database
-                        } catch (Exception $e) {
-                            $errors[] = $e->getMessage();
-                        } 
-                    }
-                    
-                    // enregistrement en bdd du socialNetwork
-                    if(!empty($_POST['socialNetwork'])){
-                        
-                        $socialNetwork
-                            ->setUrl($_POST['socialNetwork'])
-                            ->setUser_id($lastRecordingUser)
-                            ;
-
-                        try
-                        {
-                            $socialNetworkManager->addSocialNetwork($socialNetwork);
-                        }
-                        catch (Exception $e)
-                        {
-                            $errors[] = $e->getMessage();
-                        }
-                    }
-                    setFlashErrors($errors);    // pour gerer les erreurs en message flash (voir fichier globalFunctions.php)
-                    
-                    sendEmail('adminComptePerso@hotmail.com', 'nouveau compte user creer', 'un nouveau compte user a ete enregiste sur votre blog et est en attente de validation de votre part');
-                    sendEmail($user->getEmail(), 'Votre compte sur BlogNico', 'Votre compte user a bien ete enregistre sur le BlogNico et est en attente de validation de la part de l\'administrateur du site');
-
-                    header('Location: /createUserFront?createdUser=true');
-                    return http_response_code(302);
-
-                }else{  
-                    setFlashErrors($errors);    // pour gerer les erreurs en message flash (voir fichier globalFunctions.php)
-                    
-                    header('Location: /createUserFront?createdUser=false');
-                    return http_response_code(302);
+                    } 
                 }
+                
+                // enregistrement en bdd du socialNetwork
+                if(!empty($_POST['socialNetwork'])){
+                    
+                    $socialNetwork
+                        ->setUrl($_POST['socialNetwork'])
+                        ->setUser_id($lastRecordingUser)
+                        ;
+
+                    try
+                    {
+                        $socialNetworkManager->addSocialNetwork($socialNetwork);
+                    }
+                    catch (Exception $e)
+                    {
+                        $errors[] = $e->getMessage();
+                    }
+                }
+                setFlashErrors($errors);    // pour gerer les erreurs en message flash (voir fichier globalFunctions.php)
+                
+                sendEmail('adminComptePerso@hotmail.com', 'nouveau compte user creer', 'un nouveau compte user a ete enregiste sur votre blog et est en attente de validation de votre part');
+                sendEmail($user->getEmail(), 'Votre compte sur BlogNico', 'Votre compte user a bien ete enregistre sur le BlogNico et est en attente de validation de la part de l\'administrateur du site');
+
+                header('Location: /createUserFront?createdUser=true');
+                return http_response_code(302);
+
+            }else{  
+                setFlashErrors($errors);    // pour gerer les erreurs en message flash (voir fichier globalFunctions.php)
+                
+                header('Location: /createUserFront?createdUser=false');
+                return http_response_code(302);
+            }
         }
         
         require('../app/Views/frontViews/createUserFront.php');

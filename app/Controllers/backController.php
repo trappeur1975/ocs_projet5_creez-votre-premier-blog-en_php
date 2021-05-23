@@ -144,104 +144,108 @@ use App\Models\SocialNetworkManager;
         if ($_SERVER['REQUEST_METHOD'] === 'POST') { // if a submission of the form (=> a creation of a post) has been made
             
             //for data validation
-                $errors = [];
+            $errors = [];
 
-                if(empty($_POST['title'])){
-                    $errors[] = 'Le champ titre ne peut être vide';
+            //test de validation des champs du formulaire
+                if(empty($_POST['title']) OR mb_strlen($_POST['title'])<=3){
+                    $errors[] = 'Le champ title ne peut être vide et doit contenir plus de 3 caracteres';
                 }
-                if(mb_strlen($_POST['title'])<=3){
-                    $errors[] = 'Le champ titre doit contenir plus de 3 caracteres';
+                if(empty($_POST['introduction']) OR mb_strlen($_POST['introduction'])<=3){
+                    $errors[] = 'Le champ introduction ne peut être vide et doit contenir plus de 3 caracteres';
+                }
+                if(empty($_POST['content']) OR mb_strlen($_POST['content'])<=3){
+                    $errors[] = 'Le champ content ne peut être vide et doit contenir plus de 3 caracteres';
                 }
 
-                if(empty($errors)){
-                                      
-                    //ISSSUE  gestion des date en datetime dans entité post // base de donnee en string pour la create ou l edit d un post (=>voir methode setDateCreate($dateCreate) de la class Post)
-                    //modification pour gerer l enregistrement dans la base de donnee via le Postmanager
-                        $dateCreate = DateTime::createFromFormat('Y-m-d H:i:s',$_POST['dateCreate']); // pour que la date String soit en Datetime
-                               
-                    // enregistrement en bdd du post
-                    $post
-                        ->setTitle($_POST['title'])
-                        ->setIntroduction($_POST['introduction'])
-                        ->setContent($_POST['content'])
-                        ->setDateCreate($dateCreate)
+            if(empty($errors)){
+                                    
+                //ISSSUE  gestion des date en datetime dans entité post // base de donnee en string pour la create ou l edit d un post (=>voir methode setDateCreate($dateCreate) de la class Post)
+                //modification pour gerer l enregistrement dans la base de donnee via le Postmanager
+                    $dateCreate = DateTime::createFromFormat('Y-m-d H:i:s',$_POST['dateCreate']); // pour que la date String soit en Datetime
+                            
+                // enregistrement en bdd du post
+                $post
+                    ->setTitle($_POST['title'])
+                    ->setIntroduction($_POST['introduction'])
+                    ->setContent($_POST['content'])
+                    ->setDateCreate($dateCreate)
+                    ->setUser_id($_POST['user'])
+                    ;
+
+                $postManager = new PostManager();
+
+                try{
+                    $lastRecordingPost = $postManager->addPost($post);// add the post to the database and get the last id of the posts in the database via the return of the function
+                } catch (Exception $e) {
+                    // setFlashMessage($e->getMessage());
+                    $errors[] = $e->getMessage();
+                } 
+
+                //media IMAGE
+                if(isset($_FILES['mediaUploadImage']) AND $_FILES['mediaUploadImage']['error']== 0){
+                                                
+                    // variables infos
+                    $idMediaType = 1;   //image
+                    
+                    $file = $_FILES['mediaUploadImage']; //fichier uploader
+                    $storagePath = searchDatasFile('imageStoragePath')[1]; //chemin de stockage du fichier uploader (voir fichier globalFunctions.php)
+                    $name = 'mediaImage-'.pathinfo($file['name'])['filename'].'-'; 
+                    $newNameUploaderFile = uniqid($name , true);    // concatenation "media-" + nom du fichier uploader(sans son extension + identifiant unique (via uniqid) pour avoir un identifiant unique
+                    
+                    $extension_upload = pathinfo($file['name'])['extension']; //pour recuperer l'extension du fichier uploader
+                    $pathFile =  $storagePath.basename($newNameUploaderFile.'.'.$extension_upload); //chemin de stockage  avec nouveau nom du media uploader
+
+                    // enregistrement en bdd du media IMAGE et du fichier uploader sur le server dans le dossier media
+                    $mediaUploadImage
+                        ->setPath($pathFile)    // ->setPath('./media/media-19.jpg')
+                        ->setAlt($_POST['altFileMediaImage'])
+                        ->setStatutActif(1) //actif
+                        ->setMediaType_id($idMediaType)
+                        ->setPost_id($lastRecordingPost)
                         ->setUser_id($_POST['user'])
                         ;
-
-                    $postManager = new PostManager();
-
+                    
                     try{
-                        $lastRecordingPost = $postManager->addPost($post);// add the post to the database and get the last id of the posts in the database via the return of the function
+                        $mediaManager->addMediaImage($mediaUploadImage, CONFIGFILE, $file); //adding the media to the database and recovery via the id function of the last media in the database
                     } catch (Exception $e) {
                         // setFlashMessage($e->getMessage());
                         $errors[] = $e->getMessage();
-                    } 
-
-                    //media IMAGE
-                    if(isset($_FILES['mediaUploadImage']) AND $_FILES['mediaUploadImage']['error']== 0){
-                                                 
-                        // variables infos
-                        $idMediaType = 1;   //image
                         
-                        $file = $_FILES['mediaUploadImage']; //fichier uploader
-                        $storagePath = searchDatasFile('imageStoragePath')[1]; //chemin de stockage du fichier uploader (voir fichier globalFunctions.php)
-                        $name = 'mediaImage-'.pathinfo($file['name'])['filename'].'-'; 
-                        $newNameUploaderFile = uniqid($name , true);    // concatenation "media-" + nom du fichier uploader(sans son extension + identifiant unique (via uniqid) pour avoir un identifiant unique
-                        
-                        $extension_upload = pathinfo($file['name'])['extension']; //pour recuperer l'extension du fichier uploader
-                        $pathFile =  $storagePath.basename($newNameUploaderFile.'.'.$extension_upload); //chemin de stockage  avec nouveau nom du media uploader
-
-                        // enregistrement en bdd du media IMAGE et du fichier uploader sur le server dans le dossier media
-                        $mediaUploadImage
-                            ->setPath($pathFile)    // ->setPath('./media/media-19.jpg')
-                            ->setAlt($_POST['altFileMediaImage'])
-                            ->setStatutActif(1) //actif
-                            ->setMediaType_id($idMediaType)
-                            ->setPost_id($lastRecordingPost)
-                            ->setUser_id($_POST['user'])
-                            ;
-                        
-                        try{
-                            $mediaManager->addMediaImage($mediaUploadImage, CONFIGFILE, $file); //adding the media to the database and recovery via the id function of the last media in the database
-                        } catch (Exception $e) {
-                            // setFlashMessage($e->getMessage());
-                            $errors[] = $e->getMessage();
-                            
-                        }
                     }
-                    
-                    //media VIDEO
-                    if (!empty($_POST['mediaUploadVideo'])){
-                        // enregistrement en bdd du media VIDEO
-                        $mediaUploadVideo
-                            ->setPath($_POST['mediaUploadVideo'])
-                            ->setAlt($_POST['altFileMediaVideo'])
-                            ->setStatutActif(1) //actif
-                            ->setMediaType_id(3)    //video
-                            ->setPost_id($lastRecordingPost)
-                            ->setUser_id($_POST['user'])
-                            ;
-                        try{
-                            $mediaManager->addMediaVideo($mediaUploadVideo);
-                        } catch (Exception $e) {
-                            // setFlashMessage($e->getMessage());
-                            $errors[] = $e->getMessage();
-                        }
-                    }
-                    
-                    setFlashErrors($errors);    // pour gerer les erreurs en message flash (voir fichier globalFunctions.php)
-                    
-                    header('Location: /backend/editPost/'.$lastRecordingPost.'?created=true');
-                    return http_response_code(302);
-
-                }else{
-                    // ISSUE COMMENT TRANSMETTRE UN TABLEAU $errors=[]; DANS LA REDIRECTION CI DESSOUS POUR AFFICHER DANS LA VIEW LES DIFFERENTES ERREORS
-                    
-                    setFlashErrors($errors);    // pour gerer les erreurs en message flash (voir fichier globalFunctions.php)
-                    
-                    header('Location: /backend/createPost?created=false');
-                    return http_response_code(302);
                 }
+                
+                //media VIDEO
+                if (!empty($_POST['mediaUploadVideo'])){
+                    // enregistrement en bdd du media VIDEO
+                    $mediaUploadVideo
+                        ->setPath($_POST['mediaUploadVideo'])
+                        ->setAlt($_POST['altFileMediaVideo'])
+                        ->setStatutActif(1) //actif
+                        ->setMediaType_id(3)    //video
+                        ->setPost_id($lastRecordingPost)
+                        ->setUser_id($_POST['user'])
+                        ;
+                    try{
+                        $mediaManager->addMediaVideo($mediaUploadVideo);
+                    } catch (Exception $e) {
+                        // setFlashMessage($e->getMessage());
+                        $errors[] = $e->getMessage();
+                    }
+                }
+                
+                setFlashErrors($errors);    // pour gerer les erreurs en message flash (voir fichier globalFunctions.php)
+                
+                header('Location: /backend/editPost/'.$lastRecordingPost.'?created=true');
+                return http_response_code(302);
+
+            }else{
+                // ISSUE COMMENT TRANSMETTRE UN TABLEAU $errors=[]; DANS LA REDIRECTION CI DESSOUS POUR AFFICHER DANS LA VIEW LES DIFFERENTES ERREORS
+                
+                setFlashErrors($errors);    // pour gerer les erreurs en message flash (voir fichier globalFunctions.php)
+                
+                header('Location: /backend/createPost?created=false');
+                return http_response_code(302);
+            }
         }
 
         require('../app/Views/backViews/post/backCreatePostView.php');
@@ -296,148 +300,153 @@ use App\Models\SocialNetworkManager;
        
         // traitement server et affichage des retours d'infos 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') { // if a submission of the form (=> a modification of a post) has been made
-            //for data validation
-                $errors = [];
-
-                if(empty($_POST['title'])){
-                    $errors[] = 'Le champ titre ne peut être vide';
-                }
-                if(mb_strlen($_POST['title'])<=3){
-                    $errors[] = 'Le champ titre doit contenir plus de 3 caracteres';
-                }
-
-                if(empty($errors)){
-                                   
-                    //ISSUE  gestion des date en datetime dans entité post // base de donnee en string pour la create ou l edit d un post (=>voir methode setDateCreate($dateCreate) de la class Post)
-                    //modification pour gerer l enregistrement dans la base de donnee via le Postmanager
-                    $dateCreate = DateTime::createFromFormat('Y-m-d H:i:s',$_POST['dateCreate']); // pour que la date String soit en Datetime
-                    
-                    $dateChange = $_POST['dateChange'];
-                    if($_POST['dateChange'] === ''){
-                        $dateChange=NULL;
-                    }
             
-                    // enregistrement des modifications (via le select des users) infos sur le post
-                        $post
-                            ->setTitle($_POST['title'])
-                            ->setIntroduction($_POST['introduction'])
-                            ->setContent($_POST['content'])
-                            ->setDateCreate($dateCreate)
-                            ->setDateChange($dateChange)
-                            ->setUser_id($_POST['user'])
-                            ;
-                        
-                        try{                    
-                            $postManager->updatePost($post);
-                        } catch (Exception $e) {
-                            // setFlashMessage($e->getMessage());
-                            $errors[] = $e->getMessage();
-                        }
+            //for data validation
+            $errors = [];
 
-                    // -------- enregistrement des modifications (via le select des medias et upload de media) des infos sur les media lié au post edité
-                        // cela nous servira par la suite a savoir si le user a l origine du post a ete modifier
-                        $userOrigine = $user;
-                        $newUser = $userManager->getUser($post->getUser_id());
+            //test de validation des champs du formulaire
+            if(empty($_POST['title']) OR mb_strlen($_POST['title'])<=3){
+                $errors[] = 'Le champ title ne peut être vide et doit contenir plus de 3 caracteres';
+            }
+            if(empty($_POST['introduction']) OR mb_strlen($_POST['introduction'])<=3){
+                $errors[] = 'Le champ introduction ne peut être vide et doit contenir plus de 3 caracteres';
+            }
+            if(empty($_POST['content']) OR mb_strlen($_POST['content'])<=3){
+                $errors[] = 'Le champ content ne peut être vide et doit contenir plus de 3 caracteres';
+            }
 
-                        // si l utilisateur a ete modifier on desactive les medias lier a ce post
-                        if ($userOrigine != $newUser){
-                            foreach($listMediasForPostSelect as $value){                           
-                                $statutActif = 0; //false
-                                $mediaManager->updateStatutActifMedia($value, $statutActif); 
-                            }
-                        }
-
-                        if($userOrigine == $newUser){ //on enregistre la nouvelle liste de media pour le post definit dans le select des medias uniquement si le user n a pas changer
-                            // ajout du media si un upload image a ete fait lors de l edit du post
-                            if(isset($_FILES['mediaUploadImage']) AND $_FILES['mediaUploadImage']['error']== 0){
-                                // variables infos
-                                $idMediaType = 1;   //image
-
-                                $file = $_FILES['mediaUploadImage']; //fichier uploader
-                                $storagePath = searchDatasFile('imageStoragePath')[1]; //chemin de stockage du fichier uploader (voir fichier globalFunctions.php)         
-                                $name = 'mediaImage-'.pathinfo($file['name'])['filename'].'-';
-                                $newNameUploaderFile = uniqid($name , true);    // concatenation "media-" + nom du fichier uploader(sans son extension + identifiant unique (via uniqid) pour avoir un identifiant unique
+            if(empty($errors)){
                                 
-                                $extension_upload = pathinfo($file['name'])['extension']; //pour recuperer l'extension du fichier uploader   
-                                $pathFile =  $storagePath.basename($newNameUploaderFile.'.'.$extension_upload); //chemin de stockage  avec nouveau nom du media uploader
-
-                                // enregistrement en bdd du media IMAGE et du fichier uploader sur le server dans le dossier media
-                                
-                                $mediaUploadImage
-                                    ->setPath($pathFile)    // ->setPath('./media/media-19.jpg')
-                                    ->setAlt($_POST['altFileMediaImage'])
-                                    ->setStatutActif(1) //actif
-                                    ->setMediaType_id($idMediaType)
-                                    ->setPost_id($post->getId())
-                                    ->setUser_id($_POST['user'])
-                                    ;
-                                
-                                try{
-                                    $mediaManager->addMediaImage($mediaUploadImage, CONFIGFILE, $file); //adding the media to the database and recovery via the id function of the last media in the database
-                                } catch (Exception $e) {
-                                    // setFlashMessage($e->getMessage());
-                                    $errors[] = $e->getMessage();
-                                }
-                            }          
-                            
-                            // ajout du media si un upload video a ete fait lors de l edit du post
-                            if (!empty($_POST['mediaUploadVideo'])){
-                                // enregistrement en bdd du media VIDEO
-                                $mediaUploadVideo
-                                    ->setPath($_POST['mediaUploadVideo'])
-                                    ->setAlt($_POST['altFileMediaVideo'])
-                                    ->setStatutActif(1) //actif
-                                    ->setMediaType_id(3)    //video
-                                    ->setPost_id($post->getId())
-                                    ->setUser_id($_POST['user'])
-                                    ;
-                                
-                                try{
-                                    $mediaManager->addMediaVideo($mediaUploadVideo);
-                                } catch (Exception $e) {
-                                    // setFlashMessage($e->getMessage());
-                                    $errors[] = $e->getMessage();
-                                } 
-                            }
-                            
-                            // on met tout les medias du post en statutActif = false
-                            foreach($listMediasForPostSelect as $value){                           
-                                $statutActif = 0; //false
-                                $mediaManager->updateStatutActifMedia($value, $statutActif); 
-                            }
-                            
-                            // on met tout les medias dont leurs id sont dans "$_POST['path']" en statutActif = true 
-                            // et on modifie leurs post_id pour bien attribuer au media selectionner dans le select le id du post
-                            foreach($_POST['path'] as $value){
-                                $statutActif = 1; //true
-                                $mediaManager->updateStatutActifMedia($value, $statutActif);
-                                try{
-                                    $mediaManager->updatePostIdMedia($value, $post->getId());
-                                } catch (Exception $e) {
-                                    // setFlashMessage($e->getMessage());
-                                    $errors[] = $e->getMessage();
-                                }
-                            }
-                        }
-
-                        // ATTENTION ON MODIFIE LE USERORIGINE pour que notre verification de changement de user du post soit toujours valable
-                        $userOrigine = $newUser;
-                    
-                    // --------------FIN enregistrement des modifications (via le select des medias) des infos sur les media lié au post 
-                    
-                    
-                    setFlashErrors($errors);    // pour gerer les erreurs en message flash (voir fichier globalFunctions.php)
-
-                    header('Location: /backend/editPost/'.$post->getId().'?success=true');
-                    return http_response_code(302);
-
-                }else{
-                    
-                    setFlashErrors($errors);    // pour gerer les erreurs en message flash (voir fichier globalFunctions.php)
-
-                    header('Location: /backend/editPost/'.$post->getId().'?success=false');
-                    return http_response_code(302);
+                //ISSUE  gestion des date en datetime dans entité post // base de donnee en string pour la create ou l edit d un post (=>voir methode setDateCreate($dateCreate) de la class Post)
+                //modification pour gerer l enregistrement dans la base de donnee via le Postmanager
+                $dateCreate = DateTime::createFromFormat('Y-m-d H:i:s',$_POST['dateCreate']); // pour que la date String soit en Datetime
+                
+                $dateChange = $_POST['dateChange'];
+                if($_POST['dateChange'] === ''){
+                    $dateChange=NULL;
                 }
+        
+                // enregistrement des modifications (via le select des users) infos sur le post
+                    $post
+                        ->setTitle($_POST['title'])
+                        ->setIntroduction($_POST['introduction'])
+                        ->setContent($_POST['content'])
+                        ->setDateCreate($dateCreate)
+                        ->setDateChange($dateChange)
+                        ->setUser_id($_POST['user'])
+                        ;
+                    
+                    try{                    
+                        $postManager->updatePost($post);
+                    } catch (Exception $e) {
+                        // setFlashMessage($e->getMessage());
+                        $errors[] = $e->getMessage();
+                    }
+
+                // -------- enregistrement des modifications (via le select des medias et upload de media) des infos sur les media lié au post edité
+                    // cela nous servira par la suite a savoir si le user a l origine du post a ete modifier
+                    $userOrigine = $user;
+                    $newUser = $userManager->getUser($post->getUser_id());
+
+                    // si l utilisateur a ete modifier on desactive les medias lier a ce post
+                    if ($userOrigine != $newUser){
+                        foreach($listMediasForPostSelect as $value){                           
+                            $statutActif = 0; //false
+                            $mediaManager->updateStatutActifMedia($value, $statutActif); 
+                        }
+                    }
+
+                    if($userOrigine == $newUser){ //on enregistre la nouvelle liste de media pour le post definit dans le select des medias uniquement si le user n a pas changer
+                        // ajout du media si un upload image a ete fait lors de l edit du post
+                        if(isset($_FILES['mediaUploadImage']) AND $_FILES['mediaUploadImage']['error']== 0){
+                            // variables infos
+                            $idMediaType = 1;   //image
+
+                            $file = $_FILES['mediaUploadImage']; //fichier uploader
+                            $storagePath = searchDatasFile('imageStoragePath')[1]; //chemin de stockage du fichier uploader (voir fichier globalFunctions.php)         
+                            $name = 'mediaImage-'.pathinfo($file['name'])['filename'].'-';
+                            $newNameUploaderFile = uniqid($name , true);    // concatenation "media-" + nom du fichier uploader(sans son extension + identifiant unique (via uniqid) pour avoir un identifiant unique
+                            
+                            $extension_upload = pathinfo($file['name'])['extension']; //pour recuperer l'extension du fichier uploader   
+                            $pathFile =  $storagePath.basename($newNameUploaderFile.'.'.$extension_upload); //chemin de stockage  avec nouveau nom du media uploader
+
+                            // enregistrement en bdd du media IMAGE et du fichier uploader sur le server dans le dossier media
+                            
+                            $mediaUploadImage
+                                ->setPath($pathFile)    // ->setPath('./media/media-19.jpg')
+                                ->setAlt($_POST['altFileMediaImage'])
+                                ->setStatutActif(1) //actif
+                                ->setMediaType_id($idMediaType)
+                                ->setPost_id($post->getId())
+                                ->setUser_id($_POST['user'])
+                                ;
+                            
+                            try{
+                                $mediaManager->addMediaImage($mediaUploadImage, CONFIGFILE, $file); //adding the media to the database and recovery via the id function of the last media in the database
+                            } catch (Exception $e) {
+                                // setFlashMessage($e->getMessage());
+                                $errors[] = $e->getMessage();
+                            }
+                        }          
+                        
+                        // ajout du media si un upload video a ete fait lors de l edit du post
+                        if (!empty($_POST['mediaUploadVideo'])){
+                            // enregistrement en bdd du media VIDEO
+                            $mediaUploadVideo
+                                ->setPath($_POST['mediaUploadVideo'])
+                                ->setAlt($_POST['altFileMediaVideo'])
+                                ->setStatutActif(1) //actif
+                                ->setMediaType_id(3)    //video
+                                ->setPost_id($post->getId())
+                                ->setUser_id($_POST['user'])
+                                ;
+                            
+                            try{
+                                $mediaManager->addMediaVideo($mediaUploadVideo);
+                            } catch (Exception $e) {
+                                // setFlashMessage($e->getMessage());
+                                $errors[] = $e->getMessage();
+                            } 
+                        }
+                        
+                        // on met tout les medias du post en statutActif = false
+                        foreach($listMediasForPostSelect as $value){                           
+                            $statutActif = 0; //false
+                            $mediaManager->updateStatutActifMedia($value, $statutActif); 
+                        }
+                        
+                        // on met tout les medias dont leurs id sont dans "$_POST['path']" en statutActif = true 
+                        // et on modifie leurs post_id pour bien attribuer au media selectionner dans le select le id du post
+                        foreach($_POST['path'] as $value){
+                            $statutActif = 1; //true
+                            $mediaManager->updateStatutActifMedia($value, $statutActif);
+                            try{
+                                $mediaManager->updatePostIdMedia($value, $post->getId());
+                            } catch (Exception $e) {
+                                // setFlashMessage($e->getMessage());
+                                $errors[] = $e->getMessage();
+                            }
+                        }
+                    }
+
+                    // ATTENTION ON MODIFIE LE USERORIGINE pour que notre verification de changement de user du post soit toujours valable
+                    $userOrigine = $newUser;
+                
+                // --------------FIN enregistrement des modifications (via le select des medias) des infos sur les media lié au post 
+                
+                
+                setFlashErrors($errors);    // pour gerer les erreurs en message flash (voir fichier globalFunctions.php)
+
+                header('Location: /backend/editPost/'.$post->getId().'?success=true');
+                return http_response_code(302);
+
+            }else{
+                
+                setFlashErrors($errors);    // pour gerer les erreurs en message flash (voir fichier globalFunctions.php)
+
+                header('Location: /backend/editPost/'.$post->getId().'?success=false');
+                return http_response_code(302);
+            }
         }
 
         require('../app/Views/backViews/post/backEditPostView.php');
@@ -542,6 +551,8 @@ use App\Models\SocialNetworkManager;
         $user->setValidate($date);
         // $user->setValidate(new Datetime()); //to assign today's date (in datetime) by default to the user we create 
         
+        $userManager = new UserManager();
+
         $formUser = new Form($user);
 
         // userType
@@ -562,19 +573,40 @@ use App\Models\SocialNetworkManager;
         $socialNetworkManager = new SocialNetworkManager();
         $formSocialNetwork = new Form($socialNetwork);
 
-
         // traitement server et affichage des retours d'infos 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') { // if a submission of the form (=> a creation of a user) has been made
                 
             //for data validation
                 $errors = [];
             
-                if(empty($_POST['firstName'])){
-                    $errors[] = 'Le champ firstName ne peut être vide';
-                }
-                if(mb_strlen($_POST['lastName'])<=3){
-                    $errors[] = 'Le champ lastName doit contenir plus de 3 caracteres';
-                }
+                //test de validation des champs du formulaire
+                    if(empty($_POST['firstName']) OR mb_strlen($_POST['firstName'])<=3){
+                        $errors[] = 'Le champ firstName ne peut être vide et doit contenir plus de 3 caracteres';
+                    }
+                    if(empty($_POST['lastName']) OR mb_strlen($_POST['lastName'])<=3){
+                        $errors[] = 'Le champ lastName ne peut être vide et doit contenir plus de 3 caracteres';
+                    }
+
+                    if(empty($_POST['email']) OR strpos($_POST['email'], '@') === false){
+                        $errors[] = 'Le champ email ne peut être vide ou l\'ecriture de votre adresse email est incorrect';
+                    }
+                    $idUserIidenticalData1 = $userManager->identicalDataSearch('email', $_POST['email']);
+                    if(!is_null($idUserIidenticalData1)) {
+                        $errors[] = 'Votre email a été déjà utilisé, vous devez en indiquer un autre';
+                    }
+                
+                    if(empty($_POST['login']) OR mb_strlen($_POST['login'])<=3){
+                        $errors[] = 'Le champ login ne peut être vide et doit contenir plus de 3 caracteres';
+                    }
+                    
+                    $idUserIidenticalData2 = $userManager->identicalDataSearch('login', $_POST['login']);
+                    if(!is_null($idUserIidenticalData2)) {
+                        $errors[] = 'Votre login a été déjà utilisé, vous devez en indiquer un autre';
+                    }
+
+                    if(empty($_POST['password']) OR mb_strlen($_POST['password'])<=3){
+                        $errors[] = 'Le champ password ne peut être vide et doit contenir plus de 3 caracteres';
+                    }
                 
                 if(empty($errors)){
 
@@ -589,8 +621,6 @@ use App\Models\SocialNetworkManager;
                         ->setUserType_id($_POST['userType_id'][0]); //car on cette donnee est issu d'un select multiple
                         // ->setValidate(new Datetime()); //to assign today's date (in datetime) by default to the user we create
                         // ->setValidate(DateTime::createFromFormat('Y-m-d H:i:s',new Datetime())); //to assign today's date (in datetime) by default to the user we create 
-
-                    $userManager = new UserManager();
                     
                     try{
                         $lastRecordingUser = $userManager->addUser($user);// add the user to the database and get the last id of the users in the database via the return of the function
@@ -723,121 +753,143 @@ use App\Models\SocialNetworkManager;
         if ($_SERVER['REQUEST_METHOD'] === 'POST') { // if a submission of the form (=> a modification of a user) has been made
 
             //for data validation
-                $errors = [];
+            $errors = [];
 
-                if(empty($_POST['firstName'])){
-                    $errors[] = 'Le champ firstName ne peut être vide';
+            //test de validation des champs du formulaire
+                if(empty($_POST['firstName']) OR mb_strlen($_POST['firstName'])<=3){
+                    $errors[] = 'Le champ firstName ne peut être vide et doit contenir plus de 3 caracteres';
                 }
-                if(mb_strlen($_POST['lastName'])<=3){
-                    $errors[] = 'Le champ lastName doit contenir plus de 3 caracteres';
+                if(empty($_POST['lastName']) OR mb_strlen($_POST['lastName'])<=3){
+                    $errors[] = 'Le champ lastName ne peut être vide et doit contenir plus de 3 caracteres';
                 }
 
-                if(empty($errors)){
+                if(empty($_POST['email']) OR strpos($_POST['email'], '@') === false){
+                    $errors[] = 'Le champ email ne peut être vide ou l\'ecriture de votre adresse email est incorrect';
+                }
+                $idUserIidenticalData1 = $userManager->identicalDataSearch('email', $_POST['email']);
+                if(!is_null($idUserIidenticalData1) AND $idUserIidenticalData1 != $id) {
+                    $errors[] = 'Votre email a été déjà utilisé, vous devez en indiquer un autre';
+                }
+
+                if(empty($_POST['login']) OR mb_strlen($_POST['login'])<=3){
+                    $errors[] = 'Le champ login ne peut être vide et doit contenir plus de 3 caracteres';
+                }
+
+                $idUserIidenticalData2 = $userManager->identicalDataSearch('login', $_POST['login']);
+                if(!is_null($idUserIidenticalData2) AND $idUserIidenticalData2 != $id) {
+                    $errors[] = 'Votre login a été déjà utilisé, vous devez en indiquer un autre';
+                }
+
+                if(empty($_POST['password']) OR mb_strlen($_POST['password'])<=3){
+                    $errors[] = 'Le champ password ne peut être vide et doit contenir plus de 3 caracteres';
+                }
+
+            if(empty($errors)){
+            
+                // enregistrement en bdd du user
+                $user
+                    ->setFirstName($_POST['firstName'])
+                    ->setLastName($_POST['lastName'])
+                    ->setEmail($_POST['email'])
+                    ->setSlogan($_POST['slogan'])
+                    ->setLogin($_POST['login'])
+                    ->setPassword($_POST['password'])
+                    ->setUserType_id($_POST['userType_id'][0]); //car cette donnee est issu d'un select multiple
                 
-                    // enregistrement en bdd du user
-                    $user
-                        ->setFirstName($_POST['firstName'])
-                        ->setLastName($_POST['lastName'])
-                        ->setEmail($_POST['email'])
-                        ->setSlogan($_POST['slogan'])
-                        ->setLogin($_POST['login'])
-                        ->setPassword($_POST['password'])
-                        ->setUserType_id($_POST['userType_id'][0]); //car cette donnee est issu d'un select multiple
+                try{
+                    $userManager->updateUser($user);
+                } catch (Exception $e) {
+                    $errors[] = $e->getMessage();
+                }
+
+                // enregistrement en bdd du media logo et du fichier uploader sur le server dans le dossier media
+                if(isset($_FILES['mediaUploadLogo']) AND $_FILES['mediaUploadLogo']['error']== 0){
+                    
+                    // variables infos
+                    $idMediaType = 2;   //logo
+                    
+                    $file = $_FILES['mediaUploadLogo']; //fichier uploader
+                    $storagePath = searchDatasFile('imageStoragePath')[1]; //chemin de stockage du fichier uploader (voir fichier globalFunctions.php)         
+                    $name = 'mediaLogo-'.pathinfo($file['name'])['filename'].'-'; 
+                    $newNameUploaderFile = uniqid($name , true);    // concatenation "media-" + nom du fichier uploader(sans son extension + identifiant unique (via uniqid) pour avoir un identifiant unique
+
+                    $extension_upload = pathinfo($file['name'])['extension']; //pour recuperer l'extension du fichier uploader   
+                    $pathFile =  $storagePath.basename($newNameUploaderFile.'.'.$extension_upload); //chemin de stockage  avec nouveau nom du media uploader
+                    
+                    // on supprime en base de donnée ainsi que sur le server dans le dossier media l'ancien logo de l'user    
+                    $listMediasForUser = $mediaManager->getListMediasForUser($user->getId());
+                    $listLogosDelete = $mediaManager->getListMediasForUserForType($listMediasForUser, $listIdsMediaType);   // on recuperer la liste des logos du user
+                    
+                    if(!empty($listLogosDelete)){
+                        foreach($listLogosDelete as $logo){
+                            try{
+                                unlink($logo->getPath());  //suppression des media sur le serveur dans le dossier media
+                                $mediaManager->deleteMedia($logo->getId());    //suppression dans la base de donnée
+                            } catch (Exception $e) {
+                                $errors[] = $e->getMessage();
+                            }    
+                        }
+                    }
+
+                    // enregistrement en bdd du nouveau LOGO et et de son fichier uploader sur le server dans le dossier media
+                    $mediaUploadLogo
+                        ->setPath($pathFile)    // ->setPath('./media/media-19.jpg')
+                        ->setAlt($_POST['altFileMediaLogo'])
+                        ->setStatutActif(1)
+                        ->setMediaType_id($idMediaType)
+                        ->setUser_id($user->getId())
+                        ;
                     
                     try{
-                        $userManager->updateUser($user);
+                        $mediaManager->addMediaImage($mediaUploadLogo, CONFIGFILE, $file); //adding the media to the database and recovery via the id function of the last media in the database
                     } catch (Exception $e) {
                         $errors[] = $e->getMessage();
-                    }
+                    } 
+                }
 
-                    // enregistrement en bdd du media logo et du fichier uploader sur le server dans le dossier media
-                    if(isset($_FILES['mediaUploadLogo']) AND $_FILES['mediaUploadLogo']['error']== 0){
-                        
-                        // variables infos
-                        $idMediaType = 2;   //logo
-                        
-                        $file = $_FILES['mediaUploadLogo']; //fichier uploader
-                        $storagePath = searchDatasFile('imageStoragePath')[1]; //chemin de stockage du fichier uploader (voir fichier globalFunctions.php)         
-                        $name = 'mediaLogo-'.pathinfo($file['name'])['filename'].'-'; 
-                        $newNameUploaderFile = uniqid($name , true);    // concatenation "media-" + nom du fichier uploader(sans son extension + identifiant unique (via uniqid) pour avoir un identifiant unique
-
-                        $extension_upload = pathinfo($file['name'])['extension']; //pour recuperer l'extension du fichier uploader   
-                        $pathFile =  $storagePath.basename($newNameUploaderFile.'.'.$extension_upload); //chemin de stockage  avec nouveau nom du media uploader
-                       
-                        // on supprime en base de donnée ainsi que sur le server dans le dossier media l'ancien logo de l'user    
-                        $listMediasForUser = $mediaManager->getListMediasForUser($user->getId());
-                        $listLogosDelete = $mediaManager->getListMediasForUserForType($listMediasForUser, $listIdsMediaType);   // on recuperer la liste des logos du user
-                       
-                        if(!empty($listLogosDelete)){
-                            foreach($listLogosDelete as $logo){
-                                try{
-                                    unlink($logo->getPath());  //suppression des media sur le serveur dans le dossier media
-                                    $mediaManager->deleteMedia($logo->getId());    //suppression dans la base de donnée
-                                } catch (Exception $e) {
-                                    $errors[] = $e->getMessage();
-                                }    
-                            }
-                        }
-
-                        // enregistrement en bdd du nouveau LOGO et et de son fichier uploader sur le server dans le dossier media
-                        $mediaUploadLogo
-                            ->setPath($pathFile)    // ->setPath('./media/media-19.jpg')
-                            ->setAlt($_POST['altFileMediaLogo'])
-                            ->setStatutActif(1)
-                            ->setMediaType_id($idMediaType)
-                            ->setUser_id($user->getId())
-                            ;
-                        
-                        try{
-                            $mediaManager->addMediaImage($mediaUploadLogo, CONFIGFILE, $file); //adding the media to the database and recovery via the id function of the last media in the database
-                        } catch (Exception $e) {
-                            $errors[] = $e->getMessage();
-                        } 
-                    }
-
-                    // enregistrement en bdd socialNetwork des modifications qui ont etait apporté dans l'editUser()   
-                        // supression du ou des socialNetwork de l'user
-                        if(!empty($_POST['socialNetworksUser'])){ 
-                            foreach($_POST['socialNetworksUser'] as $idSsocialNetwork){
-                                try
-                                {
-                                    $socialNetworkManager->deleteSocialNetwork($idSsocialNetwork);
-                                }
-                                catch (Exception $e)
-                                {
-                                    $errors[] = $e->getMessage();
-                                }
-                            }
-                        }
-                        
-                        // ajout d'un socialNetwork a l'user
-                        if(!empty($_POST['socialNetwork'])){
-                            $socialNetwork
-                                ->setUrl($_POST['socialNetwork'])
-                                ->setUser_id($user->getId())
-                                ;
+                // enregistrement en bdd socialNetwork des modifications qui ont etait apporté dans l'editUser()   
+                    // supression du ou des socialNetwork de l'user
+                    if(!empty($_POST['socialNetworksUser'])){ 
+                        foreach($_POST['socialNetworksUser'] as $idSsocialNetwork){
                             try
                             {
-                                $socialNetworkManager->addSocialNetwork($socialNetwork);
+                                $socialNetworkManager->deleteSocialNetwork($idSsocialNetwork);
                             }
                             catch (Exception $e)
                             {
                                 $errors[] = $e->getMessage();
-                            }    
+                            }
                         }
+                    }
                     
-                    setFlashErrors($errors);    // pour gerer les erreurs en message flash (voir fichier globalFunctions.php)
+                    // ajout d'un socialNetwork a l'user
+                    if(!empty($_POST['socialNetwork'])){
+                        $socialNetwork
+                            ->setUrl($_POST['socialNetwork'])
+                            ->setUser_id($user->getId())
+                            ;
+                        try
+                        {
+                            $socialNetworkManager->addSocialNetwork($socialNetwork);
+                        }
+                        catch (Exception $e)
+                        {
+                            $errors[] = $e->getMessage();
+                        }    
+                    }
+                
+                setFlashErrors($errors);    // pour gerer les erreurs en message flash (voir fichier globalFunctions.php)
 
-                    header('Location: /backend/editUser/'.$user->getId().'?success=true');
-                    return http_response_code(302);
+                header('Location: /backend/editUser/'.$user->getId().'?success=true');
+                return http_response_code(302);
 
-                }else{
-                    
-                    setFlashErrors($errors);    // pour gerer les erreurs en message flash (voir fichier globalFunctions.php)
+            }else{
+                
+                setFlashErrors($errors);    // pour gerer les erreurs en message flash (voir fichier globalFunctions.php)
 
-                    header('Location: /backend/editUser/'.$user->getId().'?success=false');
-                    return http_response_code(302);
-                }
+                header('Location: /backend/editUser/'.$user->getId().'?success=false');
+                return http_response_code(302);
+            }
         }
 
         require('../app/Views/backViews/user/backEditUserView.php');
