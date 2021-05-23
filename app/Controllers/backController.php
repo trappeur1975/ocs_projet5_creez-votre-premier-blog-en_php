@@ -79,21 +79,6 @@ use App\Models\SocialNetworkManager;
         header('Location: /backend/connection');
         return http_response_code(302);
     }
-
-// AUTRE
-    /**
-     * function use for road http://localhost:8000/backend
-     * will display the view backHomeView.php 
-     */
-    function backHome()
-    {
-        $userLogged = Auth::check(['administrateur']);
-        // Auth::check(['administrateur']);
-        // Auth::check();
-
-        require('../app/Views/backViews/backHomeView.php');
-    }
-    
 // POST
     /**
      * function use for road http://localhost:8000/backend/adminPosts
@@ -177,7 +162,6 @@ use App\Models\SocialNetworkManager;
                 try{
                     $lastRecordingPost = $postManager->addPost($post);// add the post to the database and get the last id of the posts in the database via the return of the function
                 } catch (Exception $e) {
-                    // setFlashMessage($e->getMessage());
                     $errors[] = $e->getMessage();
                 } 
 
@@ -208,7 +192,6 @@ use App\Models\SocialNetworkManager;
                     try{
                         $mediaManager->addMediaImage($mediaUploadImage, CONFIGFILE, $file); //adding the media to the database and recovery via the id function of the last media in the database
                     } catch (Exception $e) {
-                        // setFlashMessage($e->getMessage());
                         $errors[] = $e->getMessage();
                         
                     }
@@ -239,8 +222,6 @@ use App\Models\SocialNetworkManager;
                 return http_response_code(302);
 
             }else{
-                // ISSUE COMMENT TRANSMETTRE UN TABLEAU $errors=[]; DANS LA REDIRECTION CI DESSOUS POUR AFFICHER DANS LA VIEW LES DIFFERENTES ERREORS
-                
                 setFlashErrors($errors);    // pour gerer les erreurs en message flash (voir fichier globalFunctions.php)
                 
                 header('Location: /backend/createPost?created=false');
@@ -259,9 +240,18 @@ use App\Models\SocialNetworkManager;
     {
         $userLogged = Auth::check(['administrateur']);
 
+        $errors = [];
+
         // post
         $postManager = new PostManager();
-        $post = $postManager->getPost($id);
+        try{
+            $post = $postManager->getPost($id);
+        } catch (Exception $e) {    //dans le cas ou l'on demande une ressource qui n'existe pas (ici un id de post qui n'existe pas)
+            $errors[] = $e->getMessage();
+            setFlashErrors($errors);    // pour gerer les erreurs en message flash (voir fichier globalFunctions.php)
+            require_once('../app/Views/errors.php');
+            return http_response_code(302);
+        }
 
         if ( $post->getDateChange() === null){
             $post->setDateChange(new Datetime()); //to assign today's date (in datetime) by default when to edit the post
@@ -300,9 +290,6 @@ use App\Models\SocialNetworkManager;
        
         // traitement server et affichage des retours d'infos 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') { // if a submission of the form (=> a modification of a post) has been made
-            
-            //for data validation
-            $errors = [];
 
             //test de validation des champs du formulaire
             if(empty($_POST['title']) OR mb_strlen($_POST['title'])<=3){
@@ -434,7 +421,6 @@ use App\Models\SocialNetworkManager;
                 
                 // --------------FIN enregistrement des modifications (via le select des medias) des infos sur les media lié au post 
                 
-                
                 setFlashErrors($errors);    // pour gerer les erreurs en message flash (voir fichier globalFunctions.php)
 
                 header('Location: /backend/editPost/'.$post->getId().'?success=true');
@@ -471,7 +457,6 @@ use App\Models\SocialNetworkManager;
                 try{
                     $commentManager->deleteComment($comment->getId());    //suppression dans la base de donnée
                 } catch (Exception $e) {
-                    // setFlashMessage($e->getMessage());
                     $errors[] = $e->getMessage();
                 }
             }
@@ -498,7 +483,6 @@ use App\Models\SocialNetworkManager;
         try{
             $post = $postManager->deletePost($id);
         } catch (Exception $e) {
-            // setFlashMessage($e->getMessage());
             $errors[] = $e->getMessage();
         } 
 
@@ -704,11 +688,18 @@ use App\Models\SocialNetworkManager;
     {
         $userLogged = Auth::check(['administrateur']);
         
-        $errorMessage = null;
+        $errors = [];
 
         // user
         $userManager = new UserManager();
-        $user = $userManager->getUser($id);
+        try{
+            $user = $userManager->getUser($id);
+        } catch (Exception $e) {    //dans le cas ou l'on demande une ressource qui n'existe pas (ici un id du user qui n'existe pas)
+            $errors[] = $e->getMessage();
+            setFlashErrors($errors);    // pour gerer les erreurs en message flash (voir fichier globalFunctions.php)
+            require_once('../app/Views/errors.php');
+            return http_response_code(302);
+        }
         
         $formUser = new Form($user, true);
 
@@ -753,7 +744,7 @@ use App\Models\SocialNetworkManager;
         if ($_SERVER['REQUEST_METHOD'] === 'POST') { // if a submission of the form (=> a modification of a user) has been made
 
             //for data validation
-            $errors = [];
+            // $errors = [];
 
             //test de validation des champs du formulaire
                 if(empty($_POST['firstName']) OR mb_strlen($_POST['firstName'])<=3){
@@ -1033,9 +1024,11 @@ use App\Models\SocialNetworkManager;
             $usertManager->validateUser($id);
         } catch (Exception $e) {
             $errors[] = $e->getMessage();
+
+            setFlashErrors($errors);
+            require_once('../app/Views/errors.php');
+            return http_response_code(302);
         }  
-        
-        setFlashErrors($errors);
         
         require('../app/Views/backViews/user/backValidateUserView.php');
     }
@@ -1063,6 +1056,8 @@ use App\Models\SocialNetworkManager;
     function editCommentsPost($id)
     {
         $userLogged = Auth::check(['administrateur']);
+
+        $errors = [];
   
         $commentManager = new CommentManager();
         $listCommentsForPost = $commentManager->getListCommentsForPost($id);
@@ -1085,8 +1080,11 @@ use App\Models\SocialNetworkManager;
         try{
             $comment = $commentManager->deleteComment($id);
         } catch (Exception $e) {
-            // setFlashMessage($e->getMessage());
             $errors[] = $e->getMessage();
+
+            setFlashErrors($errors);    // pour gerer les erreurs en message flash (voir fichier globalFunctions.php)
+            require_once('../app/Views/errors.php');
+            return http_response_code(302);
             
         }
 
@@ -1110,16 +1108,12 @@ use App\Models\SocialNetworkManager;
         try{
             $comment = $commentManager->validateComment($id);
         } catch (Exception $e) {
-            // setFlashMessage($e->getMessage());
             $errors[] = $e->getMessage();
+
+            setFlashErrors($errors);    // pour gerer les erreurs en message flash (voir fichier globalFunctions.php)
+            require_once('../app/Views/errors.php');
+            return http_response_code(302);
         }  
-
-        setFlashErrors($errors);
-
-        if (!isset($_SESSION['flash'])){
-            require('../app/Views/backViews/comment/backValidateCommentView.php');
-        } else {
-            adminPosts();
-        }
         
+        require('../app/Views/backViews/comment/backValidateCommentView.php');  
     }

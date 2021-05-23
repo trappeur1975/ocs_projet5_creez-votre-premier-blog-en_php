@@ -26,7 +26,7 @@ class CommentManager extends Manager
         $query->execute(['id' => $idPost]);
 
         $listCommentsForPost = $query ->fetchAll(PDO::FETCH_CLASS, Comment::class);
-
+     
         return $listCommentsForPost;
     }
 

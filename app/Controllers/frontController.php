@@ -48,9 +48,19 @@ use App\Models\SocialNetworkManager;
     { 
         $userLogged = Auth::sessionStart();
       
+        $errors = [];
+
         // post
         $postManager = new PostManager(); // Création de l'objet manger de post
-        $post = $postManager->getPost($id);
+
+        try{
+            $post = $postManager->getPost($id);
+        } catch (Exception $e) {    //dans le cas ou l'on demande une ressource qui n'existe pas (ici un id de post qui n'existe pas)
+            $errors[] = $e->getMessage();
+            setFlashErrors($errors);    // pour gerer les erreurs en message flash (voir fichier globalFunctions.php)
+            require_once('../app/Views/errors.php');
+            return http_response_code(302);
+        }
 
         // user
         $userManager = new UserManager();
@@ -72,14 +82,11 @@ use App\Models\SocialNetworkManager;
         // traitement server et affichage des retours d'infos 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') { // if a submission of the form (=> a creation of a post) has been made
             
-            //for data validation
-            $errors = [];
-
             //test de validation des champs du formulaire
                 if(empty($_POST['comment']) OR mb_strlen($_POST['comment'])<=3){
                     $errors[] = 'Le champ commentaire ne peut être vide et doit contenir plus de 3 caracteres';
                 }
-            
+            // enregistrement des infos
             if(empty($errors)){
                 Auth::check(['administrateur','abonner']);    
 
@@ -117,6 +124,7 @@ use App\Models\SocialNetworkManager;
                 return http_response_code(302);
             }
         }
+        
         require('../app/Views/frontViews/frontPostView.php');
     }
 
@@ -128,12 +136,19 @@ use App\Models\SocialNetworkManager;
     function editCommentPostFront($id)
     {
         $userLogged = Auth::check(['administrateur','abonner']);
+
+        $errors = [];
    
         // on edit le commentaire (a travers son formulaire)
         $commentManager = new CommentManager();
-        $comment = $commentManager->getComment($id);
-
-        $errors = [];
+        try{
+            $comment = $commentManager->getComment($id);
+        } catch (Exception $e) {    //dans le cas ou l'on demande une ressource qui n'existe pas (ici un id de comment qui n'existe pas)
+            $errors[] = $e->getMessage();
+            setFlashErrors($errors);    // pour gerer les erreurs en message flash (voir fichier globalFunctions.php)
+            require_once('../app/Views/errors.php');
+            return http_response_code(302);
+        }
 
         if($comment->getUser_id() === $_SESSION['connection']){ //on verifier que le commentaire que le user souhaite modifier lui appartient bien
 
@@ -141,13 +156,12 @@ use App\Models\SocialNetworkManager;
 
             if($_SERVER['REQUEST_METHOD'] === 'POST') { // if a submission of the form (=> a modification of a comment) has been made
                 
-            //for data validation
-                
                 //test de validation des champs du formulaire
-                    if(empty($_POST['comment']) OR mb_strlen($_POST['comment'])<=3){
-                        $errors[] = 'Le champ commentaire ne peut être vide et doit contenir plus de 3 caracteres';
-                    }
+                if(empty($_POST['comment']) OR mb_strlen($_POST['comment'])<=3){
+                    $errors[] = 'Le champ commentaire ne peut être vide et doit contenir plus de 3 caracteres';
+                }
 
+                // enregistrement des infos
                 if(empty($errors)){
                     // enregistrement des modifications du commentaire
                     if (!empty($_POST['comment'])){
@@ -174,7 +188,6 @@ use App\Models\SocialNetworkManager;
             }
             require('../app/Views/frontViews/frontEditCommentPostView.php');
         }else {
-            // throw new Exception('impossible de modifier le commentaire :'.$comment->getId().'par le user :'.$_SESSION['connection']);
             $errors[] = 'impossible de modifier le commentaire :'.$comment->getId().'par le user :'.$_SESSION['connection'];
             setFlashErrors($errors);
 
@@ -196,7 +209,14 @@ use App\Models\SocialNetworkManager;
     
         // on supprime le commentaire
         $commentManager = new CommentManager();
-        $comment = $commentManager->getComment($id);
+        try{
+            $comment = $commentManager->getComment($id);
+        } catch (Exception $e) {    //dans le cas ou l'on demande une ressource qui n'existe pas (ici un id de comment qui n'existe pas)
+            $errors[] = $e->getMessage();
+            setFlashErrors($errors);    // pour gerer les erreurs en message flash (voir fichier globalFunctions.php)
+            require_once('../app/Views/errors.php');
+            return http_response_code(302);
+        }
         
         if($comment->getUser_id() === $_SESSION['connection']){ //on verifier que le commentaire que le user souhaite modifier lui appartient bien
             try{
@@ -225,9 +245,18 @@ use App\Models\SocialNetworkManager;
     {
         $userLogged = Auth::check(['abonner']);
 
+        $errors = [];
+
         // users
         $userManager = new UserManager();
-        $user = $userManager->getUser($id); //user of dashboard
+        try{
+            $user = $userManager->getUser($id); //user of dashboard
+        } catch (Exception $e) {    //dans le cas ou l'on demande une ressource qui n'existe pas (ici un id du user qui n'existe pas)
+            $errors[] = $e->getMessage();
+            setFlashErrors($errors);    // pour gerer les erreurs en message flash (voir fichier globalFunctions.php)
+            require_once('../app/Views/errors.php');
+            return http_response_code(302);
+        }
 
         if($user->getId() === $_SESSION['connection']){ //on verifier que le dashboard que le user souhaite visualiser est bien le sien
 
@@ -272,9 +301,6 @@ use App\Models\SocialNetworkManager;
             // traitement server et affichage des retours d'infos 
             if ($_SERVER['REQUEST_METHOD'] === 'POST') { // if a submission of the form (=> a modification of a user) has been made
 
-                //for data validation
-                $errors = [];
-
                 //test de validation des champs du formulaire
                     if(empty($_POST['firstName']) OR mb_strlen($_POST['firstName'])<=3){
                         $errors[] = 'Le champ firstName ne peut être vide et doit contenir plus de 3 caracteres';
@@ -304,6 +330,7 @@ use App\Models\SocialNetworkManager;
                         $errors[] = 'Le champ password ne peut être vide et doit contenir plus de 3 caracteres';
                     }
                 
+                // enregistrement des infos
                 if(empty($errors)){
                 
                     // enregistrement en bdd du user
@@ -413,7 +440,10 @@ use App\Models\SocialNetworkManager;
             } 
             require('../app/Views/frontViews/frontUserFrontDashboardView.php');
         }else {
-            throw new Exception('impossible d\'afficher ce dashboard, il ne vous appartient pas');
+            $errors[] = 'impossible d\'afficher ce dashboard, il ne vous appartient pas';
+            setFlashErrors($errors);    // pour gerer les erreurs en message flash (voir fichier globalFunctions.php)
+            header('Location: /listposts');
+            return http_response_code(302);
         }
     }
 
@@ -575,7 +605,14 @@ use App\Models\SocialNetworkManager;
 
         // users
         $userManager = new UserManager();
-        $user = $userManager->getUser($id); //user of dashboard
+        try{
+            $user = $userManager->getUser($id); //user of dashboard
+        } catch (Exception $e) {    //dans le cas ou l'on demande une ressource qui n'existe pas (ici un id du user qui n'existe pas)
+            $errors[] = $e->getMessage();
+            setFlashErrors($errors);    // pour gerer les erreurs en message flash (voir fichier globalFunctions.php)
+            require_once('../app/Views/errors.php');
+            return http_response_code(302);
+        }
 
         if($user->getId() === $_SESSION['connection']){ //on verifier que le user que l on souhaite supprimer correspond bien au user connecté sur le site
             
@@ -681,7 +718,10 @@ use App\Models\SocialNetworkManager;
 
             require('../app/Views/frontViews/frontDeleteUserView.php');
         }else {
-            throw new Exception('impossible de supprimer ce user, vous n\'en avait pas le droit');
+            $errors[] = 'impossible de supprimer ce user, vous n\'en avait pas le droit';
+            setFlashErrors($errors);    // pour gerer les erreurs en message flash (voir fichier globalFunctions.php)
+            header('Location: /listposts');
+            return http_response_code(302);
         }
 
     }

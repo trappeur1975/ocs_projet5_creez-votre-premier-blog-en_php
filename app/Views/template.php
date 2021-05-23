@@ -13,7 +13,7 @@
             <a href="/" class="navbar-brand">Mon site</a>
             <ul class="navbar-nav">
                 <li class="nav-item">
-                    <a href="/listposts" class="nav-link">les articles</a>
+                    <a href="/listposts" class="nav-link">Les articles</a>
                 </li>
                 <?php   
                     if(isset($_SESSION['connection']) AND $userLogged->getUserType_id() == 2){ //si on en logger et que l on est un user de status "administrateur"
