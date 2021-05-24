@@ -708,6 +708,8 @@ use App\Models\SocialNetworkManager;
             require_once('../app/Views/errors.php');
             return http_response_code(302);
         }
+
+        $originalPassword = $user->getPassword();
         
         $formUser = new Form($user, true);
 
@@ -751,9 +753,6 @@ use App\Models\SocialNetworkManager;
         // traitement server et affichage des retours d'infos 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') { // if a submission of the form (=> a modification of a user) has been made
 
-            //for data validation
-            // $errors = [];
-
             //test de validation des champs du formulaire
                 if(empty($_POST['firstName']) OR mb_strlen($_POST['firstName'])<=3){
                     $errors[] = 'Le champ firstName ne peut être vide et doit contenir plus de 3 caracteres';
@@ -785,8 +784,12 @@ use App\Models\SocialNetworkManager;
 
             if(empty($errors)){
             
-                // on hache le mot de passe
-                $hashPsswords = hash('md5', $_POST['password']);
+                // on re-hache le mot de passe que si celui-ci a ete modifier par le user
+                if($originalPassword !== $_POST['password']){
+                    $hashPsswords = hash('md5', $_POST['password']);
+                } else {
+                    $hashPsswords = $_POST['password'];
+                }
                 
                 // enregistrement en bdd du user
                 $user

@@ -1,8 +1,8 @@
 /* info sur l ecriture de ce fichier => terminer toujours chaque ligne de donnée avec "|" */
 imageStoragePath|./media/|
-maxFileSizeImage|50|
+maxFileSizeImage|500000|
 image|jpeg|gif|png|JPG|jpg|
 video|youtube|vimeo|netfix|
 document|txt|pdf|xls|
-socialnetwork|facebook|linkedin|twitter|
-email|admin@blog.com
+socialnetwork|facebook|linkedin|twitter|github|
+email|admin@blog.com|adminPerso@hotmail.com

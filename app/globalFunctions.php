@@ -13,11 +13,43 @@ function formatHtml(string $content) {
     return nl2br(htmlentities($content));
 }
 
-// envoyer un email
+// envoie d'email
 function sendEmail(String $recipientEmail, String $title, String $message){
     $senderEmail = 'From: '.searchDatasFile('email')[1]; //chemin de stockage du fichier uploader (voir fichier globalFunctions.php)
     mail($recipientEmail, $title, $message, $senderEmail);
 }
+
+function sendEmailHtml(String$name, String$email, String $message, $emailFrom, $emailTo){
+    // Sujet
+    $subject = 'BlogNico message de '.$name;
+
+    // message
+    $message = '
+    <html>
+        <head>
+            <title>BlogNico message de '.$name.'</title>
+        </head>
+        <body>
+            <p>Message de '.$name.'</p>
+            <p>Son adresse email : '.$email.'</p>
+            <p>Voici son message :</p>
+            <p>'
+                .$message.
+            '</p>
+        </body>
+    </html>
+    ';
+
+    // Pour envoyer un mail HTML, l'en-tête Content-type doit être défini
+    $headers[] = 'MIME-Version: 1.0';
+    $headers[] = 'Content-type: text/html; charset=iso-8859-1';
+    $headers[] = 'From: '.$emailFrom;
+    $to  = $emailTo;
+    
+    // Envoi
+    mail($to, $subject, $message, implode("\r\n", $headers));
+}
+
 
 // gestion de fichier
     // cherche a recuperer (sous forme d un tableau) les données d une ligne dans un fichier si elle existe
@@ -72,6 +104,7 @@ function sendEmail(String $recipientEmail, String $title, String $message){
 
     function getFalshErrors(){
         if(isset($_SESSION['flash'])){
+            echo('<h4> message info </h4>');
             foreach($_SESSION['flash']['errors'] as $error){
                 echo('<div class="alert alert-'.$_SESSION['flash']['type'].'">
                     '.$error.'

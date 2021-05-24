@@ -20,9 +20,58 @@ use App\Models\SocialNetworkManager;
     {
         $userLogged = Auth::sessionStart();
 
-        $error = null;
+        $errors = [];
 
+        // user
+        $userManager = new UserManager(); // Création de l'objet manager de user
+
+        try{
+            $user = $userManager->getUser(1); // user nicolas tchenio
+        } catch (Exception $e) {    //dans le cas ou l'on demande une ressource qui n'existe pas (ici un id de post qui n'existe pas)
+            $errors[] = $e->getMessage();
+            setFlashErrors($errors);    // pour gerer les erreurs en message flash (voir fichier globalFunctions.php)
+            require_once('../app/Views/errors.php');
+            return http_response_code(302);
+        }
+
+        // media
+        $mediaManager = new MediaManager();
+        $listMediasForUser = $mediaManager->getListMediasForUser($user->getId());
+        $logoUser = $mediaManager->getListMediasForUserForType($listMediasForUser, [2])[0];
+
+        // traitement server et affichage des retours d'infos 
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') { // if a submission of the form (=> a creation of a user) has been made
+            //test de validation des champs du formulaire
+                
+                if(empty($_POST['name']) OR mb_strlen($_POST['name'])<=3){
+                    $errors[] = 'Le champ name ne peut être vide et doit contenir plus de 3 caracteres';
+                }
+                if(empty($_POST['email']) OR strpos($_POST['email'], '@') === false){
+                    $errors[] = 'Le champ email ne peut être vide ou l\'ecriture de votre adresse email est incorrect';
+                }
+                if(empty($_POST['message']) OR mb_strlen($_POST['message'])<=3){
+                    $errors[] = 'Le champ lastName ne peut être vide et doit contenir plus de 3 caracteres';
+                }
+        
+            if(empty($errors)){ //on envoie le email
+                // sendEmail('adminBlogNico@hotmail.com', 'BlogNico message de '.$_POST['name'], 'message de '.$_POST['name'].'\r\n adresse email '.$_POST['email'].'\r\n avec le message suivant :'.$_POST['message']);
+                $emailFrom = searchDatasFile('email')[2];
+                $emailTo = searchDatasFile('email')[1];
+                sendEmailHtml($_POST['name'], $_POST['email'], $_POST['message'], $emailFrom, $emailTo);
+               
+                header('Location: /?SendEmail=true');
+                return http_response_code(302);
+            }else{  
+                setFlashErrors($errors);    // pour gerer les erreurs en message flash (voir fichier globalFunctions.php)
+                
+                header('Location: /?SendEmail=false');
+                return http_response_code(302);
+            }
+            
+        }
+        
         require('../app/Views/frontViews/frontHomeView.php');
+
     }
 
     /**
@@ -150,6 +199,8 @@ use App\Models\SocialNetworkManager;
             return http_response_code(302);
         }
 
+        $originalPassword = $user->getPassword();
+
         if($user->getId() === $_SESSION['connection']){ //on verifier que le dashboard que le user souhaite visualiser est bien le sien
 
             // EDIT DU USER DASHBOARD
@@ -160,7 +211,6 @@ use App\Models\SocialNetworkManager;
                 $mediaManager = new MediaManager();
                     
                 $listMediasForUser = $mediaManager->getListMediasForUser($id);
-                // $listMediasForUser = $mediaManager->getListMediasForUser($user->getId());
                 $listIdsMediaType = [2];  //logo
                 $listLogos = $mediaManager->getListMediasForUserForType($listMediasForUser, $listIdsMediaType); // pour recuperer le logo du user
 
@@ -225,9 +275,13 @@ use App\Models\SocialNetworkManager;
                 // enregistrement des infos
                 if(empty($errors)){
                 
-                    // on hache le mot de passe
-                    $hashPsswords = hash('md5', $_POST['password']);
-
+                    // on re-hache le mot de passe que si celui-ci a ete modifier par le user
+                    if($originalPassword !== $_POST['password']){
+                        $hashPsswords = hash('md5', $_POST['password']);
+                    } else {
+                        $hashPsswords = $_POST['password'];
+                    }
+                    
                     // enregistrement en bdd du user
                     $user
                         ->setFirstName($_POST['firstName'])

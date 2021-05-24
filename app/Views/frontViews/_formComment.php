@@ -1,4 +1,4 @@
-<form action="" method="post" ">
+<form action="" method="post">
     <?= $formComment->textarea('comment', 'commentaire') ?>
     <button class="btn btn-primary">
         <?php 
