@@ -158,6 +158,7 @@ use App\Models\SocialNetworkManager;
                     ->setIntroduction($_POST['introduction'])
                     ->setContent($_POST['content'])
                     ->setDateCreate($dateCreate)
+                    ->setDateChange($dateCreate)
                     ->setUser_id($_POST['user'])
                     ;
 

@@ -21,7 +21,7 @@ class PostManager extends Manager
     public function getListPosts()
     {
         $db = $this->dbConnect();    
-        $query = $db->query('SELECT * FROM post');
+        $query = $db->query('SELECT * FROM post ORDER BY dateChange DESC');
         $listPosts = $query ->fetchAll(PDO::FETCH_CLASS, Post::class);
         return $listPosts;
     }
@@ -54,13 +54,14 @@ class PostManager extends Manager
                                                   introduction = :introduction,
                                                   content = :content,
                                                   dateCreate = :dateCreate,
-                                                --   dateChange = :dateChange,
+                                                  dateChange = :dateChange,
                                                   user_id = :user_id');
         $result = $query->execute([
             'title' => $post->getTitle(),
             'introduction' => $post->getIntroduction(),
             'content' => $post->getContent(),
             'dateCreate' => $post->getDateCreate()->format('Y-m-d H:i:s'),
+            'dateChange' => $post->getDateChange()->format('Y-m-d H:i:s'),
             'user_id' => $post->getUser_id()
             ]);
 

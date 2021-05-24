@@ -81,11 +81,10 @@ use App\Models\SocialNetworkManager;
     function listPosts()
     {
         $userLogged = Auth::sessionStart();
-
         
         $postManager = new PostManager();
-        
         $listPosts = $postManager->getListPosts();
+
         require('../app/Views/frontViews/frontListPostsView.php');
     }
 
