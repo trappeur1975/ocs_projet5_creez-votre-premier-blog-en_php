@@ -30,7 +30,7 @@
         <div class="col-5">
             <img src="<?= $logoUser->getPath() ?> " alt="<?= $logoUser->getAlt() ?>" class="rounded-circle rounded img-fluid" id="logoAdmin">
         </div>    
-        <div class="col-7">
+        <div class="col-7" id="civilStatus">
             <h2>
                 <?= formatHtml($user->getFirstName()); ?>
                 <?= formatHtml($user->getLastName()); ?>
@@ -45,9 +45,9 @@
             </p>
         </div>
     </div>
-    <div class="row">  
+    <div class="row" id="contactForm">  
         <div> 
-            <h1>Pour me contacter</h1>  
+            <h1 class="text-center">Pour me contacter</h1>  
             <form action="" method="post">
                 <fieldset>
                     <div class="form-group">

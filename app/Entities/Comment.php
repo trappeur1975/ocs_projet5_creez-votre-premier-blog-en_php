@@ -128,7 +128,6 @@ class comment
      * @return  self
      */ 
     public function setValidate($validate): self
-    // public function setValidate(\DateTime $validate): self
     {
         $this->validate = $validate;
 

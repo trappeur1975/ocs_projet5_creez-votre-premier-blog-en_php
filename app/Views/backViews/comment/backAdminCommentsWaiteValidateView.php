@@ -75,7 +75,7 @@ ob_start();
                         <a href="<?= '/backend/validateComment/'. $comment->getId()?>" class="btn btn-info">
                             Valider
                         </a>
-                        <!-- si on utilise la methode "post" -->
+                        <!-- if we use the "post" method  -->
                         <form action="<?= '/backend/deleteComment/'. $comment->getId()?>" methode="POST"
                             onsubmit="return confirm('Souhaitez vous vraiment executer cette action?')">
                             <button type="submit" class="btn btn-danger">Supprimer</button>

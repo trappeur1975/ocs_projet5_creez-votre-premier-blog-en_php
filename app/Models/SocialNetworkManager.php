@@ -1,4 +1,4 @@
-<?php //va interroger la base de donnée pour recuperer des infos concernant la table socialNetwork
+<?php
 namespace App\Models;
 
 use PDO;
@@ -12,13 +12,19 @@ use Exception;
  */
 class SocialNetworkManager extends Manager
 {
-    // ajoute le user (en attribut de cette fonction) a la table user en bdd
+    /**
+     * Method addSocialNetwork adds the user (as an attribute of this function) to the user table in database
+     *
+     * @param SocialNetwork $socialNetwork [explicite description]
+     *
+     * @return integer
+     */
     public function addSocialNetwork(SocialNetwork $socialNetwork)
     {
         $errorMessage = null;
         
-        //on verifier que le social network est bien autorisé a etre enregistré sur le site (base de donnee)
-        $authorizedSocialNetworks = searchDatasFile('socialnetwork');   //voir fichier globalFunctions.php
+        // we check that the social network is authorized to be registered on the site (database) 
+        $authorizedSocialNetworks = searchDatasFile('socialnetwork');   // see globalFunctions.php file 
         $validateSocialNetwork = validateWordInString($authorizedSocialNetworks, $socialNetwork->getUrl());
 
         if($validateSocialNetwork){
@@ -35,11 +41,9 @@ class SocialNetworkManager extends Manager
                 return $db->lastInsertId();
             } else {
                 throw new Exception('impossible de creer l enregistrement du socialNetwork en base de donne');
-                // $errorMessage = 'impossible de creer l enregistrement du socialNetwork';
             }
         } else {
             throw new Exception('impossible d\'enregistrer ce socialNetwork');
-            // $errorMessage = 'impossible d\'enregistrer ce socialNetwork';
         }
     }
 
@@ -59,8 +63,6 @@ class SocialNetworkManager extends Manager
             throw new Exception('impossible de supprimer le socialNetwork :'.$id);
         }
     }
-
-     // ----------------------------- methode specifique --------------------------
     
     /**
      * Method getListSocialNetworksForUser method that returns the list of socialnetwork linked to a user 
@@ -80,7 +82,13 @@ class SocialNetworkManager extends Manager
         return $listSocialNetworksForUser;
     }
 
-    // methode pour recuperer un tableau de soacialNetwork lier a un utilisateur que l on va utiliser dans le select
+    /**
+     * Method listSocialNetworksFormSelect method to retrieve an array from soacialNetwork link to a user that we will use in the select 
+     *
+     * @param array $listSocialNetworksForUser [explicite description]
+     *
+     * @return array
+     */
     public function listSocialNetworksFormSelect(array $listSocialNetworksForUser): array
     {
         $results = [];
@@ -91,6 +99,5 @@ class SocialNetworkManager extends Manager
 
         return $results;
     }
-
 
 }

@@ -237,7 +237,6 @@ class User
      *
      * @return  \Datetime
      */ 
-    // public function getValidate(): ?\datetime
     public function getValidate()
     {
         return $this->validate;
@@ -251,7 +250,6 @@ class User
      * @return  self
      */ 
     public function setValidate($validate): self
-    // public function setValidate($validate): self
     {
         $this->validate = $validate;
 
@@ -281,28 +279,4 @@ class User
 
         return $this;
     }
-
-    /**
-     * Get $logo logo of the user
-     *
-     * @return  Media
-     */ 
-    // public function getLogo(): ?Media
-    // {
-    //     return $this->logo;
-    // }
-
-    /**
-     * Set $logo logo of the user
-     *
-     * @param  Media  $logo  $logo logo of the user
-     *
-     * @return  self
-     */ 
-    // public function setLogo(Media $logo): self
-    // {
-    //     $this->logo = $logo;
-
-    //     return $this;
-    // }
 }

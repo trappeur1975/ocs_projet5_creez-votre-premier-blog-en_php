@@ -37,7 +37,7 @@ ob_start();
                         #<?= $user->getId(); ?>
                     </td>
                     <td>
-                        <a href="<?= '/backend/editUser/'. $user->getId()?>"> <!-- ISSUE faudra changer cela (ce qu il y a en php) avec l utilisation des nom de route -->
+                        <a href="<?= '/backend/editUser/'. $user->getId()?>">
                         <?= formatHtml($user->getLastName()) ?>
                         </a>
                     </td>
@@ -51,18 +51,16 @@ ob_start();
                         ?>
                     </td>
                     <td>
-                        <a href="<?= '/backend/editUser/'. $user->getId()?>" class="btn btn-primary"> <!-- ISSUE faudra changer cela (ce qu il y a en php) avec l utilisation des nom de route -->
+                        <a href="<?= '/backend/editUser/'. $user->getId()?>" class="btn btn-primary">
                             Editer
                         </a>
                         <a href="<?= '/backend/validateUser/'. $user->getId()?>" class="btn btn-info">
                             Valider
                         </a>
-                        <!-- ISSUE faudra changer cela (ce qu il y a en php) avec l utilisation des nom de route -->
-                            <!-- si on utilise la methode "post" -->
-                                <form action="<?= '/backend/deleteUser/'. $user->getId()?>" methode="POST"
-                                    onsubmit="return confirm('Souhaitez vous vraiment executer cette action?')">
-                                    <button type="submit" class="btn btn-danger">Supprimer</button>
-                                </form>
+                            <form action="<?= '/backend/deleteUser/'. $user->getId()?>" methode="POST"
+                                onsubmit="return confirm('Souhaitez vous vraiment executer cette action?')">
+                                <button type="submit" class="btn btn-danger">Supprimer</button>
+                            </form>
                     </td>
                 </tr>
                 <?php endforeach ?>

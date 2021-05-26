@@ -20,32 +20,40 @@ class Form
         $this->edit = $edit;
     }
 
-    //pour creer un champ input
-    // PERO j ai rajouter l attribue "$title" pour nommer le champ differement du label
+   
+    /**
+     * Method input to create an input field 
+     *
+     * @param string $key
+     * @param string $label
+     * @param string $title
+     *
+     * @return string
+     */
     public function input(string $key, string $label, string $title): string
     {
         $value = $this->getValue($key);
         $type = $key === "password" ? "password" : "text";
         
-        // modif perso j ai remplacé name="{$key}" par name="{$label}" ATTENTION VOIR L IMPLICATION QUE CELA A SUR LE SELECT MEDIA POUR L EDIT DE POST
-        // modif perso j ai remplacé for="{$key}" par for="{$label}"
         return <<<HTML
         <div class="form-group">
             <label for="{$label}">{$title}</label>
             <input type={$type} id="{$label}" class="form-control" name="{$label}" value="{$value}">
-            <!-- <input type={$type} id="{$label}" class="form-control" name="{$label}" value="{$value}"> -->
         </div>
 HTML;
     }
-
-    //pour creer un champ input de type file
+  
+    /**
+     * Method inputFile to create an input field of type file 
+     *
+     * @param string $id
+     * @param string $label
+     * @param string $title
+     *
+     * @return string
+     */
     public function inputFile(string $id, string $label, string $title): string
     {
-        // $value = $this->getValue($key);
-        // $type = $key === "password" ? "password" : "text"; //CODE ORIGINAL GRAFIKART
-        
-        // modif perso j ai remplacé name="{$key}" par name="{$label}" ATTENTION VOIR L IMPLICATION QUE CELA A SUR LE SELECT MEDIA POUR L EDIT DE POST
-        // modif perso j ai remplacé for="{$key}" par for="{$label}"
         return <<<HTML
         <div class="form-group">
             <label for="{$label}">{$title}</label>
@@ -54,11 +62,19 @@ HTML;
 HTML;
     }
 
-
-    //pour creer un champ input de type image
+    /**
+     * Method inputImage to create an input field of type image 
+     *
+     * @param Media $logo
+     * @param string $alt
+     * @param string $label
+     * @param string $title
+     *
+     * @return string
+     */
     public function inputImage(Media $logo, string $alt, string $label, string $title): string
     {
-        $path = substr($logo->getPath(),1); //obliger d'utiliser substr pour enlever le point devant le path du logo (=> ./media/...)
+        $path = substr($logo->getPath(),1); //force to use substr to remove the dot in front of the logo path (=> ./media / ...) 
 
         return <<<HTML
         <div class="form-group">
@@ -68,7 +84,14 @@ HTML;
 HTML;
     }
 
-    //pour creer un champ textarea
+    /**
+     * Method textarea to create a textarea field 
+     *
+     * @param string $key
+     * @param string $label
+     *
+     * @return string
+     */
     public function textarea(string $key, string $label): string
     {
         $value = $this->getValue($key);
@@ -79,12 +102,20 @@ HTML;
         </div>
 HTML;
     }
-
-    //pour creer un champ select simple
-    //perso j ai rajouter string $title pour que l affichage du champs en front soit different du label (avant il n'y avait que label)
+  
+    /**
+     * Method selectSimple to create a simple select field 
+     *
+     * @param string $key
+     * @param string $label
+     * @param string $title
+     * @param array $options
+     *
+     * @return string
+     */
     public function selectSimple(string $key, string $label, string $title, array $options=[]): ?string
     { 
-        if ($this->data != []) { //pour gerer le cas ou il n'a aucune donnée transmise (exemple pour un post qu il n'ait aucun media lier a celui ci)
+        if ($this->data != []) { // to manage the case where it has no transmitted data (example for a post that it has no media linked to this one) 
             $optionsHTML = [];
             $value = $this->getValue($key);
             
@@ -102,9 +133,7 @@ HTML;
             return <<<HTML
                 <div class="form-group">
                     <label for="field{$label}">{$title}</label>
-                    <!-- <label for="field{$key}">{$title}</label> -->
                     <select id="{$label}" class="form-control" name="{$label}">{$optionsHTML}</select>
-                    <!-- <select id="{$key}" class="form-control" name="{$label}">{$optionsHTML}</select> -->
                 </div>
 HTML;
         } else {
@@ -112,10 +141,18 @@ HTML;
         }
 
     }
-
-    //pour creer un champ select multiple
-    //perso j ai rajouter array $selects pour que l'on puisse recuperer la liste (ex des medias propre a un post) pour ensuite gerer les attributs
-    //perso j ai rajouter string $title pour que l affichage du champs en front soit different du label (avant il n'y avait que label)
+  
+    /**
+     * Method selectMultiple to create a multiple select field 
+     *
+     * @param string $key
+     * @param string $label so that the display of the front field is different from the label (before there was only label)
+     * @param string $title
+     * @param array $options
+     * @param array $selects so that we can retrieve the list (eg media specific to a post) to then manage the attributes 
+     *
+     * @return string
+     */
     public function selectMultiple(string $key, string $label, string $title, array $options=[], array $selects): ?string
     { 
         if ($this->data != []) { //pour gerer le cas ou il n'a aucune donnée transmise (exemple pour un post qu il n'ait aucun media lier a celui ci)
@@ -136,12 +173,8 @@ HTML;
 
             return <<<HTML
                 <div class="form-group">
-                    <!-- <label for="field{$key}">{$label}</label> -->
                     <label for="field{$label}">{$title}</label>
-                    
-                    <!-- ATTENTION rajout de "[]" a "name="{$label}" pour pouvoir recupérer les donnees des select multiple DE CE FAIT ON RECUPERE UN TABLEAU DE DONNEE ET NON UNE SEUL DONNEE -->
                     <select id="{$label}" class="form-control" name="{$label}[]" multiple>{$optionsHTML}</select>
-                    <!-- <select id="{$key}" class="form-control" name="{$label}[]" multiple>{$optionsHTML}</select> -->
                 </div>
 HTML;
         } else {
@@ -150,14 +183,17 @@ HTML;
 
     }
 
-    // pour trouver le getter a executer pour avoir la valeur a integrer dans notre champs de notre formulaire
-    // gerer a la fois si $key est un tableau ou un objet
-    // private function getValue(string $key) :?string
-    private function getValue(string $key): ?string //voir si on garde ce typage de retour car peut poser probleme avec un SELECT
+    /**
+     * Method getValue to find the getter to execute to have the value to integrate in our field of our form 
+     *
+     * @param string $key handle both if $ key is an array or an object 
+     *
+     * @return string
+     */
+    private function getValue(string $key): ?string // see if we keep this return typing because it can pose a problem with a SELECT 
     {
         $method = 'get'.ucfirst($key);
         $value = $this->data->$method();
-        // $value = $this->data->$method();
         if($value instanceof \DateTimeInterface){
            return  $value->format('Y-m-d H:i:s');
         }

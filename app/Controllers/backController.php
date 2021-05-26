@@ -33,26 +33,24 @@ use App\Models\SocialNetworkManager;
                 try {
                     $userRegister = $userManager->findByUserLogin($_POST['login']);
 
-                    // on hache le mot de passe
+                    // we hashed the password 
                     $hashPsswords = hash('md5', $_POST['password']);
 
                     if($userRegister->getPassword() === $hashPsswords){
 
                         session_start();
                        
-                        $_SESSION['connection'] = $userRegister->getId(); //creation de la session qui enregistre le id de user qi vient de se connecter
+                        $_SESSION['connection'] = $userRegister->getId(); // creation of the session which records the id of user who has just connected 
                         
-                        $userLogged = $userRegister;    //pour avoir l'user logger si par la suite dans le code on ne fait pas appel a la function "Auth::check(['administrateur'])" ou "Auth::sessionStart()"
+                        $userLogged = $userRegister;    // to have the user logger if later in the code we do not call the function "Auth :: check (['administrator'])" or "Auth :: sessionStart ()" 
 
                         if($userManager->getUserSatus($_SESSION['connection'])['status'] === 'administrateur'){
-                            header('Location: /backend/adminPosts');    //si user est administrateur il va sur le bachend admin
+                            header('Location: /backend/adminPosts');    // if user is administrator, he goes to the admin bachend 
                             return http_response_code(302);
-                        }else if($userManager->getUserSatus($_SESSION['connection'])['status'] === 'abonner' and !is_null($userRegister->getValidate())){  //si le user qui se connect est de type "abonner" et que sont compte a était valider par l administrateur du site (=> validate ! null)
-                            header('Location: /userFrontDashboard/'.$userRegister->getId());    //si user est abonner il va sur son dashboard
-                            // header('Location: /');    //si user est abonner il va sur le front page home
+                        }else if($userManager->getUserSatus($_SESSION['connection'])['status'] === 'abonner' and !is_null($userRegister->getValidate())){  // si le user qui se connect est de type "abonner" et que sont compte a était valider par l administrateur du site (=> validate ! null)
+                            header('Location: /userFrontDashboard/'.$userRegister->getId());    // if user is a subscriber, he goes on his dashboard 
                             return http_response_code(302);
                         }else {
-                            // $error = 'votre status ne vous autorise pas a acceder au contenu du site reserver a un certain statut ';
                             header('Location: /?unauthorizedAccess=true');
                         }
                     } else { 
@@ -123,8 +121,8 @@ use App\Models\SocialNetworkManager;
         // media (image et video)
         $mediaManager = new MediaManager();
        
-        $mediaUploadImage = new Media(); //pour avoir dans le champ input "texte alternatif du media uploader" (creer apres) un champs vide
-        $formMediaUploadImage = new Form($mediaUploadImage); //nommer "$formMediaUploadImage" au lieu de "$formMedia" par rapport a l editPost() et son utilisation dans "_form.php" du dossier "backendViews > post"
+        $mediaUploadImage = new Media(); // to have in the input field "alternative text of the media uploader" (create after) an empty field
+        $formMediaUploadImage = new Form($mediaUploadImage); // use in "_form.php" of the "backendViews> post" folder
         
         $mediaUploadVideo = new Media();
         $formMediaUploadVideo = new Form($mediaUploadVideo);
@@ -132,10 +130,10 @@ use App\Models\SocialNetworkManager;
         // traitement server et affichage des retours d'infos 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') { // if a submission of the form (=> a creation of a post) has been made
             
-            //for data validation
+            // for data validation
             $errors = [];
 
-            //test de validation des champs du formulaire
+            // test de validation des champs du formulaire
                 if(empty($_POST['title']) OR mb_strlen($_POST['title'])<=3){
                     $errors[] = 'Le champ title ne peut être vide et doit contenir plus de 3 caracteres';
                 }
@@ -147,12 +145,11 @@ use App\Models\SocialNetworkManager;
                 }
 
             if(empty($errors)){
-                                    
-                //ISSSUE  gestion des date en datetime dans entité post // base de donnee en string pour la create ou l edit d un post (=>voir methode setDateCreate($dateCreate) de la class Post)
-                //modification pour gerer l enregistrement dans la base de donnee via le Postmanager
-                    $dateCreate = DateTime::createFromFormat('Y-m-d H:i:s',$_POST['dateCreate']); // pour que la date String soit en Datetime
+            
+                // modification to manage the record in the database via the Postmanager 
+                $dateCreate = DateTime::createFromFormat('Y-m-d H:i:s',$_POST['dateCreate']);// so that the date String is in Datetime 
                             
-                // enregistrement en bdd du post
+                // bdd recording of the post 
                 $post
                     ->setTitle($_POST['title'])
                     ->setIntroduction($_POST['introduction'])
@@ -170,21 +167,21 @@ use App\Models\SocialNetworkManager;
                     $errors[] = $e->getMessage();
                 } 
 
-                //media IMAGE
+                // media IMAGE
                 if(isset($_FILES['mediaUploadImage']) AND $_FILES['mediaUploadImage']['error']== 0){
                                                 
-                    // variables infos
-                    $idMediaType = 1;   //image
+                    // info variables 
+                    $idMediaType = 1;   // image
                     
-                    $file = $_FILES['mediaUploadImage']; //fichier uploader
-                    $storagePath = searchDatasFile('imageStoragePath')[1]; //chemin de stockage du fichier uploader (voir fichier globalFunctions.php)
+                    $file = $_FILES['mediaUploadImage']; // file uploader 
+                    $storagePath = searchDatasFile('imageStoragePath')[1]; // storage path of the uploader file (see globalFunctions.php file) 
                     $name = 'mediaImage-'.pathinfo($file['name'])['filename'].'-'; 
-                    $newNameUploaderFile = uniqid($name , true);    // concatenation "media-" + nom du fichier uploader(sans son extension + identifiant unique (via uniqid) pour avoir un identifiant unique
+                    $newNameUploaderFile = uniqid($name , true);    // concatenation "media-" + name of the uploader file (without its extension + unique identifier (via uniqid) to have a unique identifier
                     
-                    $extension_upload = pathinfo($file['name'])['extension']; //pour recuperer l'extension du fichier uploader
-                    $pathFile =  $storagePath.basename($newNameUploaderFile.'.'.$extension_upload); //chemin de stockage  avec nouveau nom du media uploader
+                    $extension_upload = pathinfo($file['name'])['extension']; // to retrieve the extension of the uploader file 
+                    $pathFile =  $storagePath.basename($newNameUploaderFile.'.'.$extension_upload); //storage path with new name of the media uploader
 
-                    // enregistrement en bdd du media IMAGE et du fichier uploader sur le server dans le dossier media
+                    // recording in bdd of the IMAGE media and of the uploader file on the server in the media folder 
                     $mediaUploadImage
                         ->setPath($pathFile)    // ->setPath('./media/media-19.jpg')
                         ->setAlt($_POST['altFileMediaImage'])
@@ -202,9 +199,9 @@ use App\Models\SocialNetworkManager;
                     }
                 }
                 
-                //media VIDEO
+                // media VIDEO
                 if (!empty($_POST['mediaUploadVideo'])){
-                    // enregistrement en bdd du media VIDEO
+                    // VIDEO media bdd recording 
                     $mediaUploadVideo
                         ->setPath($_POST['mediaUploadVideo'])
                         ->setAlt($_POST['altFileMediaVideo'])
@@ -216,18 +213,17 @@ use App\Models\SocialNetworkManager;
                     try{
                         $mediaManager->addMediaVideo($mediaUploadVideo);
                     } catch (Exception $e) {
-                        // setFlashMessage($e->getMessage());
                         $errors[] = $e->getMessage();
                     }
                 }
                 
-                setFlashErrors($errors);    // pour gerer les erreurs en message flash (voir fichier globalFunctions.php)
+                setFlashErrors($errors);    // to manage flash message errors (see globalFunctions.php file)
                 
                 header('Location: /backend/editPost/'.$lastRecordingPost.'?created=true');
                 return http_response_code(302);
 
             }else{
-                setFlashErrors($errors);    // pour gerer les erreurs en message flash (voir fichier globalFunctions.php)
+                setFlashErrors($errors);    // to manage flash message errors (see globalFunctions.php file)
                 
                 header('Location: /backend/createPost?created=false');
                 return http_response_code(302);
@@ -251,9 +247,9 @@ use App\Models\SocialNetworkManager;
         $postManager = new PostManager();
         try{
             $post = $postManager->getPost($id);
-        } catch (Exception $e) {    //dans le cas ou l'on demande une ressource qui n'existe pas (ici un id de post qui n'existe pas)
+        } catch (Exception $e) {    //in the event that we request a resource that does not exist (here a post id that does not exist) 
             $errors[] = $e->getMessage();
-            setFlashErrors($errors);    // pour gerer les erreurs en message flash (voir fichier globalFunctions.php)
+            setFlashErrors($errors);    // to manage flash message errors (see globalFunctions.php file) 
             require_once('../app/Views/errors.php');
             return http_response_code(302);
         }
@@ -261,42 +257,42 @@ use App\Models\SocialNetworkManager;
         if ( $post->getDateChange() === null){
             $post->setDateChange(new Datetime()); //to assign today's date (in datetime) by default when to edit the post
         }
-        $formPost = new Form($post, true);    //pour pouvoir creer le formulaire de post (grace aux fonction qui creer les champs)
+        $formPost = new Form($post, true);    //to be able to create the post form (thanks to the functions which create the fields) 
 
         // users
         $userManager = new UserManager();
-        $user = $userManager->getUser($post->getUser_id());   // sera utiliser dans "$formPost = new Form($post);" ci dessous qui permettra de creer les champs propre au $post (via l entité "Form.php")
+        $user = $userManager->getUser($post->getUser_id());   // will be used in "$ formPost = new Form ($ post);" below which will allow you to create the fields specific to the $ post (via the "Form.php" entity) 
         $listUsers = $userManager->getListUsers();
-        $listUsersSelect = $userManager->listUsersFormSelect($listUsers);//sera utiliser dans "backView > post > _form.php"
+        $listUsersSelect = $userManager->listUsersFormSelect($listUsers);   // will be used in "backView> post> _form.php" 
     
 
-        $formUser = new Form($user, true);    //pour creer le champs select des users qui sera integrer dans "backView > post > _form.php"     
+        $formUser = new Form($user, true);    // to create the select field of users which will be integrated in "backView> post> _form.php"      
 
-        // media (image et video)
+        // media (image and video) 
         $mediaManager = new MediaManager();             
         $listMediasForUser = $mediaManager->getListMediasForUser($post->getUser_id());
-        $listIdsMediaType = [1,3];  //image et video
+        $listIdsMediaType = [1,3];  // image and video 
         $listMediasForUserForType = $mediaManager->getListMediasForUserForType($listMediasForUser, $listIdsMediaType);
 
         if(!empty($listMediasForUserForType)){
-            $media = $listMediasForUserForType[0]; // on recuperer le premier media de l user du post qui sera utiliser dans "$formMedia = new Form($media);" ci dessous qui permettra de creer les champs propre au $media (via l entité "Form.php")
-            $formMediasImageSelect = new Form($media);  //pour creer le champs select des media qui sera integrer dans "backView > post > _form.php"
+            $media = $listMediasForUserForType[0]; // we retrieve the first user media from the post which will be used in "$ formMedia = new Form ($ media);" below which will allow you to create the fields specific to $ media (via the "Form.php" entity) 
+            $formMediasImageSelect = new Form($media);  // to create the media select field which will be integrated in "backView> post> _form.php" 
         }
 
         //utiliser dans "backviews > post > _form.php" 
-        $listMediasForUserSelect =  $mediaManager->listMediasFormSelect($listMediasForUserForType); // on affiche la liste des media de l'user auteur du post (uniquement les image et les video)     
-        $listMediasForPostSelect =  $mediaManager->getIdOftListMediasActifForPost($post->getId());// on recupere la liste des media pour ce $post
+        $listMediasForUserSelect =  $mediaManager->listMediasFormSelect($listMediasForUserForType); // we display the media list of the user author of the post (only images and videos)
+        $listMediasForPostSelect =  $mediaManager->getIdOftListMediasActifForPost($post->getId());// we get the media list for this $ post 
 
         $mediaUploadImage = new Media();
-        $formMediaUploadImage = new Form($mediaUploadImage);  //pour creer le champs input "texte alternatif du media uploader" qui sera integrer dans "backView > post > _form.php"
+        $formMediaUploadImage = new Form($mediaUploadImage);  // to create the input field "alternative text of the media uploader" which will be integrated in "backView> post> _form.php" 
 
         $mediaUploadVideo = new Media();
         $formMediaUploadVideo = new Form($mediaUploadVideo);
        
-        // traitement server et affichage des retours d'infos 
+        // server processing and display of feedbacks 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') { // if a submission of the form (=> a modification of a post) has been made
 
-            //test de validation des champs du formulaire
+            //validation test of the form fields 
             if(empty($_POST['title']) OR mb_strlen($_POST['title'])<=3){
                 $errors[] = 'Le champ title ne peut être vide et doit contenir plus de 3 caracteres';
             }
@@ -309,16 +305,15 @@ use App\Models\SocialNetworkManager;
 
             if(empty($errors)){
                                 
-                //ISSUE  gestion des date en datetime dans entité post // base de donnee en string pour la create ou l edit d un post (=>voir methode setDateCreate($dateCreate) de la class Post)
-                //modification pour gerer l enregistrement dans la base de donnee via le Postmanager
-                $dateCreate = DateTime::createFromFormat('Y-m-d H:i:s',$_POST['dateCreate']); // pour que la date String soit en Datetime
+                // modification to manage the record in the database via the Postmanager 
+                $dateCreate = DateTime::createFromFormat('Y-m-d H:i:s',$_POST['dateCreate']); // so that the date String is in Datetime 
                 
                 $dateChange = $_POST['dateChange'];
                 if($_POST['dateChange'] === ''){
                     $dateChange=NULL;
                 }
         
-                // enregistrement des modifications (via le select des users) infos sur le post
+                // save changes (via user select) post info 
                     $post
                         ->setTitle($_POST['title'])
                         ->setIntroduction($_POST['introduction'])
@@ -331,16 +326,15 @@ use App\Models\SocialNetworkManager;
                     try{                    
                         $postManager->updatePost($post);
                     } catch (Exception $e) {
-                        // setFlashMessage($e->getMessage());
                         $errors[] = $e->getMessage();
                     }
 
-                // -------- enregistrement des modifications (via le select des medias et upload de media) des infos sur les media lié au post edité
-                    // cela nous servira par la suite a savoir si le user a l origine du post a ete modifier
+                // -------- recording of changes (via media select and media upload) media info linked to the edited post 
+                    // this will be used later to know if the user at the origin of the post has been modified 
                     $userOrigine = $user;
                     $newUser = $userManager->getUser($post->getUser_id());
 
-                    // si l utilisateur a ete modifier on desactive les medias lier a ce post
+                    // if the user has been modified, we deactivate the media linked to this post 
                     if ($userOrigine != $newUser){
                         foreach($listMediasForPostSelect as $value){                           
                             $statutActif = 0; //false
@@ -348,24 +342,23 @@ use App\Models\SocialNetworkManager;
                         }
                     }
 
-                    if($userOrigine == $newUser){ //on enregistre la nouvelle liste de media pour le post definit dans le select des medias uniquement si le user n a pas changer
-                        // ajout du media si un upload image a ete fait lors de l edit du post
+                    if($userOrigine == $newUser){ // we save the new media list for the post defined in the media select only if the user has not changed 
+                        // addition of the media if an image upload was made during the edit of the post 
                         if(isset($_FILES['mediaUploadImage']) AND $_FILES['mediaUploadImage']['error']== 0){
-                            // variables infos
+                            // info variables 
                             $idMediaType = 1;   //image
 
-                            $file = $_FILES['mediaUploadImage']; //fichier uploader
-                            $storagePath = searchDatasFile('imageStoragePath')[1]; //chemin de stockage du fichier uploader (voir fichier globalFunctions.php)         
+                            $file = $_FILES['mediaUploadImage']; //file uploader 
+                            $storagePath = searchDatasFile('imageStoragePath')[1]; //storage path of the uploader file (see globalFunctions.php file)
                             $name = 'mediaImage-'.pathinfo($file['name'])['filename'].'-';
-                            $newNameUploaderFile = uniqid($name , true);    // concatenation "media-" + nom du fichier uploader(sans son extension + identifiant unique (via uniqid) pour avoir un identifiant unique
+                            $newNameUploaderFile = uniqid($name , true);    // concatenation "media-" + name of the uploader file (without its extension + unique identifier (via uniqid) to have a unique identifier
                             
-                            $extension_upload = pathinfo($file['name'])['extension']; //pour recuperer l'extension du fichier uploader   
-                            $pathFile =  $storagePath.basename($newNameUploaderFile.'.'.$extension_upload); //chemin de stockage  avec nouveau nom du media uploader
+                            $extension_upload = pathinfo($file['name'])['extension']; //to retrieve the extension of the uploader file    
+                            $pathFile =  $storagePath.basename($newNameUploaderFile.'.'.$extension_upload); //storage path with new name of the media uploader 
 
-                            // enregistrement en bdd du media IMAGE et du fichier uploader sur le server dans le dossier media
-                            
+                            // recording in bdd of the IMAGE media and of the uploader file on the server in the media folder          
                             $mediaUploadImage
-                                ->setPath($pathFile)    // ->setPath('./media/media-19.jpg')
+                                ->setPath($pathFile)
                                 ->setAlt($_POST['altFileMediaImage'])
                                 ->setStatutActif(1) //actif
                                 ->setMediaType_id($idMediaType)
@@ -376,14 +369,13 @@ use App\Models\SocialNetworkManager;
                             try{
                                 $mediaManager->addMediaImage($mediaUploadImage, CONFIGFILE, $file); //adding the media to the database and recovery via the id function of the last media in the database
                             } catch (Exception $e) {
-                                // setFlashMessage($e->getMessage());
                                 $errors[] = $e->getMessage();
                             }
                         }          
                         
-                        // ajout du media si un upload video a ete fait lors de l edit du post
+                        // addition of the media if a video upload was made during the edit of the post
                         if (!empty($_POST['mediaUploadVideo'])){
-                            // enregistrement en bdd du media VIDEO
+                            // VIDEO media bdd recording 
                             $mediaUploadVideo
                                 ->setPath($_POST['mediaUploadVideo'])
                                 ->setAlt($_POST['altFileMediaVideo'])
@@ -396,44 +388,42 @@ use App\Models\SocialNetworkManager;
                             try{
                                 $mediaManager->addMediaVideo($mediaUploadVideo);
                             } catch (Exception $e) {
-                                // setFlashMessage($e->getMessage());
                                 $errors[] = $e->getMessage();
                             } 
                         }
                         
-                        // on met tout les medias du post en statutActif = false
+                        // we put all the post's media in Active status = false 
                         foreach($listMediasForPostSelect as $value){                           
                             $statutActif = 0; //false
                             $mediaManager->updateStatutActifMedia($value, $statutActif); 
                         }
                         
-                        // on met tout les medias dont leurs id sont dans "$_POST['path']" en statutActif = true 
-                        // et on modifie leurs post_id pour bien attribuer au media selectionner dans le select le id du post
+                        // we put all the media whose id are in "$ _POST ['path']" in statusActif = true 
+                        // and we modify their post_id to properly attribute to the media selected in the select the post id 
                         foreach($_POST['path'] as $value){
                             $statutActif = 1; //true
                             $mediaManager->updateStatutActifMedia($value, $statutActif);
                             try{
                                 $mediaManager->updatePostIdMedia($value, $post->getId());
                             } catch (Exception $e) {
-                                // setFlashMessage($e->getMessage());
                                 $errors[] = $e->getMessage();
                             }
                         }
                     }
 
-                    // ATTENTION ON MODIFIE LE USERORIGINE pour que notre verification de changement de user du post soit toujours valable
+                    // ATTENTION WE MODIFY THE USERORIGIN so that our post user change check is still valid 
                     $userOrigine = $newUser;
                 
-                // --------------FIN enregistrement des modifications (via le select des medias) des infos sur les media lié au post 
+                // --------------END recording of the modifications (via the media select) of the information on the media linked to the post 
                 
-                setFlashErrors($errors);    // pour gerer les erreurs en message flash (voir fichier globalFunctions.php)
+                setFlashErrors($errors);    // to manage flash message errors (see globalFunctions.php file) 
 
                 header('Location: /backend/editPost/'.$post->getId().'?success=true');
                 return http_response_code(302);
 
             }else{
                 
-                setFlashErrors($errors);    // pour gerer les erreurs en message flash (voir fichier globalFunctions.php)
+                setFlashErrors($errors);    // to manage flash message errors (see globalFunctions.php file) 
 
                 header('Location: /backend/editPost/'.$post->getId().'?success=false');
                 return http_response_code(302);
@@ -453,37 +443,36 @@ use App\Models\SocialNetworkManager;
 
         $errors = [];
  
-        // on supprime les commentaires lier au post (si il y en a)
+        // we delete the comments linked to the post (if there are any) 
         $commentManager = new CommentManager();
         $listCommentsDelete = $commentManager->getListCommentsForPost($id);
         
         if($listCommentsDelete !== []){
             foreach($listCommentsDelete as $comment){
                 try{
-                    $commentManager->deleteComment($comment->getId());    //suppression dans la base de donnée
+                    $commentManager->deleteComment($comment->getId());    //deletion from the database 
                 } catch (Exception $e) {
                     $errors[] = $e->getMessage();
                 }
             }
         }
         
-        // on supprime les medias lier au post (si il y en a)
+        // we delete the media linked to the post (if there is any) 
         $mediaManager = new MediaManager();
-        $listMediasDelete =  $mediaManager->getListMediasForPost($id);// on recupere la liste des media pour ce $post
+        $listMediasDelete =  $mediaManager->getListMediasForPost($id);// we get the media list for this $ post 
         
         if($listMediasDelete !== []){
             foreach($listMediasDelete as $media){
                 try{
-                    unlink($media->getPath());  //suppression des media sur le serveur dans le dossier media
-                    $mediaManager->deleteMedia($media->getId());    //suppression dans la base de donnée
+                    unlink($media->getPath());  //delete media on the server in the media folder 
+                    $mediaManager->deleteMedia($media->getId());    //deletion from the database 
                 } catch (Exception $e) {
-                    // setFlashMessage($e->getMessage());
                     $errors[] = $e->getMessage();
                 } 
             }
         }
         
-        // on supprime le post
+        // we delete the post 
         $postManager = new PostManager();
         try{
             $post = $postManager->deletePost($id);
@@ -538,7 +527,6 @@ use App\Models\SocialNetworkManager;
         $dateTime = new Datetime();
         $date = $dateTime->format('Y-m-d H:i:s'); 
         $user->setValidate($date);
-        // $user->setValidate(new Datetime()); //to assign today's date (in datetime) by default to the user we create 
         
         $userManager = new UserManager();
 
@@ -550,11 +538,11 @@ use App\Models\SocialNetworkManager;
 
         $userTypeManager = new UserTypeManager(); 
         $listUserTypes = $userTypeManager->getListUserTypes();
-        $listUserTypesSelect = $userTypeManager-> listUserTypesFormSelect($listUserTypes); //pour afficher le contenu du select des usertypes, sera utiliser dans "backView > user > _form.php"
+        $listUserTypesSelect = $userTypeManager-> listUserTypesFormSelect($listUserTypes); // to display the content of the select of the usertypes, will be used in "backView> user> _form.php" 
 
         // media (logo)
         $mediaManager = new MediaManager();
-        $mediaUploadLogo = new Media(); //pour avoir dans le champ input pour uploader un logo (par defaut toute les variables de cette entité Media sont a "null" )
+        $mediaUploadLogo = new Media(); //to have in the input field to upload a logo (by default all the variables of this Media entity are "null") 
         $formMediaUploadLogo = new Form($mediaUploadLogo);
 
         // socialNetwork
@@ -562,13 +550,13 @@ use App\Models\SocialNetworkManager;
         $socialNetworkManager = new SocialNetworkManager();
         $formSocialNetwork = new Form($socialNetwork);
 
-        // traitement server et affichage des retours d'infos 
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') { // if a submission of the form (=> a creation of a user) has been made
+        // server processing and display of feedbacks 
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') { // if a submission of the form (=> a creation of a user) has been made 
                 
             //for data validation
                 $errors = [];
             
-                //test de validation des champs du formulaire
+                //validation test of the form fields 
                     if(empty($_POST['firstName']) OR mb_strlen($_POST['firstName'])<=3){
                         $errors[] = 'Le champ firstName ne peut être vide et doit contenir plus de 3 caracteres';
                     }
@@ -599,10 +587,10 @@ use App\Models\SocialNetworkManager;
                 
                 if(empty($errors)){
 
-                    // on hache le mot de passe
+                    // we hashed the password
                     $hashPsswords = hash('md5', $_POST['password']);
 
-                    // enregistrement en bdd du user
+                    // user database recording 
                     $user
                         ->setFirstName($_POST['firstName'])
                         ->setLastName($_POST['lastName'])
@@ -610,34 +598,31 @@ use App\Models\SocialNetworkManager;
                         ->setSlogan($_POST['slogan'])
                         ->setLogin($_POST['login'])
                         ->setPassword($hashPsswords)
-                        // ->setPassword($_POST['password'])
-                        ->setUserType_id($_POST['userType_id'][0]); //car on cette donnee est issu d'un select multiple
-                        // ->setValidate(new Datetime()); //to assign today's date (in datetime) by default to the user we create
-                        // ->setValidate(DateTime::createFromFormat('Y-m-d H:i:s',new Datetime())); //to assign today's date (in datetime) by default to the user we create 
+                        ->setUserType_id($_POST['userType_id'][0]); //because this data comes from a multiple select 
                     
                     try{
                         $lastRecordingUser = $userManager->addUser($user);// add the user to the database and get the last id of the users in the database via the return of the function
                     } catch (Exception $e) {
-                        // setFlashMessage($e->getMessage());
                         $errors[] = $e->getMessage();
                     }
-                    // enregistrement en bdd du media logo et du fichier uploader sur le server dans le dossier media
+                    
+                    // bdd recording of the media logo and the uploader file on the server in the media folder 
                     if(isset($_FILES['mediaUploadLogo']) AND $_FILES['mediaUploadLogo']['error']== 0){
                         
-                        // variables infos
-                        $idMediaType = 2;   //logo
+                        // info variables 
+                        $idMediaType = 2;   // logo
 
-                        $file = $_FILES['mediaUploadLogo']; //fichier uploader
-                        $storagePath = searchDatasFile('imageStoragePath')[1]; //chemin de stockage du fichier uploader (voir fichier globalFunctions.php)         
+                        $file = $_FILES['mediaUploadLogo']; // file uploader 
+                        $storagePath = searchDatasFile('imageStoragePath')[1]; // storage path of the uploader file (see globalFunctions.php file)       
                         $name = 'mediaLogo-'.pathinfo($file['name'])['filename'].'-'; 
-                        $newNameUploaderFile = uniqid($name , true);    // concatenation "media-" + nom du fichier uploader(sans son extension + identifiant unique (via uniqid) pour avoir un identifiant unique
+                        $newNameUploaderFile = uniqid($name , true);    // concatenation "media-" + name of the uploader file (without its extension + unique identifier (via uniqid) to have a unique identifier 
 
-                        $extension_upload = pathinfo($file['name'])['extension']; //pour recuperer l'extension du fichier uploader   
-                        $pathFile =  $storagePath.basename($newNameUploaderFile.'.'.$extension_upload); //chemin de stockage  avec nouveau nom du media uploader
+                        $extension_upload = pathinfo($file['name'])['extension']; // to retrieve the extension of the uploader file    
+                        $pathFile =  $storagePath.basename($newNameUploaderFile.'.'.$extension_upload); // storage path with new name of the media uploader 
 
-                        // enregistrement en bdd du media LOGO
+                        // LOGO media bdd recording 
                         $mediaUploadLogo
-                            ->setPath($pathFile)    // ->setPath('./media/media-19.jpg')
+                            ->setPath($pathFile)
                             ->setAlt($_POST['altFileMediaLogo'])
                             ->setStatutActif(1)
                             ->setMediaType_id($idMediaType)
@@ -647,12 +632,11 @@ use App\Models\SocialNetworkManager;
                         try{
                             $mediaManager->addMediaImage($mediaUploadLogo, CONFIGFILE, $file); //adding the media to the database and recovery via the id function of the last media in the database
                         } catch (Exception $e) {
-                            // setFlashMessage($e->getMessage());
                             $errors[] = $e->getMessage();
                         }
                     }
                     
-                    // enregistrement en bdd du socialNetwork
+                    // socialNetwork bdd recording 
                     if(!empty($_POST['socialNetwork'])){
                         
                         $socialNetwork
@@ -665,20 +649,18 @@ use App\Models\SocialNetworkManager;
                         }
                         catch (Exception $e)
                         {
-                            // setFlashMessage($e->getMessage());
                             $errors[] = $e->getMessage();
-                            // setFlashMessage($e->getMessage(), 'warning');
                         }
                     }
 
-                    setFlashErrors($errors);    // pour gerer les erreurs en message flash (voir fichier globalFunctions.php)
+                    setFlashErrors($errors);    // to manage flash message errors (see globalFunctions.php file) 
 
                     header('Location: /backend/editUser/'.$lastRecordingUser.'?created=true');
                     return http_response_code(302);
 
                 }else{
                     
-                    setFlashErrors($errors);    // pour gerer les erreurs en message flash (voir fichier globalFunctions.php)
+                    setFlashErrors($errors);    // to manage flash message errors (see globalFunctions.php file) 
                     
                     header('Location: /backend/createUser?created=false');
                     return http_response_code(302);
@@ -703,9 +685,9 @@ use App\Models\SocialNetworkManager;
         $userManager = new UserManager();
         try{
             $user = $userManager->getUser($id);
-        } catch (Exception $e) {    //dans le cas ou l'on demande une ressource qui n'existe pas (ici un id du user qui n'existe pas)
+        } catch (Exception $e) {    // in the event that we request a resource that does not exist (here an id of the user that does not exist) 
             $errors[] = $e->getMessage();
-            setFlashErrors($errors);    // pour gerer les erreurs en message flash (voir fichier globalFunctions.php)
+            setFlashErrors($errors);    // to manage flash message errors (see globalFunctions.php file) 
             require_once('../app/Views/errors.php');
             return http_response_code(302);
         }
@@ -716,10 +698,10 @@ use App\Models\SocialNetworkManager;
 
         // userType
         $userTypeManager = new UserTypeManager();
-        $userType = $userTypeManager->getUserType($user->getUserType_id()); // sera utiliser dans "$formUserType = new Form($userType);" qui creer les champs propres au userType (via l entité "Form.php") qui seront eux meme integrer pour les integrer (en totalite ou en partie) dans "$formUser = new Form($user);" ci dessous qui permettra de creer les champs propre au $user (via l entité "Form.php")
+        $userType = $userTypeManager->getUserType($user->getUserType_id()); // will be used in "$ formUserType = new Form ($ userType);" which creates the fields specific to the userType (via the "Form.php" entity) which will themselves be integrated to integrate them (in whole or in part) in "$ formUser = new Form ($ user);" below which will allow you to create the fields specific to the $ user (via the "Form.php" entity) 
         
         $listUserTypes = $userTypeManager->getListUserTypes();
-        $listUserTypesSelect = $userTypeManager-> listUserTypesFormSelect($listUserTypes); //pour afficher le contenu du select des usertypes, sera utiliser dans "backView > user > _form.php"
+        $listUserTypesSelect = $userTypeManager-> listUserTypesFormSelect($listUserTypes); // to display the content of the select of the usertypes, will be used in "backView> user> _form.php" 
         
         $formUserType = new Form($userType);
 
@@ -728,15 +710,15 @@ use App\Models\SocialNetworkManager;
        
         $listMediasForUser = $mediaManager->getListMediasForUser($user->getId());
         $listIdsMediaType = [2];  //logo
-        $listLogos = $mediaManager->getListMediasForUserForType($listMediasForUser, $listIdsMediaType); // pour recuperer le logo du user
+        $listLogos = $mediaManager->getListMediasForUserForType($listMediasForUser, $listIdsMediaType); // to retrieve the user's logo 
         
         if(!empty($listLogos)){
             $logoUser = $listLogos[0];
-            $formMediaLogoUser = new Form($logoUser);  //pour avoir dans le champ input pour uploader un logo
+            $formMediaLogoUser = new Form($logoUser);  // to have in the input field to upload a logo 
         }
 
         $mediaUploadLogo = new Media();
-        $formMediaUploadLogo = new Form($mediaUploadLogo);  //pour avoir dans le champ input pour uploader un logo
+        $formMediaUploadLogo = new Form($mediaUploadLogo);  //to have in the input field to upload a logo 
             
         // socialNetwork
         $socialNetworkManager = new SocialNetworkManager();
@@ -744,17 +726,17 @@ use App\Models\SocialNetworkManager;
         $formSocialNetwork = new Form($socialNetwork);
 
         $listSocialNetworksForUser = $socialNetworkManager->getListSocialNetworksForUser($user->getId());
-        $listSocialNetworksForUserForSelect =  $socialNetworkManager->listSocialNetworksFormSelect($listSocialNetworksForUser); // on affiche la liste des social network de l'user 
+        $listSocialNetworksForUserForSelect =  $socialNetworkManager->listSocialNetworksFormSelect($listSocialNetworksForUser); // we display the list of social networks of the user 
         
         if(!empty($listSocialNetworksForUser)){
             $socialNetworkForSelect = $listSocialNetworksForUser[0];
             $formSocialNetworkSelect = new Form($socialNetworkForSelect);
         }
         
-        // traitement server et affichage des retours d'infos 
+        // server processing and display of feedbacks 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') { // if a submission of the form (=> a modification of a user) has been made
 
-            //test de validation des champs du formulaire
+            //validation test of the form fields 
                 if(empty($_POST['firstName']) OR mb_strlen($_POST['firstName'])<=3){
                     $errors[] = 'Le champ firstName ne peut être vide et doit contenir plus de 3 caracteres';
                 }
@@ -785,14 +767,14 @@ use App\Models\SocialNetworkManager;
 
             if(empty($errors)){
             
-                // on re-hache le mot de passe que si celui-ci a ete modifier par le user
+                // the password is re-hashed only if it has been modified by the user 
                 if($originalPassword !== $_POST['password']){
                     $hashPsswords = hash('md5', $_POST['password']);
                 } else {
                     $hashPsswords = $_POST['password'];
                 }
                 
-                // enregistrement en bdd du user
+                // user database recording 
                 $user
                     ->setFirstName($_POST['firstName'])
                     ->setLastName($_POST['lastName'])
@@ -800,7 +782,6 @@ use App\Models\SocialNetworkManager;
                     ->setSlogan($_POST['slogan'])
                     ->setLogin($_POST['login'])
                     ->setPassword($hashPsswords)
-                    // ->setPassword($_POST['password'])
                     ->setUserType_id($_POST['userType_id'][0]); //car cette donnee est issu d'un select multiple
                 
                 try{
@@ -809,38 +790,38 @@ use App\Models\SocialNetworkManager;
                     $errors[] = $e->getMessage();
                 }
 
-                // enregistrement en bdd du media logo et du fichier uploader sur le server dans le dossier media
+                // bdd recording of the media logo and the uploader file on the server in the media folder 
                 if(isset($_FILES['mediaUploadLogo']) AND $_FILES['mediaUploadLogo']['error']== 0){
                     
-                    // variables infos
-                    $idMediaType = 2;   //logo
+                    // info variables 
+                    $idMediaType = 2;   // logo
                     
-                    $file = $_FILES['mediaUploadLogo']; //fichier uploader
-                    $storagePath = searchDatasFile('imageStoragePath')[1]; //chemin de stockage du fichier uploader (voir fichier globalFunctions.php)         
+                    $file = $_FILES['mediaUploadLogo']; // fichier uploader
+                    $storagePath = searchDatasFile('imageStoragePath')[1]; // storage path of the uploader file (see globalFunctions.php file) 
                     $name = 'mediaLogo-'.pathinfo($file['name'])['filename'].'-'; 
-                    $newNameUploaderFile = uniqid($name , true);    // concatenation "media-" + nom du fichier uploader(sans son extension + identifiant unique (via uniqid) pour avoir un identifiant unique
+                    $newNameUploaderFile = uniqid($name , true);    // concatenation "media-" + name of the uploader file (without its extension + unique identifier (via uniqid) to have a unique identifier 
 
-                    $extension_upload = pathinfo($file['name'])['extension']; //pour recuperer l'extension du fichier uploader   
-                    $pathFile =  $storagePath.basename($newNameUploaderFile.'.'.$extension_upload); //chemin de stockage  avec nouveau nom du media uploader
+                    $extension_upload = pathinfo($file['name'])['extension']; //to retrieve the extension of the uploader file   
+                    $pathFile =  $storagePath.basename($newNameUploaderFile.'.'.$extension_upload); // storage path with new name of the media uploader 
                     
-                    // on supprime en base de donnée ainsi que sur le server dans le dossier media l'ancien logo de l'user    
+                    // we delete in the database as well as on the server in the media folder the old logo of the user   
                     $listMediasForUser = $mediaManager->getListMediasForUser($user->getId());
-                    $listLogosDelete = $mediaManager->getListMediasForUserForType($listMediasForUser, $listIdsMediaType);   // on recuperer la liste des logos du user
+                    $listLogosDelete = $mediaManager->getListMediasForUserForType($listMediasForUser, $listIdsMediaType);   // we retrieve the list of user logos 
                     
                     if(!empty($listLogosDelete)){
                         foreach($listLogosDelete as $logo){
                             try{
-                                unlink($logo->getPath());  //suppression des media sur le serveur dans le dossier media
-                                $mediaManager->deleteMedia($logo->getId());    //suppression dans la base de donnée
+                                unlink($logo->getPath());  // delete media on the server in the media folder 
+                                $mediaManager->deleteMedia($logo->getId());    // deletion from the database 
                             } catch (Exception $e) {
                                 $errors[] = $e->getMessage();
                             }    
                         }
                     }
 
-                    // enregistrement en bdd du nouveau LOGO et et de son fichier uploader sur le server dans le dossier media
+                    // bdd recording of the new LOGO and its uploader file on the server in the media folder 
                     $mediaUploadLogo
-                        ->setPath($pathFile)    // ->setPath('./media/media-19.jpg')
+                        ->setPath($pathFile)
                         ->setAlt($_POST['altFileMediaLogo'])
                         ->setStatutActif(1)
                         ->setMediaType_id($idMediaType)
@@ -854,8 +835,8 @@ use App\Models\SocialNetworkManager;
                     } 
                 }
 
-                // enregistrement en bdd socialNetwork des modifications qui ont etait apporté dans l'editUser()   
-                    // supression du ou des socialNetwork de l'user
+                // saving in socialNetwork database of changes made in editUser ()   
+                    // deletion of the user's social network (s) 
                     if(!empty($_POST['socialNetworksUser'])){ 
                         foreach($_POST['socialNetworksUser'] as $idSsocialNetwork){
                             try
@@ -869,7 +850,7 @@ use App\Models\SocialNetworkManager;
                         }
                     }
                     
-                    // ajout d'un socialNetwork a l'user
+                    // adding a socialNetwork to the user 
                     if(!empty($_POST['socialNetwork'])){
                         $socialNetwork
                             ->setUrl($_POST['socialNetwork'])
@@ -885,14 +866,14 @@ use App\Models\SocialNetworkManager;
                         }    
                     }
                 
-                setFlashErrors($errors);    // pour gerer les erreurs en message flash (voir fichier globalFunctions.php)
+                setFlashErrors($errors);    // to manage flash message errors (see globalFunctions.php file) 
 
                 header('Location: /backend/editUser/'.$user->getId().'?success=true');
                 return http_response_code(302);
 
             }else{
                 
-                setFlashErrors($errors);    // pour gerer les erreurs en message flash (voir fichier globalFunctions.php)
+                setFlashErrors($errors);    // to manage flash message errors (see globalFunctions.php file) 
 
                 header('Location: /backend/editUser/'.$user->getId().'?success=false');
                 return http_response_code(302);
@@ -913,38 +894,36 @@ use App\Models\SocialNetworkManager;
 
         $errors = [];
   
-        // suppression de la base de donnee de tout les commentaires de l'user    
+        // deletion of all user comments from the database  
         $commentManager = new CommentManager();
         $listCommentsDelete = $commentManager->listCommentsForUser($id);
 
         if($listCommentsDelete !== []){
             foreach($listCommentsDelete as $comment){
                 try{
-                    $commentManager->deleteComment($comment->getId());  //suppression dans la base de donnée
+                    $commentManager->deleteComment($comment->getId());  //deletion from the database 
                 } catch (Exception $e) {
-                    // setFlashMessage($e->getMessage());
                     $errors[] = $e->getMessage();
                 }
             }
         }
 
-        // suppression de tout les medias lié a l'user (les logos, image desactiver, ...) pour les supprimer du server (dossier media) et de la base de donnée
+        // deletion of all user-related media (logos, deactivate image, ...) to delete them from the server (media folder) and from the database 
         $mediaManager = new MediaManager();
-        $listMedias = $mediaManager->getListMediasForUser($id); // on recuperer la liste des logos du user
+        $listMedias = $mediaManager->getListMediasForUser($id); // we retrieve the list of user logos 
 
         if(!empty($listMedias)){
             foreach($listMedias as $media){
                 try{
-                    unlink($media->getPath());  //suppression des media sur le serveur dans le dossier media
-                    $mediaManager->deleteMedia($media->getId());    //suppression dans la base de donnée
+                    unlink($media->getPath());  //delete media on the server in the media folder 
+                    $mediaManager->deleteMedia($media->getId());    //deletion from the database 
                 } catch (Exception $e) {
-                    // setFlashMessage($e->getMessage());
                     $errors[] = $e->getMessage();
                 }   
             }
         }
 
-        // suppression de la base de donnee de tout les socialNetworks de l'user
+        // deletion of the database of all the user's socialNetworks 
         $socialNetworkManager = new SocialNetworkManager();
         $listSocialNetworksForUserDelete = $socialNetworkManager->getListSocialNetworksForUser($id);
  
@@ -952,74 +931,69 @@ use App\Models\SocialNetworkManager;
             foreach($listSocialNetworksForUserDelete as $socialnetwork){
                 try
                 { 
-                    $socialNetworkManager->deleteSocialNetwork($socialnetwork->getId());    //suppression dans la base de donnée
+                    $socialNetworkManager->deleteSocialNetwork($socialnetwork->getId());    //deletion from the database 
                 }
                 catch (Exception $e)
                 {
-                    // setFlashMessage($e->getMessage());
                     $errors[] = $e->getMessage();
                 } 
             }
         }
 
-        //supression de tout les post lier a l'user
+        //deletion of all post related to use 
         $postManager = new PostManager();
         $listPostsForUser = $postManager->getListPostsForUser($id);
         
         if(!empty($listPostsForUser)){
-            foreach($listPostsForUser as $post){    // suppression de tout les post (et des medias que leurs sont associés) de l user
+            foreach($listPostsForUser as $post){    // deletion of all posts (and their associated media) from the user 
                 
-                // on supprime les medias lier au post (si il y en a)
+                // we delete the media linked to the post (if there is any) 
                 $listMediasDelete =  $mediaManager->getListMediasForPost($post->getId());// on recupere la liste des media pour ce $post
 
                 if($listMediasDelete !== []){
                     foreach($listMediasDelete as $media){
                         try{
-                            unlink($media->getPath());  //suppression des media sur le serveur dans le dossier media
-                            $mediaManager->deleteMedia($media->getId());    //suppression dans la base de donnée
+                            unlink($media->getPath());  //delete media on the server in the media folder 
+                            $mediaManager->deleteMedia($media->getId());    //deletion from the database 
                         } catch (Exception $e) {
-                            // setFlashMessage($e->getMessage());
                             $errors[] = $e->getMessage();
                         } 
                     }
                 }
 
-                // on supprime les commentaires lier au post (si il y en a)
-                $listCommentsDelete =  $commentManager->getListCommentsForPost($post->getId());// on recupere la liste des commentaire pour ce $post
+                // we delete the comments linked to the post (if there are any) 
+                $listCommentsDelete =  $commentManager->getListCommentsForPost($post->getId());// we get the list of comments for this $ post 
                 
                 if($listCommentsDelete !== []){
                     foreach($listCommentsDelete as $comment){
                         try{
-                            $commentManager->deleteComment($comment->getId());    //suppression dans la base de donnée
+                            $commentManager->deleteComment($comment->getId());    //deletion from the database 
                         } catch (Exception $e) {
-                            // setFlashMessage($e->getMessage());
                             $errors[] = $e->getMessage();
                         } 
                     }
                 }
 
-                // on supprime le post
+                // we delete the post 
                 try{
                     $post = $postManager->deletePost($post->getId());
                 } catch (Exception $e) {
-                    // setFlashMessage($e->getMessage());
                     $errors[] = $e->getMessage();
                 } 
             }
         }
 
-        // suppression de l'user
+        // user removal 
         $userManager = new UserManager();
 
         try{
             $user = $userManager->deleteUser($id);
         } catch (Exception $e) {
-            // setFlashMessage($e->getMessage());
             $errors[] = $e->getMessage();
 
         }
 
-        setFlashErrors($errors);    // pour gerer les erreurs en message flash (voir fichier globalFunctions.php)
+        setFlashErrors($errors);    // to manage flash message errors (see globalFunctions.php file) 
 
         require('../app/Views/backViews/user/backDeleteUserView.php');
     }
@@ -1034,7 +1008,7 @@ use App\Models\SocialNetworkManager;
 
         $errors = [];
 
-        // on valide le commentaire
+        // we validate the comment 
         $usertManager = new userManager();
         try{
             $usertManager->validateUser($id);
@@ -1091,7 +1065,7 @@ use App\Models\SocialNetworkManager;
 
         $errors = [];
     
-        // on supprime le commentaire
+        // we delete the comment 
         $commentManager = new CommentManager();
         try{
             $comment = $commentManager->deleteComment($id);
@@ -1119,14 +1093,14 @@ use App\Models\SocialNetworkManager;
 
         $errors = [];
     
-        // on valide le commentaire
+        // we validate the comment 
         $commentManager = new CommentManager();
         try{
             $comment = $commentManager->validateComment($id);
         } catch (Exception $e) {
             $errors[] = $e->getMessage();
 
-            setFlashErrors($errors);    // pour gerer les erreurs en message flash (voir fichier globalFunctions.php)
+            setFlashErrors($errors);    // to manage flash message errors (see globalFunctions.php file) 
             require_once('../app/Views/errors.php');
             return http_response_code(302);
         }  

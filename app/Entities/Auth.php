@@ -5,8 +5,15 @@ use Exception;
 use App\Models\UserManager;
 
 class Auth {
-
-    // verifie si le status de l'user (connecter) (=> $userStatus) et bien valide (parmis different status => $statutes) pour acceder a une fonction ou partie du site
+    
+    /**
+     * checks if the status of the user (connect) (=> $ user Status) is valid (among different status => $ statutes) to access a function or part of the site
+     *
+     * @param array $statutes different statuses possible 
+     * @param $userStatus $userStatus user status 
+     *
+     * @return boolean
+     */
     private static function validator(array $statutes, $userStatus){
         $validStatus = false;
 
@@ -18,7 +25,10 @@ class Auth {
         }
         return $validStatus;
     }
-
+    
+    /**
+     * Method sessionStart
+     */
     public static function sessionStart(){
         if(session_status() === PHP_SESSION_NONE){
             session_start();
@@ -29,25 +39,22 @@ class Auth {
 
             return $userLogged;
         }
-
-        // return null;
     }
 
     
+ 
     /**
-     * verifies that the user is connected and that his status allows him to access a feature or part of the site 
+     * Method check verifies that the user is connected and that his status allows him to access a feature or part of the site 
      *
-     * @return void
+     * @param array $authorizedStatutes different statuses possible 
+     *
      */
     public static function check(array $authorizedStatutes){       
-        $userManager = new UserManager();   //nouveau
+        $userManager = new UserManager();   //new
         $AuthorizedAccess = false;
         
         $userLogged = self::sessionStart();
-        // if(session_status() === PHP_SESSION_NONE){
-        //     session_start();
-        // }
-        
+     
         if(!isset($_SESSION['connection'])){
             header('Location: /backend/connection?badConnection=true');
         }

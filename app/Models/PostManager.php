@@ -1,4 +1,4 @@
-<?php //va interroger la base de donnée pour recuperer des infos concernant la table post
+<?php
 namespace App\Models;
 
 use PDO;
@@ -45,8 +45,14 @@ class PostManager extends Manager
         }
         return $post;
     }
-
-    // ajoute le post (en attribut de cette fonction) a la table post en bdd
+ 
+    /**
+     * Method addPost add the post (as an attribute of this function) to the post table in database 
+     *
+     * @param Post $post
+     *
+     * @return void
+     */
     public function addPost(Post $post)
     {
         $db = $this->dbConnect();
@@ -96,7 +102,6 @@ class PostManager extends Manager
             'content' => $post->getContent(),
             'dateCreate' => $post->getDateCreate()->format('Y-m-d H:i:s'),
             'dateChange' => $post->getDateChange(),
-            // 'user_id' => $idUser,
             'user_id' => $post->getUser_id(),
             'id' => $post->getId()
         ]);
@@ -123,7 +128,6 @@ class PostManager extends Manager
         }
     }
 
-    // ------------------------------------------
     
     /**
      * Method getListPostsForUser method that returns the list of post linked to a user 

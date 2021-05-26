@@ -29,28 +29,22 @@ ob_start();
                     </td>
 
                     <td>
-                        <a href="<?= '/backend/editPost/'. $post->getId()?>"> <!-- ISSUE faudra changer cela (ce qu il y a en php) avec l utilisation des nom de route -->
+                        <a href="<?= '/backend/editPost/'. $post->getId()?>">
                         <?= formatHtml($post->getTitle()) ?>
                         </a>
                     </td>
                     <td>
-                        <a href="<?= '/backend/editPost/'. $post->getId()?>" class="btn btn-primary"> <!-- ISSUE faudra changer cela (ce qu il y a en php) avec l utilisation des nom de route -->
+                        <a href="<?= '/backend/editPost/'. $post->getId()?>" class="btn btn-primary">
                             Editer
                         </a>
-                        <!-- ISSUE faudra changer cela (ce qu il y a en php) avec l utilisation des nom de route -->
-                            <!-- si on utilise la methode "get -->
-                                <!-- <a href="<?= '/backend/deletePost/'. $post->getId()?>" class="btn btn-danger" onclick="return confirm('Souhaitez vous vraiment axecuter cette action?')">
-                                    Supprimer
-                                </a> -->
-                            <!-- si on utilise la methode "post" -->
-                                <form action="<?= '/backend/deletePost/'. $post->getId()?>" methode="POST"
-                                    onsubmit="return confirm('Souhaitez vous vraiment executer cette action?')">
-                                    <button type="submit" class="btn btn-danger">Supprimer</button>
-                                </form>
-                        <a href="<?= '/backend/editCommentsPost/'. $post->getId()?>" class="btn btn-success"> <!-- ISSUE faudra changer cela (ce qu il y a en php) avec l utilisation des nom de route -->
+                            <form action="<?= '/backend/deletePost/'. $post->getId()?>" methode="POST"
+                                onsubmit="return confirm('Souhaitez vous vraiment executer cette action?')">
+                                <button type="submit" class="btn btn-danger">Supprimer</button>
+                            </form>
+                        <a href="<?= '/backend/editCommentsPost/'. $post->getId()?>" class="btn btn-success">
                             Voir les commentaires
                         </a>
-                        <a href="<?= '/post/'. $post->getId()?>" class="btn btn-secondary"> <!-- ISSUE faudra changer cela (ce qu il y a en php) avec l utilisation des nom de route -->
+                        <a href="<?= '/post/'. $post->getId()?>" class="btn btn-secondary">
                             Voir le post
                         </a>
                     </td>

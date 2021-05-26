@@ -1,4 +1,4 @@
-<?php //va interroger la base de donnée pour recuperer des infos concernant la table post
+<?php
 namespace App\Models;
 
 use PDO;
@@ -43,7 +43,7 @@ class MediaManager extends Manager
     public function getMedia(int $id)
     {
         $db = $this->dbConnect();
-        //OBLIGER DE DE DEFINIR LES DONNEES QUE L'on souhaite car avec *, cela prend id de media type (, mediaType.id)
+        // OBLIGATE TO DEFINE THE DATA WE want because with *, it takes id of media type (, mediaType.id) 
         $query = $db->prepare('SELECT media.id As id, media.path, media.alt, media.statutActif, media.mediaType_id, media.post_id, mediaType.type FROM media 
                                 INNER JOIN mediaType
                                 ON media.mediaType_id = mediaType.id
@@ -58,26 +58,26 @@ class MediaManager extends Manager
     }
 
     /**
-     * ajoute le media Image (en attribut de cette fonction) a la table media en bdd
+     * Method addMediaImage adds the media Image (as an attribute of this function) to the media table in bdd 
      *
-     * @param Media $mediaImage media que l'on souhaite suavegarder en base de donnee
-     * @param $fileConfig fichier de configuration du site qui comporte des infos concernant les media images notamment
-     * @param $fileUploader fichier (media image) qui a été uploader sur le site et que l on souhaite sauvegarder du le serveur dans le dossier (public > media)
+     * @param Media $mediaImage media that you want to save in the database 
+     * @param $fileConfig site configuration file which contains information concerning media images in particular 
+     * @param $fileUploader file (media image) which has been uploaded on the site and which we want to save from the server in the folder (public> media) 
      * 
      * @return Media the content of the media
-     */
+     */    
     public function addMediaImage($mediaImage, $fileConfig, $fileUploader)
     {
         $fileName = $fileUploader ['name'];
         $fileInfos = pathinfo($fileName);
         $fileTypeUpload = $fileInfos['extension'];
         
-        //on verifier que le type du fichier uploader est bien autorisé a etre sauvegardé sur le site (base de donnee et serveur)
-        $authorizedFileTypes = searchDatasFile('image');   //voir fichier globalFunctions.php
-        $validateFile = validateData($authorizedFileTypes, $fileTypeUpload);  //voir fichier globalFunctions.php
+        // we check that the type of the uploader file is authorized to be saved on the site (database and server) 
+        $authorizedFileTypes = searchDatasFile('image');   // see globalFunctions.php file 
+        $validateFile = validateData($authorizedFileTypes, $fileTypeUpload);  // see globalFunctions.php file 
 
-        $authorizedMaxFileSize = searchDatasFile('maxFileSizeImage')[1]; //taille maximum du fichier uploader autorise 
-        $validateFileSize = $fileUploader['size'] <= $authorizedMaxFileSize; //VERIFIER SI CELA MARCHE AVEC STRING CAS OU LE CHIFFRE DEVIENT DES STRING
+        $authorizedMaxFileSize = searchDatasFile('maxFileSizeImage')[1]; // maximum file size uploader allowed 
+        $validateFileSize = $fileUploader['size'] <= $authorizedMaxFileSize;
 
         if($validateFile AND $validateFileSize){
 
@@ -99,26 +99,31 @@ class MediaManager extends Manager
                 'user_id' => $mediaImage->getUser_id()
                 ]);
             
-            //on transfert le fichier uploader sur le site de son dossier de stockage temporaire a son dossier de stockage définitif
+            //we transfer the uploader file to the site from its temporary storage folder to its final storage folder
             if($result === true){
-                $from = $fileUploader ['tmp_name']; //chemin temporaire de stockage du fichier uploader + son nom
+                $from = $fileUploader ['tmp_name']; //temporary storage path of the uploader file + its name 
                 $to = $mediaImage->getPath();
               
                 move_uploaded_file( $from, $to);
                 return $to;
             }else {
                 throw new Exception('impossible d\'enregistrer le media Image en base de donne et sur le serveur');
-                // $errorMessage = 'impossible de creer l enregistrement du socialNetwork';
             }
         } else {
             throw new Exception('impossible de creer l enregistrement du media Image (peut etre l extension du fichier, son poids, ...)');
         }
     }
     
-    // ajoute le media Video (en attribut de cette fonction) a la table media en bdd
+    /**
+     * Method addMediaVideo adds the Video media (as an attribute of this function) to the bdd media table 
+     *
+     * @param Media $mediaVideo
+     *
+     * @return void
+     */
     public function addMediaVideo(Media $mediaVideo)
     {
-        //on verifier que le type du fichier uploader est bien autorisé a etre sauvegardé sur le site (base de donnee et serveur)
+        // we check that the type of the uploader file is authorized to be saved on the site (database and server) 
         $authorizedFileTypes = searchDatasFile('video');   //voir fichier globalFunctions.php
         $validateVideo = validateWordInString($authorizedFileTypes, $mediaVideo->getPath());
 
@@ -163,7 +168,6 @@ class MediaManager extends Manager
         }
     }
 
-    // ----------------------------- methode specifique --------------------------
     /**
      * Method getMediasForPost method that returns the list of media linked to a post 
      *
@@ -202,7 +206,6 @@ class MediaManager extends Manager
         return $listMediasForUser;
     }
 
-//------------------------------------NOUVEAU--------------------------
 
     /**
      * Method getListMediasForUserForType method that returns the list of media for a user for the type (example mediaType "image" + "video")
@@ -225,7 +228,13 @@ class MediaManager extends Manager
         return $results;
     }
 
-    // methode pour recuperer un tableau de media lier a un utilisateur que l on va utiliser dans le select
+    /**
+     * Method listMediasFormSelect method to retrieve an array of media linked to a user that we will use in the select 
+     *
+     * @param array $listMediasForUser
+     *
+     * @return array
+     */
     public function listMediasFormSelect(array $listMediasForUser): array
     {
         $results = [];
@@ -237,7 +246,13 @@ class MediaManager extends Manager
         return $results;
     }
 
-    // methode pour recuperer les id (ayant un statut actif) de la function getListMediasForPost(Post $post) de cette classe
+    /**
+     * Method getIdOftListMediasActifForPost method to retrieve the id (having an active status) of the function getListMediasForPost (Post $ post) of this class 
+     *
+     * @param int $idPost
+     *
+     * @return array
+     */
     public function getIdOftListMediasActifForPost(int $idPost): array
     {
         $medias = $this->getListMediasForPost($idPost);
@@ -245,7 +260,7 @@ class MediaManager extends Manager
         $results = [];
         
         foreach($medias as $media){
-            // on enregistre les id des medias de l'auteur du post pour les mettre en sur brillance que si c'est media sont en "statutActif = true"
+            // we record the media id of the author of the post to highlight them if it is media are in "active status = true" 
             if ($media->getStatutActif() === true){
                 $results[] = $media->getId(); 
             }
@@ -254,8 +269,15 @@ class MediaManager extends Manager
         
         return $results;
     }
-
-    // methode pour changer le statutActif d'un media
+  
+    /**
+     * Method updateStatutActifMedia method to change the Active status of a media 
+     *
+     * @param $idMedia
+     * @param $newStatutActif
+     *
+     * @return void
+     */
     public function updateStatutActifMedia($idMedia,$newStatutActif): void
     {
         $db = $this->dbConnect();
@@ -270,7 +292,14 @@ class MediaManager extends Manager
         }
     }
 
-    // pour changer le post_id d'un media
+    /**
+     * Method updatePostIdMedia to change the post_id of a media 
+     *
+     * @param $idMedia
+     * @param $newPostId
+     *
+     * @return void
+     */
     public function updatePostIdMedia($idMedia,$newPostId): void
     {
         $db = $this->dbConnect();
@@ -294,16 +323,16 @@ class MediaManager extends Manager
      *
      * @return array all media of a post
      */
-    public function findMediasForPost(int $id): array
-    {
-        $db = $this->dbConnect();
-        $query = $db->prepare('SELECT * FROM media 
-                                INNER JOIN mediaType
-                                ON media.mediaType_id = mediaType.id
-                                WHERE media.post_id = :id');
-        $query->execute(['id' => $id]);
-        $listMediasForPost = $query ->fetchAll(PDO::FETCH_CLASS, Media::class);
-        return $listMediasForPost;
-    }
+    // public function findMediasForPost(int $id): array
+    // {
+    //     $db = $this->dbConnect();
+    //     $query = $db->prepare('SELECT * FROM media 
+    //                             INNER JOIN mediaType
+    //                             ON media.mediaType_id = mediaType.id
+    //                             WHERE media.post_id = :id');
+    //     $query->execute(['id' => $id]);
+    //     $listMediasForPost = $query ->fetchAll(PDO::FETCH_CLASS, Media::class);
+    //     return $listMediasForPost;
+    // }
 
 }

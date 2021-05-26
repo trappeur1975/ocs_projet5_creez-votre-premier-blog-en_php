@@ -4,21 +4,21 @@
     <?= $formUser->input('email', 'email', 'email') ?>
     <?= $formUser->input('slogan', 'slogan', 'slogan') ?>
 
-    <!-- affichage du logo du user (faudra verifier que le tableau de logo existe bien-->
+    <!-- affichage du logo du user (verifie que le tableau de logo existe bien-->
     <?php  
-         if ($formUser->getEdit() === true and !empty($listLogos)){//dans le cas ou l'on edit un user et que celui ci possede un logo
-            echo $formMediaLogoUser->inputImage($logoUser, 'logo de l user', 'logoUser', 'logo actuel de l user');   //pour l'affichage du logo
+         if ($formUser->getEdit() === true and !empty($listLogos)){// in the event that we edit a user and that this one has a logo 
+            echo $formMediaLogoUser->inputImage($logoUser, 'logo de l user', 'logoUser', 'logo actuel de l user');   // for logo display 
         }
     ?>
 
-    <?= $formMediaUploadLogo->inputFile('logo', 'mediaUploadLogo', 'rajouter un logo (uploader un fichier image max 500ko) a cette user') ?>    <!-- pour la creation du upload du logo -->
-    <?= $formMediaUploadLogo->input('alt', 'altFileMediaLogo', 'texte alternatif pour le logo uploader') ?>    <!-- pour la creation du input du text alt du media logo -->
+    <?= $formMediaUploadLogo->inputFile('logo', 'mediaUploadLogo', 'rajouter un logo (uploader un fichier image max 500ko) a cette user') ?>    <!-- for the creation of the logo upload  -->
+    <?= $formMediaUploadLogo->input('alt', 'altFileMediaLogo', 'texte alternatif pour le logo uploader') ?>    <!-- for the creation of the input of the alt text of the media logo  -->
     
     <?= $formSocialNetwork->input('url', 'socialNetwork','ajouter un socialNetwork' ) ?>
 
     <?php 
-        if ($formUser->getEdit() === true and !empty($listSocialNetworksForUser)){ //pour gerer le cas si on edit un user et que celui ci possede au moins un socialnetwork(on affiche le select) ou si on cree un user ou que celui-ci ne possede pas au moins un socialNetwork (on n affiche pas le select)
-            echo $formSocialNetworkSelect->selectMultiple('id', 'socialNetworksUser','supprimer un/des socialNetwork', $listSocialNetworksForUserForSelect, $listSocialNetworksForUserForSelect); //pour la creation du select des medias
+        if ($formUser->getEdit() === true and !empty($listSocialNetworksForUser)){ // to manage the case if we edit a user and this one has at least one socialnetwork (we display the select) or if we create a user or if this one does not have at least one socialNetwork (we do not display the select) 
+            echo $formSocialNetworkSelect->selectMultiple('id', 'socialNetworksUser','supprimer un/des socialNetwork', $listSocialNetworksForUserForSelect, $listSocialNetworksForUserForSelect); // for the creation of the media select 
         }
     ?>
 

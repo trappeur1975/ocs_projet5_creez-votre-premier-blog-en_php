@@ -3,7 +3,7 @@ $title = 'Backend Delete a post';
 
 ob_start(); 
 
-header('Location: /backend/adminPosts?delete=true'); //ISSUE faudra changer cela (ce qu il y a en php) avec l utilisation des nom de route 
+header('Location: /backend/adminPosts?delete=true');
 return http_response_code(302);
 
 $content = ob_get_clean();

@@ -1,4 +1,4 @@
-<?php //va interroger la base de donnée pour recuperer des infos concernant la table user
+<?php
 namespace App\Models;
 
 use PDO;
@@ -45,8 +45,14 @@ class UserTypeManager extends Manager
         $listUserTypes = $query ->fetchAll(PDO::FETCH_CLASS, UserType::class);
         return $listUserTypes;
     }
-
-    // methode pour recuperer un tableau des userTypes que l on va utiliser dans le select
+ 
+    /**
+     * Method listUserTypesFormSelect method to retrieve an array of userTypes that we will use in the select 
+     *
+     * @param array $listUserTypes [explicite description]
+     *
+     * @return array
+     */
     public function listUserTypesFormSelect(array $listUserTypes): array
     {
         $results = [];

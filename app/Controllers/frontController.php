@@ -23,13 +23,13 @@ use App\Models\SocialNetworkManager;
         $errors = [];
 
         // user
-        $userManager = new UserManager(); // Création de l'objet manager de user
+        $userManager = new UserManager(); // creation of the manager object of user 
 
         try{
             $user = $userManager->getUser(1); // user nicolas tchenio
-        } catch (Exception $e) {    //dans le cas ou l'on demande une ressource qui n'existe pas (ici un id de post qui n'existe pas)
+        } catch (Exception $e) {    //in the event that we request a resource that does not exist (here a post id that does not exist) 
             $errors[] = $e->getMessage();
-            setFlashErrors($errors);    // pour gerer les erreurs en message flash (voir fichier globalFunctions.php)
+            setFlashErrors($errors);    // to manage flash message errors (see globalFunctions.php file) 
             require_once('../app/Views/errors.php');
             return http_response_code(302);
         }
@@ -39,10 +39,9 @@ use App\Models\SocialNetworkManager;
         $listMediasForUser = $mediaManager->getListMediasForUser($user->getId());
         $logoUser = $mediaManager->getListMediasForUserForType($listMediasForUser, [2])[0];
 
-        // traitement server et affichage des retours d'infos 
+        // server processing and display of feedbacks 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') { // if a submission of the form (=> a creation of a user) has been made
-            //test de validation des champs du formulaire
-                
+            //validation test of the form fields    
                 if(empty($_POST['name']) OR mb_strlen($_POST['name'])<=3){
                     $errors[] = 'Le champ name ne peut être vide et doit contenir plus de 3 caracteres';
                 }
@@ -53,8 +52,7 @@ use App\Models\SocialNetworkManager;
                     $errors[] = 'Le champ lastName ne peut être vide et doit contenir plus de 3 caracteres';
                 }
         
-            if(empty($errors)){ //on envoie le email
-                // sendEmail('adminBlogNico@hotmail.com', 'BlogNico message de '.$_POST['name'], 'message de '.$_POST['name'].'\r\n adresse email '.$_POST['email'].'\r\n avec le message suivant :'.$_POST['message']);
+            if(empty($errors)){ // we send the email 
                 $emailFrom = searchDatasFile('email')[2];
                 $emailTo = searchDatasFile('email')[1];
                 sendEmailHtml($_POST['name'], $_POST['email'], $_POST['message'], $emailFrom, $emailTo);
@@ -62,7 +60,7 @@ use App\Models\SocialNetworkManager;
                 header('Location: /?SendEmail=true');
                 return http_response_code(302);
             }else{  
-                setFlashErrors($errors);    // pour gerer les erreurs en message flash (voir fichier globalFunctions.php)
+                setFlashErrors($errors);    // to manage flash message errors (see globalFunctions.php file) 
                 
                 header('Location: /?SendEmail=false');
                 return http_response_code(302);
@@ -99,13 +97,13 @@ use App\Models\SocialNetworkManager;
         $errors = [];
 
         // post
-        $postManager = new PostManager(); // Création de l'objet manger de post
+        $postManager = new PostManager(); // create the post eat object 
 
         try{
             $post = $postManager->getPost($id);
-        } catch (Exception $e) {    //dans le cas ou l'on demande une ressource qui n'existe pas (ici un id de post qui n'existe pas)
+        } catch (Exception $e) {    // in the event that we request a resource that does not exist (here a post id that does not exist) 
             $errors[] = $e->getMessage();
-            setFlashErrors($errors);    // pour gerer les erreurs en message flash (voir fichier globalFunctions.php)
+            setFlashErrors($errors);    // to manage flash message errors (see globalFunctions.php file) 
             require_once('../app/Views/errors.php');
             return http_response_code(302);
         }
@@ -121,20 +119,19 @@ use App\Models\SocialNetworkManager;
         // comment
         $commentManager = new CommentManager();
         $listCommentsForPost = $commentManager->listCommentsNotNullForPost($id);
-        // $listCommentsForPost = $commentManager->getListCommentsForPost($id);
     
-        // pour creer un nouveau commentaire pour un post
+        // to create a new comment for a post 
         $comment = new Comment();
         $formComment = new Form($comment);
 
-        // traitement server et affichage des retours d'infos 
+        // server processing and display of feedbacks  
         if ($_SERVER['REQUEST_METHOD'] === 'POST') { // if a submission of the form (=> a creation of a post) has been made
             
-            //test de validation des champs du formulaire
+            //validation test of the form fields 
                 if(empty($_POST['comment']) OR mb_strlen($_POST['comment'])<=3){
                     $errors[] = 'Le champ commentaire ne peut être vide et doit contenir plus de 3 caracteres';
                 }
-            // enregistrement des infos
+            // info recording 
             if(empty($errors)){
                 Auth::check(['administrateur','abonner']);    
 
@@ -145,7 +142,7 @@ use App\Models\SocialNetworkManager;
                     $validate = $date;
                 }
 
-                // enregistrement en bdd du comment    
+                // bdd recording of how     
                 $comment
                     ->setComment($_POST['comment'])
                     ->setDateCompletion($date)
@@ -155,19 +152,19 @@ use App\Models\SocialNetworkManager;
                     ;
                 
                 try{
-                    $commentManager->addComment($comment);// add the comment to the database and get the last id of the comments in the database via the return of the function
+                    $commentManager->addComment($comment);// add the comment to the database and get the last id of the comments in the database via the return of the function 
                 } catch (Exception $e) {
                     $errors[] = $e->getMessage();
                 }
 
-                setFlashErrors($errors);    // pour gerer les erreurs en message flash (voir fichier globalFunctions.php)
+                setFlashErrors($errors);    // to manage flash message errors (see globalFunctions.php file) 
 
                 header('Location: /post/'.$id.'?createdComment=true');
                 return http_response_code(302);
  
             }else{
                 
-                setFlashErrors($errors);    // pour gerer les erreurs en message flash (voir fichier globalFunctions.php)
+                setFlashErrors($errors);    // to manage flash message errors (see globalFunctions.php file) 
                 header('Location: /post/'.$id.'?createdComment=false');
                 return http_response_code(302);
             }
@@ -191,16 +188,16 @@ use App\Models\SocialNetworkManager;
         $userManager = new UserManager();
         try{
             $user = $userManager->getUser($id); //user of dashboard
-        } catch (Exception $e) {    //dans le cas ou l'on demande une ressource qui n'existe pas (ici un id du user qui n'existe pas)
+        } catch (Exception $e) {    // in the event that we request a resource that does not exist (here an id of the user that does not exist) 
             $errors[] = $e->getMessage();
-            setFlashErrors($errors);    // pour gerer les erreurs en message flash (voir fichier globalFunctions.php)
+            setFlashErrors($errors);    // to manage flash message errors (see globalFunctions.php file) 
             require_once('../app/Views/errors.php');
             return http_response_code(302);
         }
 
         $originalPassword = $user->getPassword();
 
-        if($user->getId() === $_SESSION['connection']){ //on verifier que le dashboard que le user souhaite visualiser est bien le sien
+        if($user->getId() === $_SESSION['connection']){ // we check that the dashboard that the user wishes to view is indeed his own 
 
             // EDIT DU USER DASHBOARD
                 // userDasboard 
@@ -211,15 +208,15 @@ use App\Models\SocialNetworkManager;
                     
                 $listMediasForUser = $mediaManager->getListMediasForUser($id);
                 $listIdsMediaType = [2];  //logo
-                $listLogos = $mediaManager->getListMediasForUserForType($listMediasForUser, $listIdsMediaType); // pour recuperer le logo du user
+                $listLogos = $mediaManager->getListMediasForUserForType($listMediasForUser, $listIdsMediaType); // to retrieve the user's logo 
 
                 if(!empty($listLogos)){
                     $logoUser = $listLogos[0];
-                    $formMediaLogoUser = new Form($logoUser);  //pour avoir dans le champ input pour uploader un logo
+                    $formMediaLogoUser = new Form($logoUser);  // to have in the input field to upload a logo 
                 }
 
                 $mediaUploadLogo = new Media();
-                $formMediaUploadLogo = new Form($mediaUploadLogo);  //pour avoir dans le champ input pour uploader un logo
+                $formMediaUploadLogo = new Form($mediaUploadLogo);  // to have in the input field to upload a logo 
                     
                 // socialNetwork
                 $socialNetworkManager = new SocialNetworkManager();
@@ -227,7 +224,7 @@ use App\Models\SocialNetworkManager;
                 $formSocialNetwork = new Form($socialNetwork);
 
                 $listSocialNetworksForUser = $socialNetworkManager->getListSocialNetworksForUser($id);
-                $listSocialNetworksForUserForSelect =  $socialNetworkManager->listSocialNetworksFormSelect($listSocialNetworksForUser); // on affiche la liste des social network de l'user 
+                $listSocialNetworksForUserForSelect =  $socialNetworkManager->listSocialNetworksFormSelect($listSocialNetworksForUser); // we display the list of social networks of the user  
 
                 if(!empty($listSocialNetworksForUser)){
                     $socialNetworkForSelect = $listSocialNetworksForUser[0];
@@ -239,10 +236,10 @@ use App\Models\SocialNetworkManager;
                 $listCommentsForUser = $commentManager->listCommentsForUser($id);
 
 
-            // traitement server et affichage des retours d'infos 
+            // server processing and display of feedbacks 
             if ($_SERVER['REQUEST_METHOD'] === 'POST') { // if a submission of the form (=> a modification of a user) has been made
 
-                //test de validation des champs du formulaire
+                //validation test of the form fields 
                     if(empty($_POST['firstName']) OR mb_strlen($_POST['firstName'])<=3){
                         $errors[] = 'Le champ firstName ne peut être vide et doit contenir plus de 3 caracteres';
                     }
@@ -271,17 +268,17 @@ use App\Models\SocialNetworkManager;
                         $errors[] = 'Le champ password ne peut être vide et doit contenir plus de 3 caracteres';
                     }
                 
-                // enregistrement des infos
+                // info recording 
                 if(empty($errors)){
                 
-                    // on re-hache le mot de passe que si celui-ci a ete modifier par le user
+                    // the password is re-hashed only if it has been modified by the user 
                     if($originalPassword !== $_POST['password']){
                         $hashPsswords = hash('md5', $_POST['password']);
                     } else {
                         $hashPsswords = $_POST['password'];
                     }
                     
-                    // enregistrement en bdd du user
+                    // user database recording 
                     $user
                         ->setFirstName($_POST['firstName'])
                         ->setLastName($_POST['lastName'])
@@ -289,7 +286,6 @@ use App\Models\SocialNetworkManager;
                         ->setSlogan($_POST['slogan'])
                         ->setLogin($_POST['login'])
                         ->setPassword($hashPsswords);
-                        // ->setPassword($_POST['password']);
                     
                     try{
                         $userManager->updateUser($user);
@@ -297,43 +293,42 @@ use App\Models\SocialNetworkManager;
                         $errors[] = $e->getMessage();
                     }
 
-                    // enregistrement en bdd du media logo et du fichier uploader sur le server dans le dossier media
+                    // bdd recording of the media logo and the uploader file on the server in the media folder 
                     if(isset($_FILES['mediaUploadLogo']) AND $_FILES['mediaUploadLogo']['error']== 0){
                         
-                        // variables infos
+                        // info variables 
                         $idMediaType = 2;   //logo
 
-                        $file = $_FILES['mediaUploadLogo']; //fichier uploader
-                        $storagePath = searchDatasFile('imageStoragePath')[1]; //chemin de stockage du fichier uploader (voir fichier globalFunctions.php)         
+                        $file = $_FILES['mediaUploadLogo']; //file uploader 
+                        $storagePath = searchDatasFile('imageStoragePath')[1]; //storage path of the uploader file (see globalFunctions.php file)
                         $name = 'mediaLogo-'.pathinfo($file['name'])['filename'].'-'; 
-                        $newNameUploaderFile = uniqid($name , true);    // concatenation "media-" + nom du fichier uploader(sans son extension + identifiant unique (via uniqid) pour avoir un identifiant unique
+                        $newNameUploaderFile = uniqid($name , true);    // concatenation "media-" + name of the uploader file (without its extension + unique identifier (via uniqid) to have a unique identifier 
 
-                        $extension_upload = pathinfo($file['name'])['extension']; //pour recuperer l'extension du fichier uploader   
-                        $pathFile =  $storagePath.basename($newNameUploaderFile.'.'.$extension_upload); //chemin de stockage  avec nouveau nom du media uploader
+                        $extension_upload = pathinfo($file['name'])['extension']; // to retrieve the extension of the uploader file   
+                        $pathFile =  $storagePath.basename($newNameUploaderFile.'.'.$extension_upload); // storage path with new name of the media uploader 
                     
-                        // on supprime en base de donnée ainsi que sur le server dans le dossier media l'ancien logo de l'user    
+                        // we delete in the database as well as on the server in the media folder the old logo of the user    
                         $listMediasForUser = $mediaManager->getListMediasForUser($id);
-                        $listLogosDelete = $mediaManager->getListMediasForUserForType($listMediasForUser, $listIdsMediaType);   // on recuperer la liste des logos du user
+                        $listLogosDelete = $mediaManager->getListMediasForUserForType($listMediasForUser, $listIdsMediaType);   // we retrieve the list of user logos 
                     
                         if(!empty($listLogosDelete)){
                             foreach($listLogosDelete as $logo){
                                 try{
-                                    unlink($logo->getPath());  //suppression des media sur le serveur dans le dossier media
-                                    $mediaManager->deleteMedia($logo->getId());    //suppression dans la base de donnée
+                                    unlink($logo->getPath());  // delete media on the server in the media folder 
+                                    $mediaManager->deleteMedia($logo->getId());    // deletion from the database 
                                 } catch (Exception $e) {
                                     $errors[] = $e->getMessage();
                                 }   
                             }
                         }
 
-                        // enregistrement en bdd du nouveau LOGO et et de son fichier uploader sur le server dans le dossier media
+                        // bdd recording of the new LOGO and its uploader file on the server in the media folder 
                         $mediaUploadLogo
-                            ->setPath($pathFile)    // ->setPath('./media/media-19.jpg')
+                            ->setPath($pathFile)
                             ->setAlt($_POST['altFileMediaLogo'])
                             ->setStatutActif(1)
                             ->setMediaType_id($idMediaType)
                             ->setUser_id($id)
-                            // ->setUser_id($user->getId())
                             ;
                         
                         try{
@@ -343,8 +338,8 @@ use App\Models\SocialNetworkManager;
                         } 
                     }
 
-                    // enregistrement en bdd socialNetwork des modifications qui ont etait apporté dans l'editUser()   
-                        // supression du ou des socialNetwork de l'user
+                    // saving in socialNetwork database of changes made in editUser ()  
+                        // deletion of the user's social network (s) 
                         if(!empty($_POST['socialNetworksUser'])){ 
                             foreach($_POST['socialNetworksUser'] as $idSsocialNetwork){
                                 try
@@ -358,7 +353,7 @@ use App\Models\SocialNetworkManager;
                             }
                         }
                         
-                        // ajout d'un socialNetwork a l'user
+                        // adding a socialNetwork to the user 
                         if(!empty($_POST['socialNetwork'])){
                             $socialNetwork
                                 ->setUrl($_POST['socialNetwork'])
@@ -375,13 +370,13 @@ use App\Models\SocialNetworkManager;
                             }
                         }
                     
-                    setFlashErrors($errors);    // pour gerer les erreurs en message flash (voir fichier globalFunctions.php)
+                    setFlashErrors($errors);    // to manage flash message errors (see globalFunctions.php file) 
 
                     header('Location: /userFrontDashboard/'.$id.'?successEditUser=true');
                     return http_response_code(302);
 
                 }else{
-                    setFlashErrors($errors);    // pour gerer les erreurs en message flash (voir fichier globalFunctions.php)
+                    setFlashErrors($errors);    // to manage flash message errors (see globalFunctions.php file) 
                     
                     header('Location: /userFrontDashboard/'.$id.'?successEditUser=false');
                     return http_response_code(302);
@@ -390,7 +385,7 @@ use App\Models\SocialNetworkManager;
             require('../app/Views/frontViews/frontUserFrontDashboardView.php');
         }else {
             $errors[] = 'impossible d\'afficher ce dashboard, il ne vous appartient pas';
-            setFlashErrors($errors);    // pour gerer les erreurs en message flash (voir fichier globalFunctions.php)
+            setFlashErrors($errors);    // to manage flash message errors (see globalFunctions.php file) 
             header('Location: /listposts');
             return http_response_code(302);
         }
@@ -402,7 +397,7 @@ use App\Models\SocialNetworkManager;
      */
     function createUserFront()
     {
-        // creation d une session pour pouvoir notamment afficher les message flash
+        // creation of a session to be able in particular to display flash messages 
         if(session_status() === PHP_SESSION_NONE){
             session_start();
         }
@@ -415,7 +410,7 @@ use App\Models\SocialNetworkManager;
      
         // media (logo)
         $mediaManager = new MediaManager();
-        $mediaUploadLogo = new Media(); //pour avoir dans le champ input pour uploader un logo (par defaut toute les variables de cette entité Media sont a "null" )
+        $mediaUploadLogo = new Media(); //to have in the input field to upload a logo (by default all the variables of this Media entity are "null") 
         $formMediaUploadLogo = new Form($mediaUploadLogo);
 
         // socialNetwork
@@ -423,7 +418,7 @@ use App\Models\SocialNetworkManager;
         $socialNetworkManager = new SocialNetworkManager();
         $formSocialNetwork = new Form($socialNetwork);
 
-        // traitement server et affichage des retours d'infos 
+        // server processing and display of feedbacks 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') { // if a submission of the form (=> a creation of a user) has been made
             
             //for data validation
@@ -548,7 +543,7 @@ use App\Models\SocialNetworkManager;
 
     /**
      * function use for road http://localhost:8000/deleteUserFront/1 ou http://localhost:8000/deleteUserFront/2 ou ....
-     * 
+     * will display the view frontDeleteUserView.php
      */
     function deleteUserFront($id){
 
@@ -560,45 +555,45 @@ use App\Models\SocialNetworkManager;
         $userManager = new UserManager();
         try{
             $user = $userManager->getUser($id); //user of dashboard
-        } catch (Exception $e) {    //dans le cas ou l'on demande une ressource qui n'existe pas (ici un id du user qui n'existe pas)
+        } catch (Exception $e) {    // in the event that we request a resource that does not exist (here an id of the user that does not exist) 
             $errors[] = $e->getMessage();
-            setFlashErrors($errors);    // pour gerer les erreurs en message flash (voir fichier globalFunctions.php)
+            setFlashErrors($errors);    // to manage flash message errors (see globalFunctions.php file) 
             require_once('../app/Views/errors.php');
             return http_response_code(302);
         }
 
-        if($user->getId() === $_SESSION['connection']){ //on verifier que le user que l on souhaite supprimer correspond bien au user connecté sur le site
+        if($user->getId() === $_SESSION['connection']){ // we check that the user we want to delete corresponds to the user connected to the site 
             
-            // suppression de la base de donnee de tout les commentaires de l'user
+            // deletion of all user comments from the database 
             $commentManager = new CommentManager();
             $listCommentsDelete = $commentManager->listCommentsForUser($id);
 
             if($listCommentsDelete !== []){
                 foreach($listCommentsDelete as $comment){
                     try{
-                        $commentManager->deleteComment($comment->getId());    //suppression dans la base de donnée
+                        $commentManager->deleteComment($comment->getId());    // deletion from the database
                     } catch (Exception $e) {
                         $errors[] = $e->getMessage();
                     }  
                 }
             }
 
-            // suppression de tout les medias lié a l'user (les logos, image desactiver, ...) pour les supprimer du server (dossier media) et de la base de donnée
+            // deletion of all user-related media (logos, deactivate image, ...) to delete them from the server (media folder) and from the database 
             $mediaManager = new MediaManager();
-            $listMedias = $mediaManager->getListMediasForUser($id); // on recuperer la liste des logos du user
+            $listMedias = $mediaManager->getListMediasForUser($id); // we retrieve the list of user logos 
 
             if(!empty($listMedias)){
                 foreach($listMedias as $media){
                     try{
-                        unlink($media->getPath());  //suppression des media sur le serveur dans le dossier media
-                        $mediaManager->deleteMedia($media->getId());    //suppression dans la base de donnée
+                        unlink($media->getPath());  // delete media on the server in the media folder 
+                        $mediaManager->deleteMedia($media->getId());    // deletion from the database
                     } catch (Exception $e) {
                         $errors[] = $e->getMessage();
                     }   
                 }
             }
 
-            // suppression de la base de donnee de tout les socialNetworks de l'user
+            // deletion of the database of all the user's socialNetworks 
             $socialNetworkManager = new SocialNetworkManager();
             $listSocialNetworksForUserDelete = $socialNetworkManager->getListSocialNetworksForUser($id);
             
@@ -606,7 +601,7 @@ use App\Models\SocialNetworkManager;
                 foreach($listSocialNetworksForUserDelete as $socialnetwork){
                     try
                     {
-                        $socialNetworkManager->deleteSocialNetwork($socialnetwork->getId());    //suppression dans la base de donnée
+                        $socialNetworkManager->deleteSocialNetwork($socialnetwork->getId());    // deletion from the database 
                     }
                         catch (Exception $e)
                     {
@@ -615,41 +610,41 @@ use App\Models\SocialNetworkManager;
                 }
             }
 
-            //supression de tout les post lier a l'user ATTENTION FONCTIONNALITE NON PREVU PAR LE SUJET MAIS RENDU POSSIBLE PAR MOI CAR ADMINISTRATEUR (en backend) PEUT ATTRIBUER UN POST (avec ses medias et commentaire) A UN USER
+            // deletion of all posts linked to the user CAUTION FUNCTIONALITY NOT PROVIDED FOR BY THE SUBJECT BUT MADE POSSIBLE BY ME BECAUSE ADMINISTRATOR (in backend) CAN ATTRIBUTE A POST (with his media and comments) TO A USER 
             $postManager = new PostManager();
             $listPostsForUser = $postManager->getListPostsForUser($id);
 
             if(!empty($listPostsForUser)){
-                foreach($listPostsForUser as $post){    // suppression de tout les post (et des medias que leurs sont associés) de l user
+                foreach($listPostsForUser as $post){    // deletion of all posts (and their associated media) from the user 
                     
-                    // on supprime les medias lier au post (si il y en a)
-                    $listMediasDelete =  $mediaManager->getListMediasForPost($post->getId());// on recupere la liste des media pour ce $post
+                    // we delete the media linked to the post (if there is any) 
+                    $listMediasDelete =  $mediaManager->getListMediasForPost($post->getId());// we get the media list for this $ post 
 
                     if($listMediasDelete !== []){
                         foreach($listMediasDelete as $media){
                             try{
-                                unlink($media->getPath());  //suppression des media sur le serveur dans le dossier media
-                                $mediaManager->deleteMedia($media->getId());    //suppression dans la base de donnée
+                                unlink($media->getPath());  // delete media on the server in the media folder 
+                                $mediaManager->deleteMedia($media->getId());    // deletion from the database 
                             } catch (Exception $e) {
                                 $errors[] = $e->getMessage();
                             }  
                         }
                     }
 
-                    // on supprime les commentaires lier au post (si il y en a)
-                    $listCommentsDelete =  $commentManager->getListCommentsForPost($post->getId());// on recupere la liste des commentaire pour ce $post
+                    // we delete the comments linked to the post (if there are any) 
+                    $listCommentsDelete =  $commentManager->getListCommentsForPost($post->getId());// we get the list of comments for this $ post 
                     
                     if($listCommentsDelete !== []){
                         foreach($listCommentsDelete as $comment){
                             try{
-                                $commentManager->deleteComment($comment->getId());    //suppression dans la base de donnée
+                                $commentManager->deleteComment($comment->getId());    // deletion from the database 
                             } catch (Exception $e) {
                                 $errors[] = $e->getMessage();
                             }  
                         }
                     }
 
-                    // on supprime le post
+                    // we delete the post 
                     try{
                         $post = $postManager->deletePost($post->getId());
                     } catch (Exception $e) {
@@ -658,7 +653,7 @@ use App\Models\SocialNetworkManager;
                 }
             }
 
-            // suppression de l'user
+            // user removal 
             try{
                 $user = $userManager->deleteUser($id);
             } catch (Exception $e) {
@@ -667,12 +662,12 @@ use App\Models\SocialNetworkManager;
             // session_destroy();
             unset($_SESSION['connection']);
            
-            setFlashErrors($errors);    // pour gerer les erreurs en message flash (voir fichier globalFunctions.php)
+            setFlashErrors($errors);    // to manage flash message errors (see globalFunctions.php file) 
 
             require('../app/Views/frontViews/frontDeleteUserView.php');
         }else {
             $errors[] = 'impossible de supprimer ce user, vous n\'en avait pas le droit';
-            setFlashErrors($errors);    // pour gerer les erreurs en message flash (voir fichier globalFunctions.php)
+            setFlashErrors($errors);    // to manage flash message errors (see globalFunctions.php file) 
             header('Location: /listposts');
             return http_response_code(302);
         }
@@ -682,7 +677,7 @@ use App\Models\SocialNetworkManager;
 //COMMENT
     /**
      * function use for road http://localhost:8000/editCommentPostFront/1 ou http://localhost:8000/editCommentPostFront/2 ou ....
-     * 
+     * will display the view frontEditCommentPostView.php
      */
     function editCommentPostFront($id)
     {
@@ -690,31 +685,31 @@ use App\Models\SocialNetworkManager;
 
         $errors = [];
 
-        // on edit le commentaire (a travers son formulaire)
+        // we edit the comment (through its form) 
         $commentManager = new CommentManager();
         try{
             $comment = $commentManager->getComment($id);
-        } catch (Exception $e) {    //dans le cas ou l'on demande une ressource qui n'existe pas (ici un id de comment qui n'existe pas)
+        } catch (Exception $e) {    //in the event that we request a resource that does not exist (here an id of how that does not exist) 
             $errors[] = $e->getMessage();
-            setFlashErrors($errors);    // pour gerer les erreurs en message flash (voir fichier globalFunctions.php)
+            setFlashErrors($errors);    // to manage flash message errors (see globalFunctions.php file) 
             require_once('../app/Views/errors.php');
             return http_response_code(302);
         }
 
-        if($comment->getUser_id() === $_SESSION['connection']){ //on verifier que le commentaire que le user souhaite modifier lui appartient bien
+        if($comment->getUser_id() === $_SESSION['connection']){ // we check that the comment that the user wishes to modify belongs to him 
 
             $formComment = new Form($comment, true);
 
             if($_SERVER['REQUEST_METHOD'] === 'POST') { // if a submission of the form (=> a modification of a comment) has been made
                 
-                //test de validation des champs du formulaire
+                // validation test of the form fields 
                 if(empty($_POST['comment']) OR mb_strlen($_POST['comment'])<=3){
                     $errors[] = 'Le champ commentaire ne peut être vide et doit contenir plus de 3 caracteres';
                 }
 
-                // enregistrement des infos
+                // info recording 
                 if(empty($errors)){
-                    // enregistrement des modifications du commentaire
+                    // save comment changes 
                     if (!empty($_POST['comment'])){
                         $comment->setComment($_POST['comment']);
                         
@@ -750,7 +745,7 @@ use App\Models\SocialNetworkManager;
 
     /**
      * function use for road http://localhost:8000/deleteCommentPostFront/1 ou http://localhost:8000/deleteCommentPostFront/2 ou ....
-     * 
+     * will display the view frontDeleteCommentPostView.php
      */
     function deleteCommentPostFront($id)
     {
@@ -758,18 +753,18 @@ use App\Models\SocialNetworkManager;
 
         $errors = [];
 
-        // on supprime le commentaire
+        // we delete the comment 
         $commentManager = new CommentManager();
         try{
             $comment = $commentManager->getComment($id);
-        } catch (Exception $e) {    //dans le cas ou l'on demande une ressource qui n'existe pas (ici un id de comment qui n'existe pas)
+        } catch (Exception $e) {    // in the event that we request a resource that does not exist (here an id of how that does not exist) 
             $errors[] = $e->getMessage();
-            setFlashErrors($errors);    // pour gerer les erreurs en message flash (voir fichier globalFunctions.php)
+            setFlashErrors($errors);    // to manage flash message errors (see globalFunctions.php file) 
             require_once('../app/Views/errors.php');
             return http_response_code(302);
         }
         
-        if($comment->getUser_id() === $_SESSION['connection']){ //on verifier que le commentaire que le user souhaite modifier lui appartient bien
+        if($comment->getUser_id() === $_SESSION['connection']){ // we check that the comment that the user wishes to modify belongs to him 
             try{
                 $comment = $commentManager->deleteComment($id);
             } catch (Exception $e) {
@@ -778,7 +773,6 @@ use App\Models\SocialNetworkManager;
 
             require('../app/Views/frontViews/frontDeleteCommentPostView.php');
         }else {
-            // throw new Exception('impossible de supprimmer le commentaire :'.$comment->getId().'par le user :'.$_SESSION['connection']);
             $errors[] = 'impossible de supprimer le commentaire :'.$comment->getId().' par le user :'.$_SESSION['connection'];
             setFlashErrors($errors);
 

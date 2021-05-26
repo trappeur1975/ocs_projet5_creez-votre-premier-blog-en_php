@@ -1,6 +1,5 @@
 <?php 
     ob_start(); 
-    // $countComment = 1;    
 ?>
 
 <!-- start the labels on the state of the comment of the post   -->
@@ -31,15 +30,11 @@
             </div>
     <?php endif ?>
 
-<h1><?= $title = formatHtml($post->getTitle()).' (post '. $id.')'; ?></h1>  <!-- we display here the title of the post but also to integrate this title in the browser tab by putting this title in the variable $ title  -->       
-<!-- <h1>THE POST: <?= $id ?></h1> -->
-    <!-- <h2>tilte</h2>
-        <?= $title = formatHtml($post->getTitle()); ?> we display here the title of the post but also to integrate this title in the browser tab by putting this title in the variable $ title  -->
+<h1><?= $title = formatHtml($post->getTitle()).' (post '. $id.')'; ?></h1>  <!-- we display here the title of the post but also to integrate this title in the browser tab by putting this title in the variable $ title  -->
+    <?= $title = formatHtml($post->getTitle()); ?> we display here the title of the post but also to integrate this title in the browser tab by putting this title in the variable $ title  -->
     <h2>introduction</h2>
         <?= formatHtml($post->getIntroduction()); ?> 
     <h2>image</h2>
-        <!-- <img src="/media/post_top_javascript_img1.png" alt="Photo de montagne" /> -->
-        <!-- <img src="<?//='/'.$listMediasForPost[0]->getPath(); ?>" alt="<?//=$listMediasForPost[0]->getAlt(); ?>"/> -->
         <?php
             if(!empty($listMediasForPost)){
                 echo '<img src=/'.$listMediasForPost[0]->getPath().' alt="'.$listMediasForPost[0]->getAlt().'">';
@@ -74,12 +69,7 @@
     ?>
             <h5>commentaire de <?= $userComment->getLastName().' '.$userComment->getFirstName() ?></h5>
 
-            
-
             <p><?= formatHtml($comment->getComment()); ?></p>
-
-
-            <!-- <?php //$countComment++; ?> -->
 
             <?php
                 if(isset($_SESSION['connection'])){

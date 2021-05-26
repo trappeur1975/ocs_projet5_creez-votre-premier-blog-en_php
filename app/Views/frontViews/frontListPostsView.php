@@ -17,7 +17,6 @@ ob_start();
             ?>
                             <div class="col-12 col-md-4">
                                 <div class="card">
-                                    <!-- <img class="card-img-top" src="images/actualite1.jpg" alt="actualite1" /> -->
                                     <div class="card-body">
                                         <p class="card-text">  
                                             <h2><?= formatHtml($post->getTitle()) ?></h2>
@@ -26,9 +25,6 @@ ob_start();
                                         <p class="card-text text-justify">  
                                             <?= $post->getIntroduction()?>
                                         </p>
-                                        <!-- <a href="<?= '/post/'. $post->getId()?>">
-                                            Voir le Post
-                                        </a> -->
                                         <a href="<?= '/post/'. $post->getId()?>" class="btn btn-primary">Voir le Post</a>
                                     </div>
                                 </div>

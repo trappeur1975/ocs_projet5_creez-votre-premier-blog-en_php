@@ -1,4 +1,4 @@
-<?php //va interroger la base de donnée pour recuperer des infos concernant la table comment
+<?php
 namespace App\Models;
 
 use PDO;
@@ -6,6 +6,11 @@ use App\Entities\Comment;
 use Exception;
 use \DateTime;
 
+/**
+ * CommentManager
+ * 
+ * manage access to the comment database table 
+ */
 class CommentManager extends Manager
 {
     const ADMINISTRATEUR = 2;
@@ -130,9 +135,7 @@ class CommentManager extends Manager
         $result = $query->execute([
             'comment' => $comment->getComment(),
             'dateCompletion' => $comment->getDateCompletion(),
-            // 'dateCompletion' => $comment->getDateCompletion()->format('Y-m-d H:i:s'),
             'validate' => $comment->getValidate(),
-            // 'validate' => $comment->getValidate()->format('Y-m-d H:i:s'),
             'userId' => $comment->getUser_id(),
             'postId' => $comment->getPost_id(),
             'id' => $comment->getId()

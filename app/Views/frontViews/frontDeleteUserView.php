@@ -6,8 +6,6 @@ ob_start();
 header('Location: /?deleteUser=true');
 return http_response_code(302);
 
-// disconnection();
-
 $content = ob_get_clean(); 
 
 require('../app/Views/template.php'); 

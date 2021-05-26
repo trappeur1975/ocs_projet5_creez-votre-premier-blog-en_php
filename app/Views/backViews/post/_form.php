@@ -1,29 +1,29 @@
 <form action="" method="post" enctype="multipart/form-data">
-    <!-- CREATION DES CHAMPS PROPRE A LA CLASSE POST -->
+    <!-- CREATION OF FIELDS SPECIFIC TO THE POST CLASS  -->
         <?= $formPost->input('title', 'title', 'titre') ?>
         <?= $formPost->textarea('introduction', 'introduction') ?>
         <?= $formPost->textarea('content', 'contenu') ?>
         <?= $formPost->input('dateCreate', 'dateCreate', 'date de creation') ?>
         <?php
-            if ($formPost->getEdit() === true){ //pour gerer le cas si on edit un post (on affiche le select) ou si on cree un post (on n affiche pas le select car on integrera un champs pour integrer des media au post que l on cree)
+            if ($formPost->getEdit() === true){ // to handle the case if we edit a post (we display the select) or if we create a post (we do not display the select because we will integrate a field to integrate media into the post we are creating) 
                 echo $formPost->input('dateChange', 'dateChange', 'date de modification');
             }
         ?>
 
-    <!-- CREATION DES CHAMPS  SELECT -->
-        <?= $formUser->selectSimple('id', 'user', 'auteur', $listUsersSelect) ?>   <!-- pour la creation du select des users -->
+    <!-- CREATION OF SELECT FIELDS  -->
+        <?= $formUser->selectSimple('id', 'user', 'auteur', $listUsersSelect) ?>   <!-- for the creation of the users' select  -->
         <?php 
-            if ($formUser->getEdit() === true and !empty($listMediasForUserForType)){ //pour gerer le cas si on edit un post et que le user de ce post possede au moins un media image(on affiche le select) ou si on cree un post (on n affiche pas le select car on integrera un champs pour integrer des media au post que l on cree)
-                echo $formMediasImageSelect->selectMultiple('id', 'path','medias', $listMediasForUserSelect, $listMediasForPostSelect); //pour la creation du select des medias
+            if ($formUser->getEdit() === true and !empty($listMediasForUserForType)){ // to manage the case if we edit a post and the user of this post has at least one media image (we display the select) or if we create a post (we do not display the select because we will integrate a field to integrate media to the post we create) 
+                echo $formMediasImageSelect->selectMultiple('id', 'path','medias', $listMediasForUserSelect, $listMediasForPostSelect); // for the creation of the media select 
             }
         ?>
 
-    <!-- CREATION DES CHAMP POUR LE UPLOAD DE MEDIA (image) -->
-        <?= $formMediaUploadImage->inputFile('media', 'mediaUploadImage', 'rajouter une image (uploader un fichier max 500ko) a ce post') ?>    <!-- pour la creation du upload du media -->
-        <?= $formMediaUploadImage->input('alt', 'altFileMediaImage', 'texte alternatif du media IMAGE uploader') ?>    <!-- pour la creation du input du text alt du media image -->
-    <!-- CREATION DES CHAMP POUR LE UPLOAD DE MEDIA (video) -->
+    <!-- CREATION OF FIELDS FOR THE MEDIA UPLOAD (image)  -->
+        <?= $formMediaUploadImage->inputFile('media', 'mediaUploadImage', 'rajouter une image (uploader un fichier max 500ko) a ce post') ?>    <!-- for the creation of the media upload  -->
+        <?= $formMediaUploadImage->input('alt', 'altFileMediaImage', 'texte alternatif du media IMAGE uploader') ?>    <!-- for the creation of the input of the alt text of the media image  -->
+    <!-- CREATION OF FIELDS FOR THE MEDIA UPLOAD (video)  -->
         <?= $formMediaUploadVideo->input('path', 'mediaUploadVideo', 'rajouter une video (lien url youtube ou vimeo uniquement) a ce post') ?>
-        <?= $formMediaUploadVideo->input('alt', 'altFileMediaVideo', 'texte alternatif du media VIDEO uploader') ?>    <!-- pour la creation du input du text alt du media video -->
+        <?= $formMediaUploadVideo->input('alt', 'altFileMediaVideo', 'texte alternatif du media VIDEO uploader') ?>    <!-- for the creation of the input of the alt text of the media video -->
 
     <button class="btn btn-primary">
         <?php if($post->getId() !==null):?>

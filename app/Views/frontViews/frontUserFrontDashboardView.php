@@ -70,7 +70,7 @@ ob_start();
                         <a href="<?= '/editCommentPostFront/'. $comment->getId()?>" class="btn btn-warning">
                             Modifier
                         </a>
-                        <!-- si on utilise la methode "post" -->
+                        <!-- if we use the "post" method  -->
                         <form action="<?= '/deleteCommentPostFront/'. $comment->getId()?>" methode="POST"
                             onsubmit="return confirm('Souhaitez vous vraiment executer cette action?')">
                             <button type="submit" class="btn btn-danger">Supprimer</button>

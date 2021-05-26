@@ -13,14 +13,33 @@ function formatHtml(string $content) {
     return nl2br(htmlentities($content));
 }
 
-// envoie d'email
+/**
+ * Method sendEmail
+ *
+ * @param String $recipientEmail
+ * @param String $title
+ * @param String $message
+ *
+ * @return void
+ */
 function sendEmail(String $recipientEmail, String $title, String $message){
-    $senderEmail = 'From: '.searchDatasFile('email')[1]; //chemin de stockage du fichier uploader (voir fichier globalFunctions.php)
+    $senderEmail = 'From: '.searchDatasFile('email')[1]; // storage path of the uploader file (see globalFunctions.php file) 
     mail($recipientEmail, $title, $message, $senderEmail);
 }
 
-function sendEmailHtml(String$name, String$email, String $message, $emailFrom, $emailTo){
-    // Sujet
+/**
+ * Method sendEmailHtml
+ *
+ * @param String $name $name
+ * @param String $email $email
+ * @param String $message
+ * @param String $emailFrom
+ * @param String $emailTo
+ *
+ * @return void
+ */
+function sendEmailHtml(String $name, String $email, String $message, String $emailFrom, String $emailTo){
+    // Subject
     $subject = 'BlogNico message de '.$name;
 
     // message
@@ -40,19 +59,25 @@ function sendEmailHtml(String$name, String$email, String $message, $emailFrom, $
     </html>
     ';
 
-    // Pour envoyer un mail HTML, l'en-tête Content-type doit être défini
+    // To send an HTML mail, the Content-type header must be defined 
     $headers[] = 'MIME-Version: 1.0';
     $headers[] = 'Content-type: text/html; charset=iso-8859-1';
     $headers[] = 'From: '.$emailFrom;
     $to  = $emailTo;
     
-    // Envoi
+    // Sending 
     mail($to, $subject, $message, implode("\r\n", $headers));
 }
 
 
-// gestion de fichier
-    // cherche a recuperer (sous forme d un tableau) les données d une ligne dans un fichier si elle existe
+// file management 
+    /**
+     * Method searchDatasFile seeks to recover (in the form of an array) the data of a line in a file if it exists   
+     *
+     * @param String $typeDatasSought
+     *
+     * @return array
+     */
     function searchDatasFile(String $typeDatasSought){
         $file = fopen(CONFIGFILE, 'r');
         $datasFind = [];
@@ -69,7 +94,14 @@ function sendEmailHtml(String$name, String$email, String $message, $emailFrom, $
         return $datasFind;
     }
 
-    //cherche dans un tableau de donnée ($datas) si une donnée existe (dataSought)
+    /**
+     * Method validateData search in a data table ($ datas) if a data exists (dataSought) 
+     *
+     * @param array $datas
+     * @param String $dataSought
+     *
+     * @return bool
+     */
     function validateData(array $datas, String $dataSought){
         $find = false;
         foreach ($datas as $data){    
@@ -81,7 +113,15 @@ function sendEmailHtml(String$name, String$email, String $message, $emailFrom, $
         return $find;
     }
 
-    //cherche si un des mots se trouvant dans un tableau ($datas) existe bien dans une chaine de caractére
+    //searches if one of the words found in an array ($ datas) does indeed exist in a character string    
+    /**
+     * Method validateWordInString
+     *
+     * @param array $data
+     * @param String $stringCaractere
+     *
+     * @return void
+     */
     function validateWordInString(array $datas, String $stringCaractere){  
         $find = false;
         foreach($datas as $data){
@@ -93,7 +133,15 @@ function sendEmailHtml(String$name, String$email, String $message, $emailFrom, $
         return $find;
     }
 
-//------------message flash---------------
+//flash message    
+    /**
+     * Method setFlashErrors
+     *
+     * @param array $errors
+     * @param $type='danger'
+     *
+     * @return void
+     */
     function setFlashErrors(array $errors, $type='danger'){
         $_SESSION['flash'] = array(
             'errors'=> $errors,
@@ -101,7 +149,12 @@ function sendEmailHtml(String$name, String$email, String $message, $emailFrom, $
         );
             
     }
-
+    
+    /**
+     * Method getFalshErrors
+     *
+     * @return void
+     */
     function getFalshErrors(){
         if(isset($_SESSION['flash'])){
             echo('<h4> message info </h4>');

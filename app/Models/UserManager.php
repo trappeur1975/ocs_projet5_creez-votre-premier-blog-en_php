@@ -1,4 +1,4 @@
-<?php //va interroger la base de donnée pour recuperer des infos concernant la table user
+<?php
 namespace App\Models;
 
 use PDO;
@@ -48,7 +48,13 @@ class UserManager extends Manager
         return $user;
     }
 
-    // ajoute le user (en attribut de cette fonction) a la table user en bdd
+    /**
+     * Method addUser adds the user to the user table in database 
+     *
+     * @param User $user
+     *
+     * @return integer
+     */
     public function addUser(User $user)
     {
         $db = $this->dbConnect();
@@ -96,7 +102,6 @@ class UserManager extends Manager
                                                 slogan = :slogan,
                                                 login = :login,
                                                 password = :password,
-                                                -- validate = :validate,
                                                 userType_id = :userType_id
                             WHERE id = :id');
         $result = $query->execute([
@@ -106,8 +111,6 @@ class UserManager extends Manager
             'slogan' => $user->getSlogan(),
             'login' => $user->getLogin(),
             'password' => $user->getPassword(),
-            // 'validate' => $user->getValidate()->format('Y-m-d H:i:s'),
-            // 'validate' => $user->getValidate(),
             'userType_id' => $user->getUserType_id(),
             'id' => $user->getId()
         ]);
@@ -203,7 +206,14 @@ class UserManager extends Manager
         return $status;
     }
 
-    // recherche si une donnée est deja utilisé(presente) dans les comptes user et si oui revoit le id qui a deja cette donnée et si non on return null
+    /**
+     * Method identicalDataSearch search if a data is already used (present) in the user accounts and if so, review the id which already has this data and if not we return null 
+     *
+     * @param String $key
+     * @param $data $data
+     *
+     * @return integer
+     */
     public function identicalDataSearch(String $key, $data){
         $idUserIidenticalData = null;
         $listUsers = $this->getListUsers();
@@ -217,8 +227,14 @@ class UserManager extends Manager
         return $idUserIidenticalData;
     }
 
-// --------------------------------------------------------------------------------------
-
+    
+    /**
+     * Method findByUserLogin
+     *
+     * @param string $login
+     *
+     * @return void
+     */
     public function findByUserLogin(string $login)
     {
         $db = $this->dbConnect();
@@ -232,7 +248,13 @@ class UserManager extends Manager
         return $user;
     }
 
-    // methode pour recuperer un tableau des users que l on va utiliser dans le select
+    /**
+     * Method listUsersFormSelect method to retrieve an array of users that we will use in the select 
+     *
+     * @param array $listUsers [explicite description]
+     *
+     * @return array
+     */
     public function listUsersFormSelect(array $listUsers): array
     {
         $results = [];
