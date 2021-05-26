@@ -31,18 +31,58 @@
     <?php endif ?>
 
 <h1><?= $title = formatHtml($post->getTitle()).' (post '. $id.')'; ?></h1>  <!-- we display here the title of the post but also to integrate this title in the browser tab by putting this title in the variable $ title  -->
-    <?= $title = formatHtml($post->getTitle()); ?> we display here the title of the post but also to integrate this title in the browser tab by putting this title in the variable $ title  -->
     <h2>introduction</h2>
         <?= formatHtml($post->getIntroduction()); ?> 
-    <h2>image</h2>
+    
         <?php
-            if(!empty($listMediasForPost)){
-                echo '<img src=/'.$listMediasForPost[0]->getPath().' alt="'.$listMediasForPost[0]->getAlt().'">';
+            if(!empty($listMediasForPost)){ //media image
+                echo '<h2>media</h2>'; 
+                if($listMediasForPost[0]->getMediaType_id()=== 1){ // media image
+                    echo '<img src=/'.$listMediasForPost[0]->getPath().' alt="'.$listMediasForPost[0]->getAlt().'">';
+                } else if ($listMediasForPost[0]->getMediaType_id()=== 3){ // media video
+                    echo '<iframe class="embed-responsive-item" src="'.$listMediasForPost[0]->getPath().'" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>';
+                }  
             }
         ?>
         
     <h2>content</h2>
         <?= formatHtml($post->getContent()); ?>
+    
+    <?php // display of other images if they exist
+        if(!empty($listMediasForPost) and count($listMediasForPost)>1){ //media image
+            $compteur = 0;
+                
+            foreach ($listMediasForPost as $media) {
+                if($compteur == 0){
+            ?>
+                        <div class="row">
+            <?php        
+                    }
+            ?>
+                            <div class="col-12 col-md-4">
+                                <div class="card">
+                                    <div class="card-body">
+                                    <?php 
+                                        if($media->getMediaType_id()=== 1){ //media image
+                                            echo '<img class="card-img-top" src=/'.$media->getPath().' alt="'.$media->getAlt().'">';
+                                        }
+                                    ?>
+                                    </div>
+                                </div>
+                            </div> 
+            <?php       
+                    $compteur++;
+
+                    if($compteur == 3){
+            ?>
+                        </div>  <!-- fin row  -->
+            <?php        
+                        $compteur = 0;
+                    }         
+                } //fin foreach 
+        }
+    ?>
+    
     <h2>DateCreate</h2>
         <?= htmlentities($post->getDateCreate()); ?>
     <h2>Datechange</h2>
@@ -50,7 +90,7 @@
     <h2>auteur du Post :</h2>
         <p><?= formatHtml($userPost->getLastName().' '.$userPost->getFirstName()) ?></p>
     
-    <?php //affiche du formulaire de commentaire seulement si on est connecter au site et un status abonner ou administrateur  
+    <?php //displays the comment form only if you are connected to the site and a subscriber or administrator status 
         if(isset($_SESSION['connection'])){
             if($userManager->getUserSatus($_SESSION['connection'])['status'] === 'administrateur' OR $userManager->getUserSatus($_SESSION['connection'])['status'] === 'abonner'){
                 echo '<h3>laisser un nouveau commentaire : </h3>';
