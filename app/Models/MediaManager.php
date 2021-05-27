@@ -324,15 +324,15 @@ class MediaManager extends Manager
      * @return array all media of a post
      */
     // public function findMediasForPost(int $id): array
-    // {
-    //     $db = $this->dbConnect();
-    //     $query = $db->prepare('SELECT * FROM media 
-    //                             INNER JOIN mediaType
-    //                             ON media.mediaType_id = mediaType.id
-    //                             WHERE media.post_id = :id');
-    //     $query->execute(['id' => $id]);
-    //     $listMediasForPost = $query ->fetchAll(PDO::FETCH_CLASS, Media::class);
-    //     return $listMediasForPost;
-    // }
+    {
+        $db = $this->dbConnect();
+        $query = $db->prepare('SELECT * FROM media 
+                                INNER JOIN mediaType
+                                ON media.mediaType_id = mediaType.id
+                                WHERE media.post_id = :id');
+        $query->execute(['id' => $id]);
+        $listMediasForPost = $query ->fetchAll(PDO::FETCH_CLASS, Media::class);
+        return $listMediasForPost;
+    }
 
 }

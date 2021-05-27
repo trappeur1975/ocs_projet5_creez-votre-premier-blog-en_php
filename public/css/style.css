@@ -49,6 +49,9 @@ input[type=image] {
 #contactForm{
     padding-top: 50px;
     border: 5px solid;
+    border-radius: 10px;
+    padding: 10px;
+    margin: 10px;
 }
 
 #finalWord{

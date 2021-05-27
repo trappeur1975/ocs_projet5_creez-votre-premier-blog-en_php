@@ -119,6 +119,7 @@ use App\Models\SocialNetworkManager;
         // comment
         $commentManager = new CommentManager();
         $listCommentsForPost = $commentManager->listCommentsNotNullForPost($id);
+        
     
         // to create a new comment for a post 
         $comment = new Comment();

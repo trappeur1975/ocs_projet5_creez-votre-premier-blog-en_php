@@ -19,7 +19,8 @@ class Manager // connection a la base de donnee
      */
     protected function dbConnect() : PDO
     {
-        $db = new PDO('mysql:host=localhost;dbname=p5_ocs_blog_php; charset=utf8', 'root', ''); // DO NOT FORGET "charset = utf8" TO ADJUST THE ENCODING PROBLEMS 
+        $db = new PDO('mysql:host=localhost;dbname=ocs_blog_php_version2; charset=utf8', 'root', ''); // DO NOT FORGET "charset = utf8" TO ADJUST THE ENCODING PROBLEMS 
+        // $db = new PDO('mysql:host=localhost;dbname=p5_ocs_blog_php; charset=utf8', 'root', ''); // DO NOT FORGET "charset = utf8" TO ADJUST THE ENCODING PROBLEMS 
         return $db;
     }
 
