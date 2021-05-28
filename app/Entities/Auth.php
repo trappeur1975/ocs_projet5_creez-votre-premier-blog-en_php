@@ -18,7 +18,7 @@ class Auth {
         $validStatus = false;
 
         foreach($statutes as $status){
-            if($status === $userStatus){
+            if ($status === $userStatus) {
                 $validStatus = true;
                 break;
             }
@@ -30,10 +30,10 @@ class Auth {
      * Method sessionStart
      */
     public static function sessionStart(){
-        if(session_status() === PHP_SESSION_NONE){
+        if (session_status() === PHP_SESSION_NONE) {
             session_start();
         }
-        if(isset($_SESSION['connection'])){
+        if (isset($_SESSION['connection'])) {
             $userManager = new UserManager();
             $userLogged = $userManager->getUser($_SESSION['connection']);
 
@@ -55,13 +55,13 @@ class Auth {
         
         $userLogged = self::sessionStart();
      
-        if(!isset($_SESSION['connection'])){
+        if (!isset($_SESSION['connection'])) {
             header('Location: /backend/connection?badConnection=true');
         }
 
         $AuthorizedAccess = self::validator($authorizedStatutes, $userManager->getUserSatus($_SESSION['connection'])['status']);
 
-        if( $AuthorizedAccess !== true){
+        if ( $AuthorizedAccess !== true) {
             
             header('Location: /backend/connection?badConnection=true');
         }

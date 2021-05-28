@@ -41,12 +41,6 @@ class User
      */
     private $slogan;
 
-    /**
-     * logo
-     *
-     * @var Media $logo logo of the user
-     */
-    // private $logo;
 
     /**
      * login
@@ -81,7 +75,7 @@ class User
     /** 
      * Get $id id of the user
      *
-     * @return  integer
+     * @return integer
      */ 
     public function getId(): ?int
     {
@@ -91,7 +85,7 @@ class User
     /**
      * Get $firstName firstName of the user
      *
-     * @return  string
+     * @return string
      */ 
     public function getFirstName(): ?string
     {
@@ -103,7 +97,7 @@ class User
      *
      * @param  string  $firstName firstName of the user
      *
-     * @return  self
+     * @return self
      */ 
     public function setFirstName(string $firstName): self
     {
@@ -115,7 +109,7 @@ class User
     /**
      * Get $lastName lastName of the user
      *
-     * @return  string
+     * @return string
      */ 
     public function getLastName(): ?string
     {
@@ -127,7 +121,7 @@ class User
      *
      * @param  string  $lastName lastName of the user
      *
-     * @return  self
+     * @return self
      */ 
     public function setLastName(string $lastName): self
     {
@@ -139,7 +133,7 @@ class User
     /**
      * Get $email email of the user
      *
-     * @return  string
+     * @return string
      */ 
     public function getEmail(): ?string
     {
@@ -149,9 +143,9 @@ class User
     /**
      * Set $email email of the user
      *
-     * @param  string  $email email of the user
+     * @param string  $email email of the user
      *
-     * @return  self
+     * @return self
      */ 
     public function setEmail(string $email): self
     {
@@ -163,7 +157,7 @@ class User
     /**
      * Get $slogan slogan of the user
      *
-     * @return  string
+     * @return string
      */ 
     public function getSlogan(): ?string
     {
@@ -173,9 +167,9 @@ class User
     /**
      * Set $slogan slogan of the user
      *
-     * @param  string  $slogan slogan of the user
+     * @param string  $slogan slogan of the user
      *
-     * @return  self
+     * @return self
      */ 
     public function setSlogan(string $slogan): self
     {
@@ -187,7 +181,7 @@ class User
     /**
      * Get $login login of the user
      *
-     * @return  string
+     * @return string
      */ 
     public function getLogin(): ?string
     {
@@ -197,9 +191,9 @@ class User
     /**
      * Set $login login of the user
      *
-     * @param  string  $login login of the user
+     * @param string  $login login of the user
      *
-     * @return  self
+     * @return self
      */ 
     public function setLogin(string $login): self
     {
@@ -211,7 +205,7 @@ class User
     /**
      * Get $password password of the user
      *
-     * @return  string
+     * @return string $password password of the user
      */ 
     public function getPassword(): ?string
     {
@@ -223,7 +217,7 @@ class User
      *
      * @param  string  $password password of the user
      *
-     * @return  self
+     * @return self
      */ 
     public function setPassword(string $password): self
     {
@@ -235,7 +229,7 @@ class User
     /**
      * Get $validate validate of the user
      *
-     * @return  \Datetime
+     * @return \Datetime
      */ 
     public function getValidate()
     {
@@ -247,7 +241,7 @@ class User
      *
      * @param $validate validate of the user (can be null or datetime )
      *
-     * @return  self
+     * @return self
      */ 
     public function setValidate($validate): self
     {
@@ -259,7 +253,7 @@ class User
     /**
      * Get $userType_id userType_id of the user
      *
-     * @return  int
+     * @return int
      */ 
     public function getUserType_id()
     {
@@ -269,9 +263,9 @@ class User
     /**
      * Set $userType_id userType_id of the user
      *
-     * @param  int  $userType userType_id of the user
+     * @param int  $userType userType_id of the user
      *
-     * @return  self
+     * @return self
      */ 
     public function setUserType_id(int $userType_id): self
     {

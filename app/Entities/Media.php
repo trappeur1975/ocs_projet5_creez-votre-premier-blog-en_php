@@ -9,36 +9,42 @@ class Media
 {    
     /**
      * id
+     * 
      * @var integer $id id of the media
      */
     private $id;
     
     /**
      * path
+     * 
      * @var string $path path of the media
      */
     private $path;
 
     /**
      * alt
+     * 
      * @var string $alt alt of the media
      */
     private $alt;
 
     /**
      * statutActif
+     * 
      * @var bool $statutActif media status (active = boolean true or not active = boolean false) depending on whether the media is used or not in a post 
      */
     private $statutActif;
 
     /**
      * mediaType_id
+     * 
      * @var int $mediaType_id id of the media type to which this media belongs 
      */
     private $mediaType_id;
 
     /**
      * post_id
+     * 
      * @var int $post_id id of the post to which this media belongs
      */
     private $post_id;
@@ -52,7 +58,7 @@ class Media
     /**
      * Get $id id of the media
      *
-     * @return  integer
+     * @return integer
      */ 
     public function getId(): ?int
     {
@@ -62,7 +68,7 @@ class Media
     /**
      * Get $path path of the media
      *
-     * @return  string
+     * @return string
      */ 
     public function getPath(): ?string
     {
@@ -74,7 +80,7 @@ class Media
      *
      * @param  string  $path  $path of the media
      *
-     * @return  self
+     * @return self
      */ 
     public function setPath(string $path): self
     {
@@ -86,7 +92,7 @@ class Media
     /**
      * Get $alt alt of the media
      *
-     * @return  string
+     * @return string
      */ 
     public function getAlt(): ?string
     {
@@ -98,7 +104,7 @@ class Media
      *
      * @param  string  $alt alt of the media
      *
-     * @return  self
+     * @return self
      */ 
     public function setAlt(string $alt): self
     {
@@ -110,7 +116,7 @@ class Media
     /**
      * Get $statutActif media status (active = boolean true or not active = boolean false) depending on whether the media is used or not in a post
      *
-     * @return  bool
+     * @return bool
      */ 
     public function getStatutActif(): ?bool
     {
@@ -122,7 +128,7 @@ class Media
      *
      * @param  bool  $statutActif  $statutActif media status (active = boolean true or not active = boolean false) depending on whether the media is used or not in a post
      *
-     * @return  self
+     * @return self
      */ 
     public function setStatutActif(bool $statutActif) :self
     {
@@ -134,7 +140,7 @@ class Media
     /**
      * Get $mediaType_id id of the media type to which this media belongs
      *
-     * @return  int
+     * @return int
      */ 
     public function getMediaType_id(): ?int
     {
@@ -146,7 +152,7 @@ class Media
      *
      * @param  int  $mediaType_id  $mediaType_id id of the media type to which this media belongs
      *
-     * @return  self
+     * @return self
      */ 
     public function setMediaType_id(int $mediaType_id): self
     {
@@ -158,7 +164,7 @@ class Media
     /**
      * Get $post_id id of the post to which this media belongs
      *
-     * @return  int
+     * @return int
      */ 
     public function getPost_id(): ?int
     {
@@ -170,7 +176,7 @@ class Media
      *
      * @param  int  $post_id  $post_id id of the post to which this media belongs
      *
-     * @return  self
+     * @return self
      */ 
     public function setPost_id(int $post_id): self
     {
@@ -182,7 +188,7 @@ class Media
     /**
      * Get $user_id id of the user to which this media belongs
      *
-     * @return  int
+     * @return int
      */ 
     public function getUser_id(): ?int
     {
@@ -194,7 +200,7 @@ class Media
      *
      * @param  int  $user_id  $user_id id of the user to which this media belongs
      *
-     * @return  self
+     * @return self
      */ 
     public function setUser_id(int $user_id): self
     {

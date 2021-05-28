@@ -4,15 +4,15 @@ ob_start();
 ?>
 
 <!-- label alert-->
-    <?php  if(isset($_GET['delete'])): ?>
+    <?php  if (isset($_GET['delete'])) : ?>
         <div class="alert alert-success">
             le user a bien été supprimé.
         </div>
-        <?php  elseif(isset($_GET['validateUser'])and($_GET['validateUser'])==='true'): ?>
+        <?php  elseif (isset($_GET['validateUser'])and($_GET['validateUser'])==='true') : ?>
             <div class="alert alert-success">
                 le user a bien été validé.
             </div>
-        <?php elseif(isset($_GET['validateUser'])and($_GET['validateUser'])==='false'): ?>
+        <?php elseif (isset($_GET['validateUser'])and($_GET['validateUser'])==='false') : ?>
             <div class="alert alert-danger">
                 le user n'a pu être validé.
             </div>
@@ -43,7 +43,7 @@ ob_start();
                     </td>
                     <td <?=($user->getValidate()) !== null ? 'class = "validate"' : 'class = "noValidate"';?> >
                         <?php
-                            if($user->getValidate() !== null){
+                            if ($user->getValidate() !== null) {
                                 echo $user->getValidate();
                             } else {
                                 echo "en attente de validation";
@@ -70,5 +70,5 @@ ob_start();
 
 <?php 
 $content = ob_get_clean(); 
-require('../app/Views/template.php'); 
+require'../app/Views/template.php'; 
 ?>

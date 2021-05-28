@@ -4,27 +4,27 @@
 
 <!-- start the labels on the state of the comment of the post   -->
     <!-- to manage the display of the success or not of the comment of a post -->
-    <?php  if(isset($_GET['createdComment'])and($_GET['createdComment'])==='true'): ?>
+    <?php  if (isset($_GET['createdComment'])and($_GET['createdComment'])==='true') : ?>
             <div class="alert alert-success">
                 le commentaire a bien été créé.
             </div>
-        <?php elseif(isset($_GET['createdComment'])and($_GET['createdComment'])==='false'): ?>
+        <?php elseif (isset($_GET['createdComment'])and($_GET['createdComment'])==='false') : ?>
             <div class="alert alert-danger">
                 le commentaire n'a pu être créé.
             </div>
-        <?php elseif(isset($_GET['deleteComment'])and($_GET['deleteComment'])==='true'): ?>
+        <?php elseif (isset($_GET['deleteComment'])and($_GET['deleteComment'])==='true') : ?>
             <div class="alert alert-success">
                 le commentaire a bien été supprimer.
             </div>    
-        <?php elseif(isset($_GET['deleteComment'])and($_GET['deleteComment'])==='false'): ?>
+        <?php elseif (isset($_GET['deleteComment'])and($_GET['deleteComment'])==='false') : ?>
             <div class="alert alert-danger">
                 le commentaire n'a pu être supprimer.
             </div>
-        <?php elseif(isset($_GET['successUploadComment'])and($_GET['successUploadComment'])==='true'): ?>
+        <?php elseif (isset($_GET['successUploadComment'])and($_GET['successUploadComment'])==='true') : ?>
             <div class="alert alert-success">
                 le commentaire a bien été modifier.
             </div>    
-        <?php elseif(isset($_GET['successUploadComment'])and($_GET['successUploadComment'])==='false'): ?>
+        <?php elseif (isset($_GET['successUploadComment'])and($_GET['successUploadComment'])==='false') : ?>
             <div class="alert alert-danger">
                 le commentaire n'a pu être modifier.
             </div>
@@ -35,11 +35,11 @@
         <?= formatHtml($post->getIntroduction()); ?> 
     
         <?php
-            if(!empty($listMediasForPost)){ //media image
+            if (!empty($listMediasForPost)) { //media image
                 echo '<h2>media</h2>'; 
-                if($listMediasForPost[0]->getMediaType_id()=== 1){ // media image
+                if ($listMediasForPost[0]->getMediaType_id()=== 1) { // media image
                     echo '<img src=/'.$listMediasForPost[0]->getPath().' alt="'.$listMediasForPost[0]->getAlt().'">';
-                } else if ($listMediasForPost[0]->getMediaType_id()=== 3){ // media video
+                } elseif ($listMediasForPost[0]->getMediaType_id()=== 3){ // media video
                     echo '<iframe class="embed-responsive-item" src="'.$listMediasForPost[0]->getPath().'" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>';
                 }  
             }
@@ -49,11 +49,11 @@
         <?= formatHtml($post->getContent()); ?>
     
     <?php // display of other images if they exist
-        if(!empty($listMediasForPost) and count($listMediasForPost)>1){ //media image
+        if (!empty($listMediasForPost) and count($listMediasForPost)>1) { //media image
             $compteur = 0;
                 
             foreach ($listMediasForPost as $media) {
-                if($compteur == 0){
+                if ($compteur == 0) {
             ?>
                         <div class="row">
             <?php        
@@ -63,7 +63,7 @@
                                 <div class="card">
                                     <div class="card-body">
                                     <?php 
-                                        if($media->getMediaType_id()=== 1){ //media image
+                                        if ($media->getMediaType_id()=== 1) { //media image
                                             echo '<img class="card-img-top" src=/'.$media->getPath().' alt="'.$media->getAlt().'">';
                                         }
                                     ?>
@@ -73,7 +73,7 @@
             <?php       
                     $compteur++;
 
-                    if($compteur == 3){
+                    if ($compteur == 3) {
             ?>
                         </div>  <!-- fin row  -->
             <?php        
@@ -91,10 +91,10 @@
         <p><?= formatHtml($userPost->getLastName().' '.$userPost->getFirstName()) ?></p>
     
     <?php //displays the comment form only if you are connected to the site and a subscriber or administrator status 
-        if(isset($_SESSION['connection'])){
-            if($userManager->getUserSatus($_SESSION['connection'])['status'] === 'administrateur' OR $userManager->getUserSatus($_SESSION['connection'])['status'] === 'abonner'){
+        if (isset($_SESSION['connection'])) {
+            if ($userManager->getUserSatus($_SESSION['connection'])['status'] === 'administrateur' OR $userManager->getUserSatus($_SESSION['connection'])['status'] === 'abonner') {
                 echo '<h3>laisser un nouveau commentaire : </h3>';
-                require('../app/Views/frontViews/_formComment.php');
+                require'../app/Views/frontViews/_formComment.php';
                 echo '</br>';
                 echo '</br>';
             }
@@ -112,8 +112,8 @@
             <p><?= formatHtml($comment->getComment()); ?></p>
 
             <?php
-                if(isset($_SESSION['connection'])){
-                    if($_SESSION['connection'] === $comment->getUser_id()){
+                if (isset($_SESSION['connection'])) {
+                    if ($_SESSION['connection'] === $comment->getUser_id()) {
             ?>
                         <form action="<?= '/deleteCommentPostFront/'. $comment->getId()?>" methode="POST"
                             onsubmit="return confirm('Souhaitez vous vraiment executer cette action?')">
@@ -131,5 +131,5 @@
 
 <?php 
 $content = ob_get_clean();
-require('../app/Views/template.php'); 
+require'../app/Views/template.php'; 
 ?>

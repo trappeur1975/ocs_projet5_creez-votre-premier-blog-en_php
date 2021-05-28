@@ -8,11 +8,11 @@ ob_start();
 ?>
     <!-- start the labels on the state of the edition of the user   -->
     <!-- to manage the display of the success or not of the EDITING of a user -->
-    <?php  if(isset($_GET['successEditUser'])and($_GET['successEditUser'])==='true'): ?>
+    <?php  if (isset($_GET['successEditUser'])and($_GET['successEditUser'])==='true') : ?>
             <div class="alert alert-success">
                 le user a bien été modifié.
             </div>
-        <?php elseif(isset($_GET['successEditUser'])and($_GET['successEditUser'])==='false'): ?>
+        <?php elseif (isset($_GET['successEditUser'])and($_GET['successEditUser'])==='false' ): ?>
             <div class="alert alert-danger">
                 le user n'a pu être modifié.
             </div>
@@ -28,7 +28,7 @@ ob_start();
                 </form>
             
         <h2>Mes infos (modification)</h2>
-            <?php require('../app/Views/frontViews/_formUserFront.php')?>
+            <?php require'../app/Views/frontViews/_formUserFront.php'?>
 
         <h2>Mes commentaires</h2>
 
@@ -59,7 +59,7 @@ ob_start();
 
                     <td <?=($comment->getValidate()) !== null ? 'class = "validate"' : 'class = "noValidate"';?> >
                         <?php
-                            if($comment->getValidate() !== null){
+                            if ($comment->getValidate() !== null) {
                                 echo $comment->getValidate();
                             } else {
                                 echo "en attente de validation";
@@ -91,5 +91,5 @@ ob_start();
 
 <?php 
 $content = ob_get_clean(); 
-require('../app/Views/template.php'); 
+require'../app/Views/template.php'; 
 ?>

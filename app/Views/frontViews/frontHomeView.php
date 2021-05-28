@@ -3,19 +3,19 @@
     ob_start(); 
 ?>
 <!-- label alert-->
-    <?php  if(isset($_GET['deleteUser'])): ?>
+    <?php  if (isset($_GET['deleteUser'])) : ?>
         <div class="alert alert-success">
             Votre compte user a bien été supprimé.
         </div>
-    <?php elseif(isset($_GET['unauthorizedAccess'])): ?>
+    <?php elseif (isset($_GET['unauthorizedAccess'])) : ?>
         <div class="alert alert-danger">
             votre statut ne vous autorise pas a acceder au contenu du site reserver a un certain statut.
         </div>
-    <?php elseif(isset($_GET['SendEmail'])and($_GET['SendEmail'])==='true'): ?>
+    <?php elseif (isset($_GET['SendEmail'])and($_GET['SendEmail'])==='true') : ?>
         <div class="alert alert-success">
             Votre message a bien été envoyé.
         </div>
-    <?php elseif(isset($_GET['SendEmail'])and($_GET['SendEmail'])==='false'): ?>
+    <?php elseif (isset($_GET['SendEmail'])and($_GET['SendEmail'])==='false') : ?>
         <div class="alert alert-danger">
             Votre message n'a pas pu être envoyer.
         </div>
@@ -73,5 +73,5 @@
 
 <?php 
     $content = ob_get_clean(); 
-    require('../app/Views/template.php'); 
+    require'../app/Views/template.php'; 
 ?>

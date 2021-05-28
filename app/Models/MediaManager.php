@@ -51,7 +51,7 @@ class MediaManager extends Manager
         $query->execute(['id' => $id]);
         $query->setFetchMode(PDO::FETCH_CLASS, Media::class);
         $media = $query->fetch();
-        if($media === false){
+        if ($media === false) {
             throw new Exception('aucun media ne correspond a cet ID');
         }
         return $media;
@@ -79,7 +79,7 @@ class MediaManager extends Manager
         $authorizedMaxFileSize = searchDatasFile('maxFileSizeImage')[1]; // maximum file size uploader allowed 
         $validateFileSize = $fileUploader['size'] <= $authorizedMaxFileSize;
 
-        if($validateFile AND $validateFileSize){
+        if ($validateFile AND $validateFileSize) {
 
             // on sauvegarde en base de donnee
             $db = $this->dbConnect();
@@ -100,7 +100,7 @@ class MediaManager extends Manager
                 ]);
             
             //we transfer the uploader file to the site from its temporary storage folder to its final storage folder
-            if($result === true){
+            if ($result === true) {
                 $from = $fileUploader ['tmp_name']; //temporary storage path of the uploader file + its name 
                 $to = $mediaImage->getPath();
               
@@ -127,7 +127,7 @@ class MediaManager extends Manager
         $authorizedFileTypes = searchDatasFile('video');   //voir fichier globalFunctions.php
         $validateVideo = validateWordInString($authorizedFileTypes, $mediaVideo->getPath());
 
-        if($validateVideo){
+        if ($validateVideo) {
             $db = $this->dbConnect();
             $query = $db->prepare('INSERT INTO media SET path = :path, 
                                                         alt = :alt,
@@ -143,7 +143,7 @@ class MediaManager extends Manager
                 'post_id' => $mediaVideo->getPost_id(),
                 'user_id' => $mediaVideo->getUser_id()
                 ]);
-            if($result === false){
+            if ($result === false) {
                 throw new Exception('impossible d\'enregistrer le media video en base de donnee');
             }
         } else {
@@ -163,7 +163,7 @@ class MediaManager extends Manager
         $db = $this->dbConnect();
         $query = $db->prepare('DELETE FROM media WHERE id = :id');
         $result = $query->execute(['id' => $id]);
-        if($result === false){
+        if ($result === false) {
             throw new Exception('impossible de supprimer le media :'.$id.'peut être il n\'existe pas');
         }
     }
@@ -172,7 +172,6 @@ class MediaManager extends Manager
      * Method getMediasForPost method that returns the list of media linked to a post 
      *
      * @param int $idPost id of the post which we want to retrieve the linked media 
-     *
      * @return Media[]  all media of a post
      */
     public function getListMediasForPost(int $idPost): array
@@ -190,10 +189,8 @@ class MediaManager extends Manager
      * Method getMediasForUser method that returns the list of media linked to a user 
      *
      * @param int $idUser the id user whose medias we want to retrieve 
-     *
      * @return Media[]
      */
-
     public function getListMediasForUser(int $idUser): array
     {
         $db = $this->dbConnect();
@@ -212,7 +209,6 @@ class MediaManager extends Manager
      *
      * @param array $mediasUser media list of a user 
      * @param array  $idsMediaType list of id of the mediaTypes we want to have 
-     *
      * @return Media[]
      */
     public function getListMediasForUserForType(array $mediasUser, array $idsMediaType): array
@@ -220,7 +216,7 @@ class MediaManager extends Manager
         $results = [];
         foreach($idsMediaType as $idMediaType){
             foreach($mediasUser as $mediaUser){
-                if($mediaUser->getMediaType_id() ===  $idMediaType){
+                if ($mediaUser->getMediaType_id() ===  $idMediaType) {
                     $results[] =  $mediaUser; 
                 }
             }
@@ -287,7 +283,7 @@ class MediaManager extends Manager
             'id' => $idMedia
         ]);
 
-        if($result === false){
+        if ($result === false) {
             throw new Exception('impossible de d effectuer le changement de statutActif demander sur les medias');
         }
     }
@@ -309,7 +305,7 @@ class MediaManager extends Manager
             'id' => $idMedia
         ]);
 
-        if($result === false){
+        if ($result === false) {
             throw new Exception('impossible de d effectuer le changemenent de post_id demander sur le des medias');
         }
     }

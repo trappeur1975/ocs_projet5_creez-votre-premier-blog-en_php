@@ -9,7 +9,7 @@ ob_start();
                 $compteur = 0;
                 
                 foreach ($listPosts as $post) {
-                    if($compteur == 0){
+                    if ($compteur == 0) {
             ?>
                         <div class="row">
             <?php        
@@ -32,7 +32,7 @@ ob_start();
             <?php       
                     $compteur++;
 
-                    if($compteur == 3){
+                    if ($compteur == 3) {
             ?>
                         </div>  <!-- fin row  -->
             <?php        
@@ -43,5 +43,5 @@ ob_start();
 
 <?php 
 $content = ob_get_clean();
-require('../app/Views/template.php'); 
+require'../app/Views/template.php'; 
 ?>

@@ -42,7 +42,7 @@ class UserManager extends Manager
         $query->setFetchMode(PDO::FETCH_CLASS, User::class);
         $user = $query->fetch();
 
-        if($user === false){
+        if ($user === false) {
             throw new Exception('aucun user ne correspond a cet ID');
         }
         return $user;
@@ -79,7 +79,7 @@ class UserManager extends Manager
             'userType_id' => $user->getUserType_id()
             ]);
 
-        if($result === true){
+        if ($result === true) {
             return $db->lastInsertId();
         } else {
             throw new Exception('impossible d\'enregistrer le user en base de donnee');
@@ -115,7 +115,7 @@ class UserManager extends Manager
             'id' => $user->getId()
         ]);
         
-        if($result === false){
+        if ($result === false) {
             throw new Exception('impossible de modifier le user'.$user->getId());
         }
     }
@@ -135,7 +135,7 @@ class UserManager extends Manager
         $db = $this->dbConnect();
         $query = $db->prepare('DELETE FROM user WHERE id = :id');
         $result = $query->execute(['id' => $id]);
-        if($result === false){
+        if ($result === false) {
             throw new Exception('impossible de supprimer l utilisateur :'.$id);
         }
         sendEmail($emailUser, 'Supression de votre compte sur BlogNico', 'Votre compte user sur le BlogNico a ete SUPPRIMER');
@@ -161,7 +161,7 @@ class UserManager extends Manager
             'idUser' => $idUser
             ]);
 
-        if($result === false){
+        if ($result === false) {
             throw new Exception('impossible de valider le user :'.$idUser);
         }
 
@@ -200,7 +200,7 @@ class UserManager extends Manager
 
         $status = $query->fetch();
 
-        if($status === false){
+        if ($status === false) {
             throw new Exception('aucun user dont vous rechercher le status ne correspond a cet ID');
         }
         return $status;
@@ -219,7 +219,7 @@ class UserManager extends Manager
         $listUsers = $this->getListUsers();
         $method = 'get'.ucfirst($key);
         foreach( $listUsers as $user){
-            if($user->$method() === $data){
+            if ($user->$method() === $data) {
                 $idUserIidenticalData = $user->getId();
                 break;	//to exit the foreach loop 
             }
@@ -233,7 +233,7 @@ class UserManager extends Manager
      *
      * @param string $login
      *
-     * @return void
+     * @return User
      */
     public function findByUserLogin(string $login)
     {
@@ -242,7 +242,7 @@ class UserManager extends Manager
         $query->execute(['login' => $login]);
         $query->setFetchMode(PDO::FETCH_CLASS, User::class);
         $user = $query->fetch();
-        if($user === false){
+        if ($user === false) {
             throw new Exception('aucun user ne correspond a ce login');
         }
         return $user;

@@ -54,7 +54,7 @@ class comment
     /**
      * Get id of the comment
      *
-     * @return  integer
+     * @return integer
      */ 
     public function getId(): ?int
     {
@@ -64,7 +64,7 @@ class comment
     /**
      * Get $comment the comment
      *
-     * @return  string
+     * @return string
      */ 
     public function getComment(): ?string
     {
@@ -88,7 +88,7 @@ class comment
     /**
      * Get $dateCompletion comment creation date
      *
-     * @return  dateTime //voir si cele faite de typer le return en datetime ne pose pas de probleme
+     * @return dateTime //voir si cele faite de typer le return en datetime ne pose pas de probleme
      */ 
     public function getDateCompletion()
     {
@@ -100,7 +100,7 @@ class comment
      *
      * @param  dateTime  $dateCompletion comment creation date
      *
-     * @return  self
+     * @return self
      */ 
     public function setDateCompletion($dateCompletion): self
     // public function setDateCompletion(\DateTime $dateCompletion): self
@@ -113,7 +113,7 @@ class comment
     /**
      * Get $validate comment validation date
      *
-     * @return  DateTime //voir si cele faite de typer le return en datetime ne pose pas de probleme
+     * @return DateTime //voir si cele faite de typer le return en datetime ne pose pas de probleme
      */ 
     public function getValidate()
     {
@@ -125,7 +125,7 @@ class comment
      *
      * @param  DateTime  $validate comment validation date
      *
-     * @return  self
+     * @return self
      */ 
     public function setValidate($validate): self
     {
@@ -137,7 +137,7 @@ class comment
     /**
      * Get $user_id commenter id of the comment
      *
-     * @return  integer
+     * @return integer
      */ 
     public function getUser_id(): ?int
     {
@@ -149,7 +149,7 @@ class comment
      *
      * @param  integer $user_id commenter id of the comment
      *
-     * @return  self
+     * @return self
      */ 
     public function setUser_id($user_id): self
     {
@@ -161,7 +161,7 @@ class comment
     /**
      * Get $poste_id id of the post on which the comment was posted
      *
-     * @return  integer
+     * @return integer
      */ 
     public function getPost_id(): ?int
     {
@@ -173,7 +173,7 @@ class comment
      *
      * @param  integer $poste_id id of the post on which the comment was posted
      *
-     * @return  self
+     * @return self
      */ 
     public function setPost_id($post_id): self
     {

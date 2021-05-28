@@ -27,7 +27,7 @@ class SocialNetworkManager extends Manager
         $authorizedSocialNetworks = searchDatasFile('socialnetwork');   // see globalFunctions.php file 
         $validateSocialNetwork = validateWordInString($authorizedSocialNetworks, $socialNetwork->getUrl());
 
-        if($validateSocialNetwork){
+        if ($validateSocialNetwork) {
             $db = $this->dbConnect();
             
             $query = $db->prepare('INSERT INTO socialnetwork SET url = :url, 
@@ -37,7 +37,7 @@ class SocialNetworkManager extends Manager
                 'user_id' => $socialNetwork->getUser_id()
                 ]);
 
-            if($result === true){
+            if ($result === true) {
                 return $db->lastInsertId();
             } else {
                 throw new Exception('impossible de creer l enregistrement du socialNetwork en base de donne');
@@ -59,7 +59,7 @@ class SocialNetworkManager extends Manager
         $db = $this->dbConnect();
         $query = $db->prepare('DELETE FROM socialnetwork WHERE id = :id');
         $result = $query->execute(['id' => $id]);
-        if($result === false){
+        if ($result === false) {
             throw new Exception('impossible de supprimer le socialNetwork :'.$id);
         }
     }

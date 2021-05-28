@@ -22,7 +22,8 @@ function formatHtml(string $content) {
  *
  * @return void
  */
-function sendEmail(String $recipientEmail, String $title, String $message){
+function sendEmail(String $recipientEmail, String $title, String $message)
+{
     $senderEmail = 'From: '.searchDatasFile('email')[1]; // storage path of the uploader file (see globalFunctions.php file) 
     mail($recipientEmail, $title, $message, $senderEmail);
 }
@@ -38,7 +39,8 @@ function sendEmail(String $recipientEmail, String $title, String $message){
  *
  * @return void
  */
-function sendEmailHtml(String $name, String $email, String $message, String $emailFrom, String $emailTo){
+function sendEmailHtml(String $name, String $email, String $message, String $emailFrom, String $emailTo)
+{
     // Subject
     $subject = 'BlogNico message de '.$name;
 
@@ -78,13 +80,14 @@ function sendEmailHtml(String $name, String $email, String $message, String $ema
      *
      * @return array
      */
-    function searchDatasFile(String $typeDatasSought){
+    function searchDatasFile(String $typeDatasSought)
+    {
         $file = fopen(CONFIGFILE, 'r');
         $datasFind = [];
         while(!feof($file)){
             $line = fgets($file);
             $datas = explode('|', $line);
-            if($datas[0] == $typeDatasSought){
+            if ($datas[0] == $typeDatasSought) {
                 $datasFind = $datas;
                 break;	//to exit the foreach loop 
             }
@@ -102,10 +105,11 @@ function sendEmailHtml(String $name, String $email, String $message, String $ema
      *
      * @return bool
      */
-    function validateData(array $datas, String $dataSought){
+    function validateData(array $datas, String $dataSought)
+    {
         $find = false;
         foreach ($datas as $data){    
-            if($data == $dataSought){
+            if ($data == $dataSought) {
                 $find = true;
                 break;	//to exit the foreach loop 
             }
@@ -125,7 +129,7 @@ function sendEmailHtml(String $name, String $email, String $message, String $ema
     function validateWordInString(array $datas, String $stringCaractere){  
         $find = false;
         foreach($datas as $data){
-            if(strpos($stringCaractere, $data)){
+            if (strpos($stringCaractere, $data)) {
                 $find = true;
                 break;
             }
@@ -156,7 +160,7 @@ function sendEmailHtml(String $name, String $email, String $message, String $ema
      * @return void
      */
     function getFalshErrors(){
-        if(isset($_SESSION['flash'])){
+        if (isset($_SESSION['flash'])) {
             echo('<h4> message info </h4>');
             foreach($_SESSION['flash']['errors'] as $error){
                 echo('<div class="alert alert-'.$_SESSION['flash']['type'].'">

@@ -7,5 +7,5 @@ ob_start();
 header('Location: /post/'.$comment->getPost_id().'?deleteComment=true');
 $content = ob_get_clean(); 
 
-require('../app/Views/template.php'); 
+require'../app/Views/template.php'; 
 ?>

@@ -28,7 +28,7 @@
                             <a href="/listposts" class="nav-link">Les articles</a>
                         </li>
                         <?php   
-                            if(isset($_SESSION['connection']) AND $userLogged->getUserType_id() == 2){ //si on en logger et que l on est un user de status "administrateur"
+                            if (isset($_SESSION['connection']) AND $userLogged->getUserType_id() == 2) { //si on en logger et que l on est un user de status "administrateur"
                         ?>
                             <li class="nav-item">
                                 <a href="/backend/adminPosts" class="nav-link">Articles</a>
@@ -41,7 +41,7 @@
                         ?>
 
                         <?php
-                            if(isset($_SESSION['connection']) AND $userLogged->getUserType_id() == 1 AND !is_null($userLogged->getValidate())){ //si on en logger et que l on est un user de status "abonner"
+                            if (isset($_SESSION['connection']) AND $userLogged->getUserType_id() == 1 AND !is_null($userLogged->getValidate())) { //si on en logger et que l on est un user de status "abonner"
 
                         ?>
                             <li class="nav-item">
@@ -53,7 +53,7 @@
                         
                         <!-- display of certain menu depending on whether user is connected or not to the site  -->
                         <?php
-                            if(!isset($_SESSION['connection']) OR is_null($userLogged->getValidate())){
+                            if (!isset($_SESSION['connection']) OR is_null($userLogged->getValidate())) {
                         ?>
                             <li class="nav-item">
                                 <form action="/backend/connection" method="post"> <!-- for security to prevent me being forcibly connected by sending me this link -->
@@ -140,7 +140,7 @@
 
                             <!-- display of certain menu depending on whether user is connected or not to the site  -->
                             <?php
-                                if(!isset($_SESSION['connection']) OR is_null($userLogged->getValidate())){
+                                if (!isset($_SESSION['connection']) OR is_null($userLogged->getValidate())) {
                             ?>
                                     <form action="/backend/connection" method="post"> <!-- for security to prevent me being forcibly connected by sending me this link -->
                                         <button type ="submit" class="btn btn-primary btn-lg" >Se connecter</button>

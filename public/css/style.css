@@ -1,6 +1,6 @@
 #blog {
-    font-size: 40px;
-    padding-left: 20px;
+  font-size: 40px;
+  padding-left: 20px;
 }
 
 .nav-link {
@@ -8,7 +8,7 @@
 }
 
 h1 {
-   color: #932ab6;
+  color: #932ab6;
 }
 
 h2,
@@ -17,7 +17,7 @@ h2,
 }
 
 form {
-   display: inline;
+  display: inline;
 }
 
 input[type=image] {
@@ -48,7 +48,6 @@ input[type=image] {
 }
 
 #contactForm {
-  padding-top: 50px;
   border: 5px solid;
   border-radius: 10px;
   padding: 10px;

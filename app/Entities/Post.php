@@ -76,7 +76,7 @@ class Post
      * Set the value of title
      * @param string $title title of the post
      * 
-     * @return  self
+     * @return self
      */
     public function setTitle(string $title): self
     {
@@ -97,7 +97,7 @@ class Post
      * Set the value of introduction
      * @param string $introduction post introduction
      * 
-     * @return  self
+     * @return self
      */
     public function setIntroduction(string $introduction): self
     {
@@ -116,7 +116,7 @@ class Post
      * Set the value of content
      * @param string $content content of the post
      *
-     * @return  self
+     * @return self
      */
     public function setContent(string $content): self
     {
@@ -137,7 +137,7 @@ class Post
      * Set the value of dateCreate
      * @param datetime $dateCreate post creation date
      *
-     * @return  self
+     * @return self
      */
     public function setDateCreate(\Datetime $dateCreate): self
     {
@@ -158,7 +158,7 @@ class Post
      * Set the value of datechange
      * @param datetime $datechange post modification date
      *
-     * @return  self
+     * @return self
      */
     public function setDateChange($datechange): self
     {
@@ -179,7 +179,7 @@ class Post
      * Set the value of user_id
      * @param integer $user_id id of the user who created the post
      *
-     * @return  self
+     * @return self
      */
     public function setUser_id(int $user_id): self
     {

@@ -8,7 +8,7 @@ use App\Entities\UserType;
 /**
  * UserTypeManager
  * 
- * manage access to the userType database table
+ * Manage access to the userType database table
  */
 class UserTypeManager extends Manager
 {
@@ -27,7 +27,7 @@ class UserTypeManager extends Manager
         $query->execute(['id' => $id]);
         $query->setFetchMode(PDO::FETCH_CLASS, UserType::class);
         $userType = $query->fetch();
-        if($userType === false){
+        if ($userType === false) {
             throw new Exception('aucun user ne correspond a cet ID');
         }
         return $userType;

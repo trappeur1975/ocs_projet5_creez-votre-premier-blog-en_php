@@ -30,7 +30,7 @@ class SocialNetwork
     /**
      * Get $id id of the SocialNetwork
      *
-     * @return  integer
+     * @return integer
      */ 
     public function getId(): ?int
     {
@@ -40,7 +40,7 @@ class SocialNetwork
     /**
      * Get $url url of the SocialNetwork
      *
-     * @return  string
+     * @return string
      */ 
     public function getUrl(): ?string
     {
@@ -52,7 +52,7 @@ class SocialNetwork
      *
      * @param  string  $url url of the SocialNetwork
      *
-     * @return  self
+     * @return self
      */ 
     public function setUrl(string $url): self
     {
@@ -64,7 +64,7 @@ class SocialNetwork
     /**
      * Get $user_id id of the user to which this socialNetwork belongs
      *
-     * @return  int
+     * @return int
      */ 
     public function getUser_id(): ?int
     {
@@ -76,7 +76,7 @@ class SocialNetwork
      *
      * @param  int  $User_id id of the user to which this socialNetwork belongs
      *
-     * @return  self
+     * @return self
      */ 
     public function setUser_id(int $user_id): self
     {

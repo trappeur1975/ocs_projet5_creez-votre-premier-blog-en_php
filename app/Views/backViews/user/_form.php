@@ -27,7 +27,7 @@
     <?= $formUser->input('password', 'password', 'password') ?>
 
     <button class="btn btn-primary">
-        <?php if($user->getId() !==null):?>
+        <?php if ($user->getId() !==null) :?>
             Modifier
         <?php else:?>
             créer

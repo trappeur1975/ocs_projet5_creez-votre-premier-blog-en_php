@@ -9,7 +9,7 @@ use PDO;
  * manages access to the database
  */
 class Manager // connection a la base de donnee
-{    
+{
     /**
      * Method dbConnect
      *

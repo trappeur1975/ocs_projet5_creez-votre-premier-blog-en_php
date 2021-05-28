@@ -15,5 +15,5 @@ http_response_code(400);
 
 <?php 
     $content = ob_get_clean(); 
-    require('../app/Views/template.php'); 
+    require'../app/Views/template.php'; 
 ?>

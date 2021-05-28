@@ -49,7 +49,7 @@ class CommentManager extends Manager
         $query->execute(['id' => $id]);
         $query->setFetchMode(PDO::FETCH_CLASS, Comment::class);
         $post = $query->fetch();
-        if($post === false){
+        if ($post === false) {
             throw new Exception('aucun comment ne correspond a cet ID');
         }
         return $post;
@@ -76,11 +76,11 @@ class CommentManager extends Manager
             'post_id' => $comment->getPost_id()
             ]);
         
-        if($result === false){
+        if ($result === false) {
             throw new Exception('impossible de creer l enregistrement du nouveau commentaire');
         }  
 
-        if($userComment->getUserType_id() != self::ADMINISTRATEUR){
+        if ($userComment->getUserType_id() != self::ADMINISTRATEUR) {
             sendEmail($userComment->getEmail(), 'commentaire sur BlogNico en attente', 'Votre commentaire sur le BlogNico a bien ete enregistre et est en attente de validation de la part de l\'administrateur du site');
         }
        
@@ -105,10 +105,10 @@ class CommentManager extends Manager
         $query = $db->prepare('DELETE FROM comment WHERE id = :idComment');
         $result = $query->execute(['idComment' => $idComment]);
 
-        if($result === false){
+        if ($result === false) {
             throw new Exception('impossible de supprimer le commentaire :'.$idComment);
         }else {
-            if($userComment->getUserType_id() != self::ADMINISTRATEUR){
+            if ($userComment->getUserType_id() != self::ADMINISTRATEUR) {
                 sendEmail($userComment->getEmail(), 'commentaire #'.$idComment.' sur BlogNico SUPPRIMER', 'Votre commentaire #'.$idComment.' sur le BlogNico a ete supprime');
             }
             
@@ -141,7 +141,7 @@ class CommentManager extends Manager
             'id' => $comment->getId()
         ]);
         
-        if($result === false){
+        if ($result === false) {
             throw new Exception('impossible de modifier le commentaire'.$comment->getId());
         }
     }
@@ -170,8 +170,8 @@ class CommentManager extends Manager
             'idComment' => $idComment
             ]);
       
-        if($result === true){
-            if($userComment->getUserType_id() != self::ADMINISTRATEUR){
+        if ($result === true) {
+            if ($userComment->getUserType_id() != self::ADMINISTRATEUR) {
                 sendEmail($userComment->getEmail(), 'votre commentaire #'.$idComment.' sur BlogNico VALIDER', 'Votre commentaire # '.$idComment.' sur le BlogNico a ete VALIDER part de l\'administrateur du site'); 
             }
             return $comment;

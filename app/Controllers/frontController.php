@@ -30,7 +30,7 @@ use App\Models\SocialNetworkManager;
         } catch (Exception $e) {    //in the event that we request a resource that does not exist (here a post id that does not exist) 
             $errors[] = $e->getMessage();
             setFlashErrors($errors);    // to manage flash message errors (see globalFunctions.php file) 
-            require_once('../app/Views/errors.php');
+            require_once'../app/Views/errors.php';
             return http_response_code(302);
         }
 
@@ -42,17 +42,17 @@ use App\Models\SocialNetworkManager;
         // server processing and display of feedbacks 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') { // if a submission of the form (=> a creation of a user) has been made
             //validation test of the form fields    
-                if(empty($_POST['name']) OR mb_strlen($_POST['name'])<=3){
+                if (empty($_POST['name']) OR mb_strlen($_POST['name'])<=3) {
                     $errors[] = 'Le champ name ne peut être vide et doit contenir plus de 3 caracteres';
                 }
-                if(empty($_POST['email']) OR strpos($_POST['email'], '@') === false){
+                if (empty($_POST['email']) OR strpos($_POST['email'], '@') === false) {
                     $errors[] = 'Le champ email ne peut être vide ou l\'ecriture de votre adresse email est incorrect';
                 }
-                if(empty($_POST['message']) OR mb_strlen($_POST['message'])<=3){
+                if (empty($_POST['message']) OR mb_strlen($_POST['message'])<=3) {
                     $errors[] = 'Le champ lastName ne peut être vide et doit contenir plus de 3 caracteres';
                 }
         
-            if(empty($errors)){ // we send the email 
+            if (empty($errors)) { // we send the email 
                 $emailFrom = searchDatasFile('email')[2];
                 $emailTo = searchDatasFile('email')[1];
                 sendEmailHtml($_POST['name'], $_POST['email'], $_POST['message'], $emailFrom, $emailTo);
@@ -68,7 +68,7 @@ use App\Models\SocialNetworkManager;
             
         }
         
-        require('../app/Views/frontViews/frontHomeView.php');
+        require'../app/Views/frontViews/frontHomeView.php';
 
     }
 
@@ -83,11 +83,11 @@ use App\Models\SocialNetworkManager;
         $postManager = new PostManager();
         $listPosts = $postManager->getListPosts();
 
-        require('../app/Views/frontViews/frontListPostsView.php');
+        require'../app/Views/frontViews/frontListPostsView.php';
     }
 
     /**
-     * function use for road http://localhost:8000/post/1 ou http://localhost:8000/post/2 ou ....
+     * Function use for road http://localhost:8000/post/1 ou http://localhost:8000/post/2 ou ....
      * will display the view frontPostView.php  
      */
     function post($id)
@@ -104,7 +104,7 @@ use App\Models\SocialNetworkManager;
         } catch (Exception $e) {    // in the event that we request a resource that does not exist (here a post id that does not exist) 
             $errors[] = $e->getMessage();
             setFlashErrors($errors);    // to manage flash message errors (see globalFunctions.php file) 
-            require_once('../app/Views/errors.php');
+            require_once'../app/Views/errors.php';
             return http_response_code(302);
         }
 
@@ -129,17 +129,17 @@ use App\Models\SocialNetworkManager;
         if ($_SERVER['REQUEST_METHOD'] === 'POST') { // if a submission of the form (=> a creation of a post) has been made
             
             //validation test of the form fields 
-                if(empty($_POST['comment']) OR mb_strlen($_POST['comment'])<=3){
+                if (empty($_POST['comment']) OR mb_strlen($_POST['comment'])<=3) {
                     $errors[] = 'Le champ commentaire ne peut être vide et doit contenir plus de 3 caracteres';
                 }
             // info recording 
-            if(empty($errors)){
+            if (empty($errors)) {
                 Auth::check(['administrateur','abonner']);    
 
                 $dateTime = new Datetime();
                 $date = $dateTime->format('Y-m-d H:i:s');
                 $validate = null;
-                if($userManager->getUserSatus($_SESSION['connection'])['status'] === 'administrateur'){ //pour valider automatiquement le commentaire si le commentateur a un status "administrateur"
+                if ($userManager->getUserSatus($_SESSION['connection'])['status'] === 'administrateur') { //pour valider automatiquement le commentaire si le commentateur a un status "administrateur"
                     $validate = $date;
                 }
 
@@ -171,7 +171,7 @@ use App\Models\SocialNetworkManager;
             }
         }
         
-        require('../app/Views/frontViews/frontPostView.php');
+        require'../app/Views/frontViews/frontPostView.php';
     }
 
 // USER
@@ -192,13 +192,13 @@ use App\Models\SocialNetworkManager;
         } catch (Exception $e) {    // in the event that we request a resource that does not exist (here an id of the user that does not exist) 
             $errors[] = $e->getMessage();
             setFlashErrors($errors);    // to manage flash message errors (see globalFunctions.php file) 
-            require_once('../app/Views/errors.php');
+            require_once'../app/Views/errors.php';
             return http_response_code(302);
         }
 
         $originalPassword = $user->getPassword();
 
-        if($user->getId() === $_SESSION['connection']){ // we check that the dashboard that the user wishes to view is indeed his own 
+        if ($user->getId() === $_SESSION['connection']) { // we check that the dashboard that the user wishes to view is indeed his own 
 
             // EDIT DU USER DASHBOARD
                 // userDasboard 
@@ -211,7 +211,7 @@ use App\Models\SocialNetworkManager;
                 $listIdsMediaType = [2];  //logo
                 $listLogos = $mediaManager->getListMediasForUserForType($listMediasForUser, $listIdsMediaType); // to retrieve the user's logo 
 
-                if(!empty($listLogos)){
+                if (!empty($listLogos)) {
                     $logoUser = $listLogos[0];
                     $formMediaLogoUser = new Form($logoUser);  // to have in the input field to upload a logo 
                 }
@@ -227,7 +227,7 @@ use App\Models\SocialNetworkManager;
                 $listSocialNetworksForUser = $socialNetworkManager->getListSocialNetworksForUser($id);
                 $listSocialNetworksForUserForSelect =  $socialNetworkManager->listSocialNetworksFormSelect($listSocialNetworksForUser); // we display the list of social networks of the user  
 
-                if(!empty($listSocialNetworksForUser)){
+                if (!empty($listSocialNetworksForUser)) {
                     $socialNetworkForSelect = $listSocialNetworksForUser[0];
                     $formSocialNetworkSelect = new Form($socialNetworkForSelect);
                 }
@@ -241,39 +241,39 @@ use App\Models\SocialNetworkManager;
             if ($_SERVER['REQUEST_METHOD'] === 'POST') { // if a submission of the form (=> a modification of a user) has been made
 
                 //validation test of the form fields 
-                    if(empty($_POST['firstName']) OR mb_strlen($_POST['firstName'])<=3){
+                    if (empty($_POST['firstName']) OR mb_strlen($_POST['firstName'])<=3) {
                         $errors[] = 'Le champ firstName ne peut être vide et doit contenir plus de 3 caracteres';
                     }
-                    if(empty($_POST['lastName']) OR mb_strlen($_POST['lastName'])<=3){
+                    if (empty($_POST['lastName']) OR mb_strlen($_POST['lastName'])<=3) {
                         $errors[] = 'Le champ lastName ne peut être vide et doit contenir plus de 3 caracteres';
                     }
     
-                    if(empty($_POST['email']) OR strpos($_POST['email'], '@') === false){
+                    if (empty($_POST['email']) OR strpos($_POST['email'], '@') === false) {
                         $errors[] = 'Le champ email ne peut être vide ou l\'ecriture de votre adresse email est incorrect';
                     }
                     $idUserIidenticalData1 = $userManager->identicalDataSearch('email', $_POST['email']);
-                    if(!is_null($idUserIidenticalData1) AND $idUserIidenticalData1 != $id) {
+                    if (!is_null($idUserIidenticalData1) AND $idUserIidenticalData1 != $id) {
                         $errors[] = 'Votre email a été déjà utilisé, vous devez en indiquer un autre';
                     }
                 
-                    if(empty($_POST['login']) OR mb_strlen($_POST['login'])<=3){
+                    if (empty($_POST['login']) OR mb_strlen($_POST['login'])<=3) {
                         $errors[] = 'Le champ login ne peut être vide et doit contenir plus de 3 caracteres';
                     }
                     
                     $idUserIidenticalData2 = $userManager->identicalDataSearch('login', $_POST['login']);
-                    if(!is_null($idUserIidenticalData2) AND $idUserIidenticalData2 != $id) {
+                    if (!is_null($idUserIidenticalData2) AND $idUserIidenticalData2 != $id) {
                         $errors[] = 'Votre login a été déjà utilisé, vous devez en indiquer un autre';
                     }
     
-                    if(empty($_POST['password']) OR mb_strlen($_POST['password'])<=3){
+                    if (empty($_POST['password']) OR mb_strlen($_POST['password'])<=3) {
                         $errors[] = 'Le champ password ne peut être vide et doit contenir plus de 3 caracteres';
                     }
                 
                 // info recording 
-                if(empty($errors)){
+                if (empty($errors)) {
                 
                     // the password is re-hashed only if it has been modified by the user 
-                    if($originalPassword !== $_POST['password']){
+                    if ($originalPassword !== $_POST['password']) {
                         $hashPsswords = hash('md5', $_POST['password']);
                     } else {
                         $hashPsswords = $_POST['password'];
@@ -295,7 +295,7 @@ use App\Models\SocialNetworkManager;
                     }
 
                     // bdd recording of the media logo and the uploader file on the server in the media folder 
-                    if(isset($_FILES['mediaUploadLogo']) AND $_FILES['mediaUploadLogo']['error']== 0){
+                    if (isset($_FILES['mediaUploadLogo']) AND $_FILES['mediaUploadLogo']['error']== 0) {
                         
                         // info variables 
                         $idMediaType = 2;   //logo
@@ -312,7 +312,7 @@ use App\Models\SocialNetworkManager;
                         $listMediasForUser = $mediaManager->getListMediasForUser($id);
                         $listLogosDelete = $mediaManager->getListMediasForUserForType($listMediasForUser, $listIdsMediaType);   // we retrieve the list of user logos 
                     
-                        if(!empty($listLogosDelete)){
+                        if (!empty($listLogosDelete)) {
                             foreach($listLogosDelete as $logo){
                                 try{
                                     unlink($logo->getPath());  // delete media on the server in the media folder 
@@ -341,7 +341,7 @@ use App\Models\SocialNetworkManager;
 
                     // saving in socialNetwork database of changes made in editUser ()  
                         // deletion of the user's social network (s) 
-                        if(!empty($_POST['socialNetworksUser'])){ 
+                        if (!empty($_POST['socialNetworksUser'])) { 
                             foreach($_POST['socialNetworksUser'] as $idSsocialNetwork){
                                 try
                                 {
@@ -355,7 +355,7 @@ use App\Models\SocialNetworkManager;
                         }
                         
                         // adding a socialNetwork to the user 
-                        if(!empty($_POST['socialNetwork'])){
+                        if (!empty($_POST['socialNetwork'])) {
                             $socialNetwork
                                 ->setUrl($_POST['socialNetwork'])
                                 ->setUser_id($id)
@@ -383,7 +383,7 @@ use App\Models\SocialNetworkManager;
                     return http_response_code(302);
                 }
             } 
-            require('../app/Views/frontViews/frontUserFrontDashboardView.php');
+            require'../app/Views/frontViews/frontUserFrontDashboardView.php';
         }else {
             $errors[] = 'impossible d\'afficher ce dashboard, il ne vous appartient pas';
             setFlashErrors($errors);    // to manage flash message errors (see globalFunctions.php file) 
@@ -399,7 +399,7 @@ use App\Models\SocialNetworkManager;
     function createUserFront()
     {
         // creation of a session to be able in particular to display flash messages 
-        if(session_status() === PHP_SESSION_NONE){
+        if (session_status() === PHP_SESSION_NONE) {
             session_start();
         }
 
@@ -426,35 +426,35 @@ use App\Models\SocialNetworkManager;
             $errors = [];
             
             //test de validation des champs du formulaire
-                if(empty($_POST['firstName']) OR mb_strlen($_POST['firstName'])<=3){
+                if (empty($_POST['firstName']) OR mb_strlen($_POST['firstName'])<=3) {
                     $errors[] = 'Le champ firstName ne peut être vide et doit contenir plus de 3 caracteres';
                 }
-                if(empty($_POST['lastName']) OR mb_strlen($_POST['lastName'])<=3){
+                if (empty($_POST['lastName']) OR mb_strlen($_POST['lastName'])<=3) {
                     $errors[] = 'Le champ lastName ne peut être vide et doit contenir plus de 3 caracteres';
                 }
 
-                if(empty($_POST['email']) OR strpos($_POST['email'], '@') === false){
+                if (empty($_POST['email']) OR strpos($_POST['email'], '@') === false) {
                     $errors[] = 'Le champ email ne peut être vide ou l\'ecriture de votre adresse email est incorrect';
                 }
                 $idUserIidenticalData1 = $userManager->identicalDataSearch('email', $_POST['email']);
-                if(!is_null($idUserIidenticalData1)) {
+                if (!is_null($idUserIidenticalData1)) {
                     $errors[] = 'Votre email a été déjà utilisé, vous devez en indiquer un autre';
                 }
             
-                if(empty($_POST['login']) OR mb_strlen($_POST['login'])<=3){
+                if (empty($_POST['login']) OR mb_strlen($_POST['login'])<=3) {
                     $errors[] = 'Le champ login ne peut être vide et doit contenir plus de 3 caracteres';
                 }
                 
                 $idUserIidenticalData2 = $userManager->identicalDataSearch('login', $_POST['login']);
-                if(!is_null($idUserIidenticalData2)) {
+                if (!is_null($idUserIidenticalData2)) {
                     $errors[] = 'Votre login a été déjà utilisé, vous devez en indiquer un autre';
                 }
 
-                if(empty($_POST['password']) OR mb_strlen($_POST['password'])<=3){
+                if (empty($_POST['password']) OR mb_strlen($_POST['password'])<=3) {
                     $errors[] = 'Le champ password ne peut être vide et doit contenir plus de 3 caracteres';
                 }
             
-            if(empty($errors)){
+            if (empty($errors)) {
                 
                 // on hache le mot de passe
                 $hashPsswords = hash('md5', $_POST['password']);
@@ -477,7 +477,7 @@ use App\Models\SocialNetworkManager;
                 }
 
                 // enregistrement en bdd du media logo et du fichier uploader sur le server dans le dossier media
-                if(isset($_FILES['mediaUploadLogo']) AND $_FILES['mediaUploadLogo']['error']== 0){
+                if (isset($_FILES['mediaUploadLogo']) AND $_FILES['mediaUploadLogo']['error']== 0) {
                     
                     // variables infos
                     $idMediaType = 2;   //logo
@@ -507,7 +507,7 @@ use App\Models\SocialNetworkManager;
                 }
                 
                 // enregistrement en bdd du socialNetwork
-                if(!empty($_POST['socialNetwork'])){
+                if (!empty($_POST['socialNetwork'])) {
                     
                     $socialNetwork
                         ->setUrl($_POST['socialNetwork'])
@@ -539,7 +539,7 @@ use App\Models\SocialNetworkManager;
             }
         }
         
-        require('../app/Views/frontViews/createUserFront.php');
+        require'../app/Views/frontViews/createUserFront.php';
     }
 
     /**
@@ -559,17 +559,17 @@ use App\Models\SocialNetworkManager;
         } catch (Exception $e) {    // in the event that we request a resource that does not exist (here an id of the user that does not exist) 
             $errors[] = $e->getMessage();
             setFlashErrors($errors);    // to manage flash message errors (see globalFunctions.php file) 
-            require_once('../app/Views/errors.php');
+            require_once'../app/Views/errors.php';
             return http_response_code(302);
         }
 
-        if($user->getId() === $_SESSION['connection']){ // we check that the user we want to delete corresponds to the user connected to the site 
+        if ($user->getId() === $_SESSION['connection']) { // we check that the user we want to delete corresponds to the user connected to the site 
             
             // deletion of all user comments from the database 
             $commentManager = new CommentManager();
             $listCommentsDelete = $commentManager->listCommentsForUser($id);
 
-            if($listCommentsDelete !== []){
+            if ($listCommentsDelete !== []) {
                 foreach($listCommentsDelete as $comment){
                     try{
                         $commentManager->deleteComment($comment->getId());    // deletion from the database
@@ -583,7 +583,7 @@ use App\Models\SocialNetworkManager;
             $mediaManager = new MediaManager();
             $listMedias = $mediaManager->getListMediasForUser($id); // we retrieve the list of user logos 
 
-            if(!empty($listMedias)){
+            if (!empty($listMedias)) {
                 foreach($listMedias as $media){
                     try{
                         unlink($media->getPath());  // delete media on the server in the media folder 
@@ -598,7 +598,7 @@ use App\Models\SocialNetworkManager;
             $socialNetworkManager = new SocialNetworkManager();
             $listSocialNetworksForUserDelete = $socialNetworkManager->getListSocialNetworksForUser($id);
             
-            if(!empty($listSocialNetworksForUserDelete)){
+            if (!empty($listSocialNetworksForUserDelete)) {
                 foreach($listSocialNetworksForUserDelete as $socialnetwork){
                     try
                     {
@@ -615,13 +615,13 @@ use App\Models\SocialNetworkManager;
             $postManager = new PostManager();
             $listPostsForUser = $postManager->getListPostsForUser($id);
 
-            if(!empty($listPostsForUser)){
+            if (!empty($listPostsForUser)) {
                 foreach($listPostsForUser as $post){    // deletion of all posts (and their associated media) from the user 
                     
                     // we delete the media linked to the post (if there is any) 
                     $listMediasDelete =  $mediaManager->getListMediasForPost($post->getId());// we get the media list for this $ post 
 
-                    if($listMediasDelete !== []){
+                    if ($listMediasDelete !== []) {
                         foreach($listMediasDelete as $media){
                             try{
                                 unlink($media->getPath());  // delete media on the server in the media folder 
@@ -635,7 +635,7 @@ use App\Models\SocialNetworkManager;
                     // we delete the comments linked to the post (if there are any) 
                     $listCommentsDelete =  $commentManager->getListCommentsForPost($post->getId());// we get the list of comments for this $ post 
                     
-                    if($listCommentsDelete !== []){
+                    if ($listCommentsDelete !== []) {
                         foreach($listCommentsDelete as $comment){
                             try{
                                 $commentManager->deleteComment($comment->getId());    // deletion from the database 
@@ -665,7 +665,7 @@ use App\Models\SocialNetworkManager;
            
             setFlashErrors($errors);    // to manage flash message errors (see globalFunctions.php file) 
 
-            require('../app/Views/frontViews/frontDeleteUserView.php');
+            require'../app/Views/frontViews/frontDeleteUserView.php';
         }else {
             $errors[] = 'impossible de supprimer ce user, vous n\'en avait pas le droit';
             setFlashErrors($errors);    // to manage flash message errors (see globalFunctions.php file) 
@@ -693,23 +693,23 @@ use App\Models\SocialNetworkManager;
         } catch (Exception $e) {    //in the event that we request a resource that does not exist (here an id of how that does not exist) 
             $errors[] = $e->getMessage();
             setFlashErrors($errors);    // to manage flash message errors (see globalFunctions.php file) 
-            require_once('../app/Views/errors.php');
+            require_once'../app/Views/errors.php';
             return http_response_code(302);
         }
 
-        if($comment->getUser_id() === $_SESSION['connection']){ // we check that the comment that the user wishes to modify belongs to him 
+        if ($comment->getUser_id() === $_SESSION['connection']) { // we check that the comment that the user wishes to modify belongs to him 
 
             $formComment = new Form($comment, true);
 
-            if($_SERVER['REQUEST_METHOD'] === 'POST') { // if a submission of the form (=> a modification of a comment) has been made
+            if ($_SERVER['REQUEST_METHOD'] === 'POST') { // if a submission of the form (=> a modification of a comment) has been made
                 
                 // validation test of the form fields 
-                if(empty($_POST['comment']) OR mb_strlen($_POST['comment'])<=3){
+                if (empty($_POST['comment']) OR mb_strlen($_POST['comment'])<=3) {
                     $errors[] = 'Le champ commentaire ne peut être vide et doit contenir plus de 3 caracteres';
                 }
 
                 // info recording 
-                if(empty($errors)){
+                if (empty($errors)) {
                     // save comment changes 
                     if (!empty($_POST['comment'])){
                         $comment->setComment($_POST['comment']);
@@ -733,7 +733,7 @@ use App\Models\SocialNetworkManager;
                     return http_response_code(302);
                 }
             }
-            require('../app/Views/frontViews/frontEditCommentPostView.php');
+            require'../app/Views/frontViews/frontEditCommentPostView.php';
         }else {
             $errors[] = 'impossible de modifier le commentaire :'.$comment->getId().'par le user :'.$_SESSION['connection'];
             setFlashErrors($errors);
@@ -761,18 +761,18 @@ use App\Models\SocialNetworkManager;
         } catch (Exception $e) {    // in the event that we request a resource that does not exist (here an id of how that does not exist) 
             $errors[] = $e->getMessage();
             setFlashErrors($errors);    // to manage flash message errors (see globalFunctions.php file) 
-            require_once('../app/Views/errors.php');
+            require_once'../app/Views/errors.php';
             return http_response_code(302);
         }
         
-        if($comment->getUser_id() === $_SESSION['connection']){ // we check that the comment that the user wishes to modify belongs to him 
+        if ($comment->getUser_id() === $_SESSION['connection']) { // we check that the comment that the user wishes to modify belongs to him 
             try{
                 $comment = $commentManager->deleteComment($id);
             } catch (Exception $e) {
                 $errors[] = $e->getMessage();
             }  
 
-            require('../app/Views/frontViews/frontDeleteCommentPostView.php');
+            require'../app/Views/frontViews/frontDeleteCommentPostView.php';
         }else {
             $errors[] = 'impossible de supprimer le commentaire :'.$comment->getId().' par le user :'.$_SESSION['connection'];
             setFlashErrors($errors);

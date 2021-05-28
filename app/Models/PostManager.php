@@ -8,7 +8,7 @@ use Exception;
 /**
  * PostManager
  * 
- * manage access to the post database table
+ * Manage access to the post database table
  */
 class PostManager extends Manager
 {
@@ -40,7 +40,7 @@ class PostManager extends Manager
         $query->execute(['id' => $id]);
         $query->setFetchMode(PDO::FETCH_CLASS, Post::class);
         $post = $query->fetch();
-        if($post === false){
+        if ($post === false) {
             throw new Exception('aucun post ne correspond a cet ID');
         }
         return $post;
@@ -51,7 +51,7 @@ class PostManager extends Manager
      *
      * @param Post $post
      *
-     * @return void
+     * @return int
      */
     public function addPost(Post $post)
     {
@@ -71,7 +71,7 @@ class PostManager extends Manager
             'user_id' => $post->getUser_id()
             ]);
 
-        if($result === true){
+        if ($result === true) {
             return $db->lastInsertId();
         } else {
             throw new Exception('impossible d\'enregistrer le post en base de donnee');
@@ -95,7 +95,8 @@ class PostManager extends Manager
                                                 dateCreate = :dateCreate,
                                                 dateChange = :dateChange,
                                                 user_id = :user_id
-                            WHERE id = :id');
+                                WHERE id = :id'
+                            );
         $result = $query->execute([
             'title' => $post->getTitle(),
             'introduction' => $post->getIntroduction(),
@@ -106,7 +107,7 @@ class PostManager extends Manager
             'id' => $post->getId()
         ]);
         
-        if($result === false){
+        if ($result === false) {
             throw new Exception('impossible de modifier le post'.$post->getId());
         }
     }
@@ -123,7 +124,7 @@ class PostManager extends Manager
         $db = $this->dbConnect();
         $query = $db->prepare('DELETE FROM post WHERE id = :id');
         $result = $query->execute(['id' => $id]);
-        if($result === false){
+        if ($result === false) {
             throw new Exception('impossible de supprimer le post :'.$id.'peut être il n\'existe pas');
         }
     }
@@ -136,7 +137,6 @@ class PostManager extends Manager
      *
      * @return Post[]
      */
-
     public function getListPostsForUser(int $idUser): array
     {
         $db = $this->dbConnect();

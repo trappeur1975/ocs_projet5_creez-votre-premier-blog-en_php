@@ -26,7 +26,7 @@
         <?= $formMediaUploadVideo->input('alt', 'altFileMediaVideo', 'texte alternatif du media VIDEO uploader') ?>    <!-- for the creation of the input of the alt text of the media video -->
 
     <button class="btn btn-primary">
-        <?php if($post->getId() !==null):?>
+        <?php if ($post->getId() !==null) :?>
             Modifier
         <?php else:?>
             créer

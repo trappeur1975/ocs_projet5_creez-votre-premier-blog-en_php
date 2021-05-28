@@ -5,14 +5,14 @@ ob_start();
     <h1>page de connexion au backend du site</h1>
     
     <!-- to manage the case where users (not identified) on the site wish to access content where they must be logged in (see the "check ()" function of the "Auth" class  -->
-     <?php  if(isset($_GET['badConnection'])): ?> 
+     <?php  if (isset($_GET['badConnection'])) : ?> 
         <div class="alert alert-danger">
             vous n'étes identifié sur le site ou votre statut ne vous autorise pas a acceder à la fonctionnalité ou à la partie du site que vous demandez
         </div>
     <?php endif ?>
 
     <!--  handle connection error messages  -->
-    <?php  if($error != null): ?> 
+    <?php  if ($error != null) : ?> 
         <div class="alert alert-danger">
             <?php echo $error; ?>
         </div>
@@ -28,5 +28,5 @@ ob_start();
 
 <?php 
 $content = ob_get_clean(); 
-require('../app/Views/template.php'); 
+require'../app/Views/template.php'; 
 ?>

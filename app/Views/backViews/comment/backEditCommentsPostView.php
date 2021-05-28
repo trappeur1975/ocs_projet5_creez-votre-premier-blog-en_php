@@ -9,19 +9,19 @@ ob_start();
 
 <!-- start the labels on the state of the comment of the post   -->
     <!-- to manage the display of the success or not of the comment of a post -->
-    <?php  if(isset($_GET['deleteComment'])and($_GET['deleteComment'])==='true'): ?>
+    <?php  if (isset($_GET['deleteComment'])and($_GET['deleteComment'])==='true') : ?>
             <div class="alert alert-success">
                 le commentaire a bien été supprimer.
             </div>
-        <?php elseif(isset($_GET['deleteComment'])and($_GET['deleteComment'])==='false'): ?>
+        <?php elseif (isset($_GET['deleteComment'])and($_GET['deleteComment'])==='false') : ?>
             <div class="alert alert-danger">
                 le commentaire n'a pu être supprimer.
             </div>
-        <?php  elseif(isset($_GET['validateComment'])and($_GET['validateComment'])==='true'): ?>
+        <?php  elseif (isset($_GET['validateComment'])and($_GET['validateComment'])==='true') : ?>
             <div class="alert alert-success">
                 le commentaire a bien été validé.
             </div>
-        <?php elseif(isset($_GET['validateComment'])and($_GET['validateComment'])==='false'): ?>
+        <?php elseif (isset($_GET['validateComment'])and($_GET['validateComment'])==='false') : ?>
             <div class="alert alert-danger">
                 le commentaire n'a pu être validé.
             </div>     
@@ -62,7 +62,7 @@ ob_start();
 
                     <td <?=($comment->getValidate()) !== null ? 'class = "validate"' : 'class = "noValidate"';?> >
                         <?php
-                            if($comment->getValidate() !== null){
+                            if ($comment->getValidate() !== null) {
                                 echo $comment->getValidate();
                             } else {
                                 echo "en attente de validation";
@@ -87,5 +87,5 @@ ob_start();
 
 <?php 
 $content = ob_get_clean(); 
-require('../app/Views/template.php'); 
+require'../app/Views/template.php';
 ?>

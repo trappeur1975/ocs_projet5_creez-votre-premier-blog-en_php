@@ -27,7 +27,6 @@ class Form
      * @param string $key
      * @param string $label
      * @param string $title
-     *
      * @return string
      */
     public function input(string $key, string $label, string $title): string
@@ -49,7 +48,6 @@ HTML;
      * @param string $id
      * @param string $label
      * @param string $title
-     *
      * @return string
      */
     public function inputFile(string $id, string $label, string $title): string
@@ -69,7 +67,6 @@ HTML;
      * @param string $alt
      * @param string $label
      * @param string $title
-     *
      * @return string
      */
     public function inputImage(Media $logo, string $alt, string $label, string $title): string
@@ -89,7 +86,6 @@ HTML;
      *
      * @param string $key
      * @param string $label
-     *
      * @return string
      */
     public function textarea(string $key, string $label): string
@@ -110,7 +106,6 @@ HTML;
      * @param string $label
      * @param string $title
      * @param array $options
-     *
      * @return string
      */
     public function selectSimple(string $key, string $label, string $title, array $options=[]): ?string
@@ -150,7 +145,6 @@ HTML;
      * @param string $title
      * @param array $options
      * @param array $selects so that we can retrieve the list (eg media specific to a post) to then manage the attributes 
-     *
      * @return string
      */
     public function selectMultiple(string $key, string $label, string $title, array $options=[], array $selects): ?string
@@ -194,7 +188,7 @@ HTML;
     {
         $method = 'get'.ucfirst($key);
         $value = $this->data->$method();
-        if($value instanceof \DateTimeInterface){
+        if ($value instanceof \DateTimeInterface) {
            return  $value->format('Y-m-d H:i:s');
         }
 

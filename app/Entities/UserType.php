@@ -24,7 +24,7 @@ class UserType
     /** 
      * Get $id id of the userType
      *
-     * @return  integer
+     * @return integer
      */ 
     public function getId(): ?int
     {
@@ -34,7 +34,7 @@ class UserType
     /**
      * Get $status status of the userType
      * 
-     * @return  string
+     * @return string
      */ 
     public function getStatus(): ?string
     {
@@ -46,7 +46,7 @@ class UserType
      *
      * @param  string  $status status of the userType
      *
-     * @return  self
+     * @return self
      */ 
     public function setStatus(string $status): self
     {

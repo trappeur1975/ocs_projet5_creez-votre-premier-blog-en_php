@@ -4,7 +4,7 @@ ob_start();
 ?>
         
 <!-- label if the post was successfully deleted  -->
-    <?php  if(isset($_GET['delete'])): ?>
+    <?php  if (isset($_GET['delete'])): ?>
         <div class="alert alert-success">
             le post a bien été supprimé.
         </div>
@@ -56,5 +56,5 @@ ob_start();
 
 <?php 
 $content = ob_get_clean(); 
-require('../app/Views/template.php'); 
+require'../app/Views/template.php'; 
 ?>
