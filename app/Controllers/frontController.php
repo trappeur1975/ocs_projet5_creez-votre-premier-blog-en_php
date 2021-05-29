@@ -114,7 +114,9 @@ use App\Models\SocialNetworkManager;
         
         // media
         $mediaManager= new MediaManager();
-        $listMediasForPost = $mediaManager->getListMediasForPost($id);
+        $listMediasImage = $mediaManager->listMediasActifForPostForTypeMedia($id, 1);
+        $listMediasVideo = $mediaManager->listMediasActifForPostForTypeMedia($id, 3);
+        // $listMediasForPost = $mediaManager->getListMediasActifForPost($id);
 
         // comment
         $commentManager = new CommentManager();

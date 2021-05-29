@@ -14,20 +14,20 @@ Ce code c'est inspiré fortement des tutorielles suivants :
     https://openclassrooms.com/fr/courses/1665806-programmez-en-oriente-objet-en-php
 
 ----------------- info utile pour le developpement ----------------
- 1) php doc 
+1) php doc 
     https://docs.phpdoc.org/3.0/guide/references/phpdoc/tags/index.html
     https://docs.phpdoc.org/3.0/guide/guides/types.html
 
- 2) composer
+2) composer
     lien librairies pour composer : https://packagist.org/
     commande pour relancer l autoloader : composer dump-autoload
     commande pour supprimer un package composer remove vendor/package
 
 ----------------- librairie utiliser via composer ----------------
- 1) autoload
+1) autoload
     un autoloader
 
- 2) AltoRouter
+2) AltoRouter
     un routeur
 
     https://packagist.org/packages/altorouter/altorouter
@@ -39,7 +39,7 @@ Ce code c'est inspiré fortement des tutorielles suivants :
             post($id, $nom);
         });
 
- 3) var-dumper (juste pour le developpement)
+3) var-dumper (juste pour le developpement)
 
     https://packagist.org/packages/symfony/var-dumper
 
@@ -50,11 +50,11 @@ Ce code c'est inspiré fortement des tutorielles suivants :
 ----------------- gestion des email ----------------
 pour tester l'envoi des email un serveur de email ("MailDev) en local a été utilisé
 
- 1) pour l'installer (utilise nodejs => installer nodejs auparavant sur sa machine)
+1) pour l'installer (utilise nodejs => installer nodejs auparavant sur sa machine)
     npm install -g maildev # Utilisez sudo si nécessaire
     maildev
 
- 2) configurer wampserver
+2) configurer wampserver
     ce serveur SMTP fonctionnant sur le port 1025.
     il faut doncmodifier le fichier php.ini
 
@@ -63,14 +63,14 @@ pour tester l'envoi des email un serveur de email ("MailDev) en local a été ut
         smtp_port = 1025
 
     ne pas oublier de relancer apache/wamp
- 3) pour le lancer
+3) pour le lancer
     executer la commande suicante dans l invité commande
     maildev
     
     puis dans le navigateur aller a l adresse suivante
     http://localhost:1080
 
- 4) pour tester le service on peut envoyer un email depuis un fichier php
+4) pour tester le service on peut envoyer un email depuis un fichier php
 
         mail('destinataireEmail@societe.fr', 'titre du email', 'message du email', 'From: emailExpediteur@societe.com');
 
@@ -79,4 +79,4 @@ pour lancer le serveur php via la console avec pour dossier racine "public" exec
 
     php -S localhost:8000 -t public
 
-dernier modif 28/05/2021 version2
+dernier modif 29/05/2021 version1

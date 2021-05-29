@@ -265,7 +265,55 @@ class MediaManager extends Manager
         
         return $results;
     }
+
+    /**
+     * Method getListMediasActifForPost method to retrieve the media (having an active status) of the function getListMediasForPost (Post $ post) of this class 
+     *
+     * @param int $idPost
+     *
+     * @return Media[]
+     */
+    public function getListMediasActifForPost(int $idPost): array
+    {
+        $medias = $this->getListMediasForPost($idPost);
+    
+        $results = [];
+        
+        foreach($medias as $media){
+            // we record the media id of the author of the post to highlight them if it is media are in "active status = true" 
+            if ($media->getStatutActif() === true){
+                $results[] = $media; 
+            }
+            
+        }
+        
+        return $results;
+    }
   
+    /**
+     * Method getListMediasActifForPost method to retrieve the media (having an active status) for a media type 
+     *
+     * @param int $idPost
+     * @param int $mediaType
+     * @return Media[]
+     */
+    public function listMediasActifForPostForTypeMedia(int $idPost, int $mediaType): array
+    {
+        $medias = $this->getListMediasActifForPost($idPost);
+    
+        $results = [];
+        
+        foreach($medias as $media){
+            if ($media->getMediaType_id() === $mediaType){
+                $results[] = $media; 
+            }
+        }
+        
+        return $results;
+    }
+
+
+
     /**
      * Method updateStatutActifMedia method to change the Active status of a media 
      *
